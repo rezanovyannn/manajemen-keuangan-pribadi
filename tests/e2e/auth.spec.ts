@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-for (const path of ["/beranda", "/transaksi", "/budget", "/profil"]) {
+for (const path of ["/beranda", "/transaksi", "/akun", "/budget", "/profil"]) {
   test(`${path} mengarahkan tamu ke /masuk`, async ({ page }) => {
     await page.goto(path);
     await expect(page).toHaveURL(new RegExp(`/masuk\\?next=${encodeURIComponent(path)}$`));

@@ -1,4 +1,4 @@
-import { ArrowLeftRight, CircleUser, House, PiggyBank, type LucideIcon } from "lucide-react";
+import { ArrowLeftRight, CircleUser, House, PiggyBank, Wallet, type LucideIcon } from "lucide-react";
 
 export type NavItem = { href: string; label: string; Icon: LucideIcon };
 
@@ -6,6 +6,7 @@ export type NavItem = { href: string; label: string; Icon: LucideIcon };
 export const NAV_ITEMS: NavItem[] = [
   { href: "/beranda", label: "Beranda", Icon: House },
   { href: "/transaksi", label: "Transaksi", Icon: ArrowLeftRight },
+  { href: "/akun", label: "Akun", Icon: Wallet },
   { href: "/budget", label: "Budget", Icon: PiggyBank },
   { href: "/profil", label: "Profil", Icon: CircleUser },
 ];
