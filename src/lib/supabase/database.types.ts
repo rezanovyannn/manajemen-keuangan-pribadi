@@ -3,8 +3,11 @@
 //   npx supabase gen types typescript --linked > src/lib/supabase/database.types.ts
 // Setiap migrasi yang mengubah tabel wajib memperbarui file ini.
 
+import type { TransactionType } from "@/lib/money/balance";
+
 export type AccountType = "cash" | "bank" | "ewallet";
 export type CategoryType = "income" | "expense";
+export type { TransactionType };
 
 type Timestamps = { created_at: string; updated_at: string };
 
@@ -32,6 +35,27 @@ type CategoryRow = {
   archived_at: string | null;
 } & Timestamps;
 
+type TransactionRow = {
+  id: string;
+  user_id: string;
+  account_id: string;
+  category_id: string | null;
+  type: TransactionType;
+  category_type: CategoryType | null;
+  amount: number;
+  occurred_on: string; // YYYY-MM-DD
+  note: string | null;
+  transfer_id: string | null;
+} & Timestamps;
+
+type TransferArgs = {
+  p_from_account_id: string;
+  p_to_account_id: string;
+  p_amount: number;
+  p_occurred_on: string;
+  p_note?: string | null;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -55,9 +79,21 @@ export type Database = {
         Update: Partial<Omit<CategoryRow, "id" | "user_id">>;
         Relationships: [];
       };
+      transactions: {
+        Row: TransactionRow;
+        // Insert/update langsung hanya untuk income/expense (RLS); transfer lewat Functions.
+        Insert: Pick<TransactionRow, "account_id" | "type" | "amount"> &
+          Partial<Omit<TransactionRow, "id" | "category_type" | "account_id" | "type" | "amount">>;
+        Update: Partial<Omit<TransactionRow, "id" | "user_id" | "category_type" | "transfer_id">>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
-    Functions: { [_ in never]: never };
+    Functions: {
+      create_transfer: { Args: TransferArgs; Returns: string };
+      update_transfer: { Args: TransferArgs & { p_transfer_id: string }; Returns: undefined };
+      delete_transfer: { Args: { p_transfer_id: string }; Returns: undefined };
+    };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };
