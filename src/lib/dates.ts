@@ -58,3 +58,68 @@ export function formatBulan(month: string): string {
     new Date(Date.UTC(y, m - 1, 1)),
   );
 }
+
+// Tambah/kurangi hari pada "YYYY-MM-DD".
+export function addDays(date: string, days: number): string {
+  const [y, m, d] = date.split("-").map(Number) as [number, number, number];
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
+}
+
+// --- Periode dashboard ---
+
+export type PeriodKey = "bulan-ini" | "bulan-lalu" | "kustom";
+
+export type Period = {
+  key: PeriodKey;
+  start: string; // inklusif
+  end: string; // eksklusif
+  from: string; // inklusif, untuk tampilan/form
+  to: string; // inklusif, untuk tampilan/form
+  label: string;
+  invalid?: boolean; // input kustom tidak valid -> jatuh ke bulan ini
+};
+
+export const BATAS_HARI_KUSTOM = 366;
+
+function periodeBulan(key: "bulan-ini" | "bulan-lalu", month: string): Period {
+  const { start, end } = monthRange(month);
+  return { key, start, end, from: start, to: addDays(end, -1), label: formatBulan(month) };
+}
+
+export function resolvePeriod(
+  params: { periode?: string; dari?: string; sampai?: string },
+  today: string = todayInJakarta(),
+): Period {
+  const bulanIni = today.slice(0, 7);
+  if (params.periode === "bulan-lalu") return periodeBulan("bulan-lalu", shiftMonth(bulanIni, -1));
+  if (params.periode === "kustom") {
+    const { dari = "", sampai = "" } = params;
+    const valid =
+      isValidDateString(dari) &&
+      isValidDateString(sampai) &&
+      dari <= sampai &&
+      addDays(dari, BATAS_HARI_KUSTOM) > sampai;
+    if (!valid) return { ...periodeBulan("bulan-ini", bulanIni), invalid: true };
+    return {
+      key: "kustom",
+      start: dari,
+      end: addDays(sampai, 1),
+      from: dari,
+      to: sampai,
+      label: `${formatTanggal(dari)} – ${formatTanggal(sampai)}`,
+    };
+  }
+  return periodeBulan("bulan-ini", bulanIni);
+}
+
+// Daftar n bulan berakhir di `lastMonth`, urut lama -> baru.
+export function lastMonths(lastMonth: string, n: number): string[] {
+  return Array.from({ length: n }, (_, i) => shiftMonth(lastMonth, i - (n - 1)));
+}
+
+// "2026-10" -> "Okt 26" (label sumbu grafik)
+export function formatBulanPendek(month: string): string {
+  const [y, m] = month.split("-").map(Number) as [number, number];
+  const bulan = new Intl.DateTimeFormat("id-ID", { timeZone: "UTC", month: "short" }).format(new Date(Date.UTC(y, m - 1, 1)));
+  return `${bulan} ${String(y).slice(2)}`;
+}

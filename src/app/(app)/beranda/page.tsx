@@ -2,22 +2,35 @@ import { TriangleAlert } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { PageHeader, SegeraHadir } from "@/components/page-header";
+import { FormAlert } from "@/components/auth/form-field";
+import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown";
+import { PeriodPicker } from "@/components/dashboard/period-picker";
+import { SummaryTiles } from "@/components/dashboard/summary-tiles";
+import { TrendChart } from "@/components/dashboard/trend-chart";
+import { PageHeader } from "@/components/page-header";
 import { AddTransactionButton } from "@/components/transactions/add-button";
 import { requireUser } from "@/lib/auth/session";
 import { loadMonthBudgets } from "@/lib/budgets/query";
-import { currentMonthInJakarta } from "@/lib/dates";
+import { BULAN_TREN, loadDashboard } from "@/lib/dashboard/query";
+import { currentMonthInJakarta, resolvePeriod } from "@/lib/dates";
 import { countBudgetAlerts } from "@/lib/money";
 
 export const metadata: Metadata = { title: "Beranda · Keuangan Pribadi" };
 
-export default async function BerandaPage() {
-  const { supabase, user } = await requireUser();
-  const month = currentMonthInJakarta();
+function teks(v: string | string[] | undefined) {
+  return typeof v === "string" ? v : undefined;
+}
 
-  const [{ data: profile }, budgets] = await Promise.all([
+export default async function BerandaPage({ searchParams }: PageProps<"/beranda">) {
+  const sp = await searchParams;
+  const period = resolvePeriod({ periode: teks(sp.periode), dari: teks(sp.dari), sampai: teks(sp.sampai) });
+  const month = currentMonthInJakarta();
+  const { supabase, user } = await requireUser();
+
+  const [{ data: profile }, budgets, dash] = await Promise.all([
     supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
     loadMonthBudgets(supabase, month),
+    loadDashboard(supabase, period),
   ]);
   const alerts = countBudgetAlerts(budgets.items.map((b) => b.usage));
   const bagian = [
@@ -26,11 +39,10 @@ export default async function BerandaPage() {
   ].filter(Boolean);
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-4">
-      <PageHeader
-        title={`Halo, ${profile?.display_name ?? "pengguna baru"}!`}
-        description="Ringkasan keuanganmu akan tampil di sini."
-      />
+    // pb-16: ruang agar konten terakhir tidak tertutup tombol + melayang
+    <div className="grid max-w-xl grid-cols-1 gap-4 pb-16">
+      <PageHeader title={`Halo, ${profile?.display_name ?? "pengguna baru"}!`} description={period.label} />
+
       {bagian.length > 0 && (
         <section aria-label="Peringatan budget">
           <Link
@@ -44,7 +56,26 @@ export default async function BerandaPage() {
           </Link>
         </section>
       )}
-      <SegeraHadir fase="Fase 5: dashboard" />
+
+      <PeriodPicker period={period} />
+      <FormAlert tone="error" message={dash.error ? "Sebagian data gagal dimuat. Coba muat ulang halaman." : undefined} />
+
+      <SummaryTiles {...dash.summary} totalSaldo={dash.totalSaldo} />
+
+      <section aria-labelledby="judul-kategori" className="grid grid-cols-1 gap-3 rounded-xl border border-border p-4">
+        <h2 id="judul-kategori" className="font-medium">
+          Pengeluaran per kategori
+        </h2>
+        <ExpenseBreakdown {...dash.breakdown} />
+      </section>
+
+      <section aria-labelledby="judul-tren" className="grid grid-cols-1 gap-3 rounded-xl border border-border p-4">
+        <h2 id="judul-tren" className="font-medium">
+          Tren {BULAN_TREN} bulan
+        </h2>
+        <TrendChart data={dash.trend} />
+      </section>
+
       <AddTransactionButton />
     </div>
   );

@@ -6,11 +6,3 @@ export function PageHeader({ title, description }: { title: string; description?
     </header>
   );
 }
-
-export function SegeraHadir({ fase }: { fase: string }) {
-  return (
-    <div className="rounded-xl border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
-      Fitur ini sedang disiapkan ({fase}).
-    </div>
-  );
-}

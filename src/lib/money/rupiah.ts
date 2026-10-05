@@ -32,3 +32,10 @@ export function parseRupiah(input: string): number | null {
   if (!isValidAmount(value)) return null;
   return value === 0 ? 0 : value; // hindari -0
 }
+
+// Label ringkas untuk sumbu grafik saja, contoh 1250000 -> "1,3 jt".
+// Hanya untuk tampilan; jangan dipakai untuk perhitungan atau menampilkan nominal transaksi.
+export function formatRupiahRingkas(amount: number): string {
+  assertAmount(amount);
+  return new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(amount);
+}

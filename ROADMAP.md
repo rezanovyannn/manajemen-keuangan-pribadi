@@ -73,11 +73,11 @@ Tes manual: dua akun berbeda tidak bisa saling melihat data.
 
 ## Fase 5 — Dashboard dan laporan (±2–3 hari)
 
-- [ ] Ringkasan bulanan: total pemasukan, pengeluaran, selisih
-- [ ] Grafik pengeluaran per kategori (donut/bar)
-- [ ] Grafik tren bulanan
-- [ ] Pilih periode (bulan ini, bulan lalu, kustom)
-- [ ] Export laporan ke CSV
+- [x] Ringkasan bulanan: total pemasukan, pengeluaran, selisih
+- [x] Grafik pengeluaran per kategori (donut/bar)
+- [x] Grafik tren bulanan
+- [x] Pilih periode (bulan ini, bulan lalu, kustom)
+- ~~Export laporan ke CSV~~ (dibatalkan: tidak diperlukan, keputusan 5 Okt 2026)
 
 **Selesai jika:** angka di dashboard cocok dengan hitungan manual dari daftar transaksi.
 

@@ -49,6 +49,9 @@
 }
 
 :root {
+  /* Warna seri grafik (palet kategorikal tervalidasi, slot 1-2). Terang. */
+  --series-income: #2a78d6;
+  --series-expense: #eb6834;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -84,6 +87,9 @@
 }
 
 .dark {
+  /* Warna seri grafik untuk permukaan gelap (langkah gelap dari hue yang sama). */
+  --series-income: #3987e5;
+  --series-expense: #d95926;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);

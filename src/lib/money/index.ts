@@ -1,4 +1,4 @@
-export { assertAmount, formatRupiah, isValidAmount, parseRupiah } from "./rupiah";
+export { assertAmount, formatRupiah, formatRupiahRingkas, isValidAmount, parseRupiah } from "./rupiah";
 export {
   addAmounts,
   computeBalance,
@@ -20,3 +20,11 @@ export {
   type BudgetUsage,
   type ExpenseRow,
 } from "./budget";
+export {
+  expenseBreakdown,
+  monthlyTrend,
+  percentOf,
+  type BreakdownItem,
+  type ReportRow,
+  type TrendPoint,
+} from "./report";
