@@ -48,6 +48,15 @@ type TransactionRow = {
   transfer_id: string | null;
 } & Timestamps;
 
+type BudgetRow = {
+  id: string;
+  user_id: string;
+  category_id: string;
+  category_type: "expense";
+  month: string; // YYYY-MM-01
+  amount: number;
+} & Timestamps;
+
 type TransferArgs = {
   p_from_account_id: string;
   p_to_account_id: string;
@@ -85,6 +94,12 @@ export type Database = {
         Insert: Pick<TransactionRow, "account_id" | "type" | "amount"> &
           Partial<Omit<TransactionRow, "id" | "category_type" | "account_id" | "type" | "amount">>;
         Update: Partial<Omit<TransactionRow, "id" | "user_id" | "category_type" | "transfer_id">>;
+        Relationships: [];
+      };
+      budgets: {
+        Row: BudgetRow;
+        Insert: Pick<BudgetRow, "category_id" | "month" | "amount"> & Partial<Pick<BudgetRow, "id" | "user_id">>;
+        Update: Partial<Pick<BudgetRow, "category_id" | "month" | "amount">>;
         Relationships: [];
       };
     };
