@@ -84,8 +84,8 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
         <ExpenseBreakdown {...dash.breakdown} />
       </section>
 
-      <section aria-labelledby="judul-akun" className="grid grid-cols-1 gap-3 rounded-xl border border-border p-4">
-        <h2 id="judul-akun" className="font-medium">
+      <section aria-labelledby="judul-akun" className="grid grid-cols-1 gap-3">
+        <h2 id="judul-akun" className="px-1 font-medium">
           Arus kas per akun
         </h2>
         <AccountCashflowList items={dash.perAkun} />

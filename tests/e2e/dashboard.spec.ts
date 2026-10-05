@@ -61,14 +61,15 @@ test.describe("dashboard", () => {
     await expect(rincian.getByRole("listitem")).toHaveText([/Makan & Minum\s*Rp 150\.000 · 75%/, /Transportasi\s*Rp 50\.000 · 25%/]);
 
     // Arus kas per akun: transfer terpisah, tapi ikut mengubah saldo; transaksi April tidak dihitung.
-    const perAkun = page.getByRole("region", { name: "Arus kas per akun" }).getByRole("listitem");
-    const akunA = perAkun.filter({ hasText: a1 });
-    await expect(akunA).toContainText("Masuk Rp 1.000.000");
-    await expect(akunA).toContainText("Keluar Rp 200.000");
-    await expect(akunA).toContainText("Transfer −Rp 100.000");
+    const perAkun = page.getByRole("region", { name: "Arus kas per akun" });
+    const akunA = perAkun.getByRole("article", { name: a1 });
+    await expect(akunA.getByLabel("Masuk Rp 1.000.000")).toBeVisible();
+    await expect(akunA.getByLabel("Keluar Rp 200.000")).toBeVisible();
+    await expect(akunA.getByLabel("Transfer −Rp 100.000")).toBeVisible();
     await expect(akunA.getByLabel("Perubahan saldo +Rp 700.000")).toBeVisible();
-    const akunB = perAkun.filter({ hasText: a2 });
-    await expect(akunB).toContainText("Transfer +Rp 100.000");
+    const akunB = perAkun.getByRole("article", { name: a2 });
+    await expect(akunB.getByLabel("Masuk Rp 0")).toBeVisible();
+    await expect(akunB.getByLabel("Transfer +Rp 100.000")).toBeVisible();
     await expect(akunB.getByLabel("Perubahan saldo +Rp 100.000")).toBeVisible();
     await expect(page.getByText(/Tren \d+ bulan/)).toHaveCount(0);
 
