@@ -45,7 +45,7 @@ export default async function TransaksiPage({ searchParams }: PageProps<"/transa
 
   return (
     // pb-16: ruang agar baris terakhir tidak tertutup tombol + melayang
-    <div className="grid max-w-xl gap-4 pb-16">
+    <div className="grid max-w-xl grid-cols-1 gap-4 pb-16">
       <PageHeader title="Transaksi" />
       <FormAlert tone={pesan?.tone ?? "success"} message={pesan?.text} />
       <FormAlert tone="error" message={error ? "Daftar transaksi gagal dimuat." : undefined} />

@@ -33,7 +33,7 @@ export default async function KategoriPage({ searchParams }: PageProps<"/kategor
   const arsip = rows.filter((c) => c.archived_at && c.type === type);
 
   return (
-    <div className="grid max-w-xl gap-4">
+    <div className="grid max-w-xl grid-cols-1 gap-4">
       <div className="flex items-start justify-between gap-4">
         <PageHeader title="Kategori" description="Kelompokkan pemasukan dan pengeluaran." />
         <Link

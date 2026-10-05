@@ -76,7 +76,7 @@ test.describe("budget", () => {
     await expect(kartu(page, s.sub)).toContainText("Terlampaui");
     await expect(kartu(page, s.sub)).toContainText("Lewat Rp 5.000");
     await page.goto("/beranda");
-    await expect(page.getByRole("alert")).toContainText("terlampaui");
+    await expect(page.getByRole("region", { name: "Peringatan budget" })).toContainText("terlampaui");
 
     // Ubah batas -> aman lagi.
     await page.goto("/budget");

@@ -20,7 +20,7 @@ export default async function BudgetBaruPage({ searchParams }: PageProps<"/budge
   const kembali = `/budget?bulan=${month}`;
 
   return (
-    <div className="grid max-w-xl">
+    <div className="grid max-w-xl grid-cols-1">
       <PageHeader title="Tambah budget" description={formatBulan(month)} />
       {categories.length === 0 ? (
         <div className="grid justify-items-center gap-4 rounded-xl border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">

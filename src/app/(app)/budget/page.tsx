@@ -32,7 +32,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
   const pesan = typeof status === "string" ? PESAN[status] : undefined;
 
   return (
-    <div className="grid max-w-xl gap-4">
+    <div className="grid max-w-xl grid-cols-1 gap-4">
       <div className="flex items-start justify-between gap-4">
         <PageHeader title="Budget" description="Batas pengeluaran bulanan per kategori." />
         <Link href={`/budget/baru?bulan=${month}`} className={cn(buttonVariants({ size: "lg" }), "h-10 shrink-0")}>

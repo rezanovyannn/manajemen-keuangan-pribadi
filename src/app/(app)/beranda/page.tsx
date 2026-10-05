@@ -26,22 +26,23 @@ export default async function BerandaPage() {
   ].filter(Boolean);
 
   return (
-    <div className="grid max-w-xl gap-4">
+    <div className="grid max-w-xl grid-cols-1 gap-4">
       <PageHeader
         title={`Halo, ${profile?.display_name ?? "pengguna baru"}!`}
         description="Ringkasan keuanganmu akan tampil di sini."
       />
       {bagian.length > 0 && (
-        <Link
-          href={`/budget?bulan=${month}`}
-          role="alert"
-          className="flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
-          <TriangleAlert className="size-5 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden />
-          <span className="flex-1">
-            <span className="font-medium">{bagian.join(" · ")}</span> bulan ini. Lihat budget
-          </span>
-        </Link>
+        <section aria-label="Peringatan budget">
+          <Link
+            href={`/budget?bulan=${month}`}
+            className="flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <TriangleAlert className="size-5 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden />
+            <span className="flex-1">
+              <span className="font-medium">{bagian.join(" · ")}</span> bulan ini. Lihat budget
+            </span>
+          </Link>
+        </section>
       )}
       <SegeraHadir fase="Fase 5: dashboard" />
       <AddTransactionButton />

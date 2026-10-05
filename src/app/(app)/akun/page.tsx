@@ -38,7 +38,7 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
   const total = balances ? totalBalance(aktif.map((a) => balances.get(a.id) ?? 0)) : undefined;
 
   return (
-    <div className="grid max-w-xl gap-4">
+    <div className="grid max-w-xl grid-cols-1 gap-4">
       <div className="flex items-start justify-between gap-4">
         <PageHeader title="Akun" description="Dompet, rekening bank, dan e-wallet." />
         <Link href="/akun/baru" className={cn(buttonVariants({ size: "lg" }), "h-10 shrink-0")}>

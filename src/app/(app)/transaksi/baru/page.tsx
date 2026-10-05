@@ -24,7 +24,7 @@ export default async function TransaksiBaruPage({ searchParams }: PageProps<"/tr
 
   if (accounts.length === 0) {
     return (
-      <div className="grid max-w-xl gap-4">
+      <div className="grid max-w-xl grid-cols-1 gap-4">
         <PageHeader title="Tambah transaksi" />
         <div className="grid justify-items-center gap-4 rounded-xl border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
           Buat akun atau dompet dulu sebelum mencatat transaksi.
@@ -39,7 +39,7 @@ export default async function TransaksiBaruPage({ searchParams }: PageProps<"/tr
   const accountId = typeof akun === "string" ? akun : accounts[0]?.value;
 
   return (
-    <div className="grid max-w-xl">
+    <div className="grid max-w-xl grid-cols-1">
       <PageHeader title="Tambah transaksi" />
       <TransactionForm
         action={createTransaction}

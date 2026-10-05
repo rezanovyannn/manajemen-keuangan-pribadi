@@ -30,7 +30,7 @@ export function BudgetCard({ item, month }: { item: BudgetItem; month: string })
   return (
     <Link
       href={`/budget/${item.id}?bulan=${month}`}
-      className="grid gap-2 rounded-xl border border-border px-4 py-3 outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
+      className="grid grid-cols-1 gap-2 rounded-xl border border-border px-4 py-3 outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
     >
       <div className="flex items-center justify-between gap-3">
         <p className="min-w-0 truncate font-medium">{item.label}</p>

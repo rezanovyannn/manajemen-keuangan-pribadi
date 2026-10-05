@@ -61,11 +61,11 @@ Tes manual: dua akun berbeda tidak bisa saling melihat data.
 
 ## Fase 4 — Budget (±2 hari)
 
-- [ ] Tabel `budgets` + RLS
-- [ ] Atur budget bulanan per kategori
-- [ ] Progress bar pemakaian budget
-- [ ] Peringatan saat budget hampir habis (contoh: 80%) dan saat terlampaui
-- [ ] Unit test pemakaian budget dan ambang peringatan
+- [x] Tabel `budgets` + RLS
+- [x] Atur budget bulanan per kategori
+- [x] Progress bar pemakaian budget
+- [x] Peringatan saat budget hampir habis (contoh: 80%) dan saat terlampaui
+- [x] Unit test pemakaian budget dan ambang peringatan
 
 **Selesai jika:** budget terhitung otomatis dari transaksi bulan berjalan.
 

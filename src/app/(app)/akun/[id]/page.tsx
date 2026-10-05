@@ -25,7 +25,7 @@ export default async function UbahAkunPage({ params }: PageProps<"/akun/[id]">) 
   if (!account || account.archived_at) notFound();
 
   return (
-    <div className="grid max-w-xl gap-8">
+    <div className="grid max-w-xl grid-cols-1 gap-8">
       <div>
         <PageHeader title="Ubah akun" />
         <AccountForm
