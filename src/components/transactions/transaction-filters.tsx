@@ -1,39 +1,21 @@
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 
 import type { SelectOption } from "@/components/transactions/select-field";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatBulan, shiftMonth } from "@/lib/dates";
 import type { TransactionFilters } from "@/lib/transactions/query";
 import { cn } from "@/lib/utils";
 
 const SELECT =
   "h-10 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30";
 
-function hrefBulan(filters: TransactionFilters, month: string) {
+export function hrefBulan(filters: TransactionFilters, month: string) {
   const p = new URLSearchParams({ bulan: month });
   if (filters.accountId) p.set("akun", filters.accountId);
   if (filters.categoryId) p.set("kategori", filters.categoryId);
   if (filters.search) p.set("cari", filters.search);
   return `/transaksi?${p}`;
-}
-
-export function MonthNav({ filters }: { filters: TransactionFilters }) {
-  const nav = cn(buttonVariants({ variant: "ghost", size: "icon" }), "size-10");
-  return (
-    <div className="flex items-center justify-between gap-2">
-      <Link href={hrefBulan(filters, shiftMonth(filters.month, -1))} className={nav} aria-label="Bulan sebelumnya">
-        <ChevronLeft aria-hidden />
-      </Link>
-      <p className="font-medium" aria-live="polite">
-        {formatBulan(filters.month)}
-      </p>
-      <Link href={hrefBulan(filters, shiftMonth(filters.month, 1))} className={nav} aria-label="Bulan berikutnya">
-        <ChevronRight aria-hidden />
-      </Link>
-    </div>
-  );
 }
 
 // Form GET biasa: filter tersimpan di URL dan tetap jalan tanpa JavaScript.

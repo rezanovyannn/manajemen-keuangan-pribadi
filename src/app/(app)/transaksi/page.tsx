@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { FormAlert } from "@/components/auth/form-field";
 import { PageHeader } from "@/components/page-header";
 import { AddTransactionButton } from "@/components/transactions/add-button";
-import { MonthNav, TransactionFiltersForm } from "@/components/transactions/transaction-filters";
+import { MonthNav } from "@/components/month-nav";
+import { hrefBulan, TransactionFiltersForm } from "@/components/transactions/transaction-filters";
 import { TransactionList } from "@/components/transactions/transaction-list";
 import { requireUser } from "@/lib/auth/session";
 import { currentMonthInJakarta, isValidMonthString } from "@/lib/dates";
@@ -49,7 +50,7 @@ export default async function TransaksiPage({ searchParams }: PageProps<"/transa
       <FormAlert tone={pesan?.tone ?? "success"} message={pesan?.text} />
       <FormAlert tone="error" message={error ? "Daftar transaksi gagal dimuat." : undefined} />
 
-      <MonthNav filters={filters} />
+      <MonthNav month={filters.month} href={(m) => hrefBulan(filters, m)} />
 
       <dl className="grid grid-cols-3 gap-2 text-center">
         <Ringkas label="Pemasukan" value={ringkasan.income} className="text-emerald-700 dark:text-emerald-400" />
