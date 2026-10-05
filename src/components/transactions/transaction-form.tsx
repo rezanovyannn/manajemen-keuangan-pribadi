@@ -26,6 +26,8 @@ type TransactionFormProps = {
   // Saat edit: transfer tidak bisa diganti jenis; pemasukan/pengeluaran hanya bisa saling tukar.
   allowedTypes?: TransactionFormType[];
   notice?: string;
+  // Field tersembunyi tambahan, misal penanda jadwal berulang saat "Catat" dari saran.
+  hiddenFields?: Record<string, string>;
 };
 
 function asType(v: string | undefined, fallback: TransactionFormType): TransactionFormType {
@@ -47,6 +49,7 @@ function FormBody({
   allowContinue,
   allowedTypes,
   notice,
+  hiddenFields,
   state,
   formAction,
   pending,
@@ -64,6 +67,9 @@ function FormBody({
     <form action={formAction} className="grid gap-5" noValidate>
       <FormAlert message={state.error} tone="error" />
       <FormAlert message={state.error ? undefined : notice} tone="success" />
+      {Object.entries(hiddenFields ?? {}).map(([name, value]) => (
+        <input key={name} type="hidden" name={name} value={value} />
+      ))}
 
       {allowedTypes?.length === 1 ? (
         <input type="hidden" name="type" value={type} />

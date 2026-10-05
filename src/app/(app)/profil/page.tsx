@@ -1,4 +1,4 @@
-import { ChevronRight, LogOut, Tags } from "lucide-react";
+import { ChevronRight, LogOut, Repeat, Tags } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -45,6 +45,15 @@ export default async function ProfilPage() {
       >
         <Tags className="size-4 text-muted-foreground" aria-hidden />
         <span className="flex-1">Kategori</span>
+        <ChevronRight className="size-4 text-muted-foreground" aria-hidden />
+      </Link>
+
+      <Link
+        href="/berulang"
+        className="flex items-center gap-3 rounded-xl border border-border px-4 py-3 text-sm font-medium outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
+      >
+        <Repeat className="size-4 text-muted-foreground" aria-hidden />
+        <span className="flex-1">Transaksi berulang</span>
         <ChevronRight className="size-4 text-muted-foreground" aria-hidden />
       </Link>
 

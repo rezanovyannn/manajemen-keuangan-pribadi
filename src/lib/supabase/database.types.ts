@@ -46,6 +46,8 @@ type TransactionRow = {
   occurred_on: string; // YYYY-MM-DD
   note: string | null;
   transfer_id: string | null;
+  recurring_rule_id: string | null;
+  recurring_date: string | null;
 } & Timestamps;
 
 type BudgetRow = {
@@ -55,6 +57,23 @@ type BudgetRow = {
   category_type: "expense";
   month: string; // YYYY-MM-01
   amount: number;
+} & Timestamps;
+
+type RecurringRuleRow = {
+  id: string;
+  user_id: string;
+  name: string;
+  account_id: string;
+  category_id: string;
+  type: "income" | "expense";
+  category_type: "income" | "expense";
+  amount: number;
+  note: string | null;
+  frequency: "weekly" | "monthly" | "yearly";
+  start_date: string;
+  end_date: string | null;
+  next_due_date: string;
+  paused: boolean;
 } & Timestamps;
 
 type TransferArgs = {
@@ -94,6 +113,13 @@ export type Database = {
         Insert: Pick<TransactionRow, "account_id" | "type" | "amount"> &
           Partial<Omit<TransactionRow, "id" | "category_type" | "account_id" | "type" | "amount">>;
         Update: Partial<Omit<TransactionRow, "id" | "user_id" | "category_type" | "transfer_id">>;
+        Relationships: [];
+      };
+      recurring_rules: {
+        Row: RecurringRuleRow;
+        Insert: Omit<RecurringRuleRow, "id" | "user_id" | "category_type" | "created_at" | "updated_at" | "paused" | "note" | "end_date"> &
+          Partial<Pick<RecurringRuleRow, "id" | "user_id" | "paused" | "note" | "end_date">>;
+        Update: Partial<Omit<RecurringRuleRow, "id" | "user_id" | "category_type" | "created_at" | "updated_at">>;
         Relationships: [];
       };
       budgets: {

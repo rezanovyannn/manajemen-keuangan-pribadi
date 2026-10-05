@@ -8,14 +8,23 @@ import { PeriodPicker } from "@/components/dashboard/period-picker";
 import { SummaryTiles } from "@/components/dashboard/summary-tiles";
 import { TrendChart } from "@/components/dashboard/trend-chart";
 import { PageHeader } from "@/components/page-header";
+import { RecurringSuggestions } from "@/components/recurring/suggestions";
 import { AddTransactionButton } from "@/components/transactions/add-button";
 import { requireUser } from "@/lib/auth/session";
 import { loadMonthBudgets } from "@/lib/budgets/query";
 import { BULAN_TREN, loadDashboard } from "@/lib/dashboard/query";
-import { currentMonthInJakarta, resolvePeriod } from "@/lib/dates";
+import { currentMonthInJakarta, resolvePeriod, todayInJakarta } from "@/lib/dates";
 import { countBudgetAlerts } from "@/lib/money";
+import { loadSuggestions } from "@/lib/recurring/suggestions";
 
 export const metadata: Metadata = { title: "Beranda · Keuangan Pribadi" };
+
+const PESAN: Record<string, { tone: "success" | "error"; text: string }> = {
+  dicatat: { tone: "success", text: "Transaksi dari jadwal tercatat." },
+  "sudah-dicatat": { tone: "success", text: "Jadwal ini sudah pernah dicatat, tidak dibuat ganda." },
+  dilewati: { tone: "success", text: "Jadwal dilewati untuk tanggal ini." },
+  gagal: { tone: "error", text: "Perubahan gagal disimpan. Silakan coba lagi." },
+};
 
 function teks(v: string | string[] | undefined) {
   return typeof v === "string" ? v : undefined;
@@ -25,12 +34,15 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
   const sp = await searchParams;
   const period = resolvePeriod({ periode: teks(sp.periode), dari: teks(sp.dari), sampai: teks(sp.sampai) });
   const month = currentMonthInJakarta();
+  const today = todayInJakarta();
+  const pesan = PESAN[teks(sp.status) ?? ""];
   const { supabase, user } = await requireUser();
 
-  const [{ data: profile }, budgets, dash] = await Promise.all([
+  const [{ data: profile }, budgets, dash, saran] = await Promise.all([
     supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
     loadMonthBudgets(supabase, month),
     loadDashboard(supabase, period),
+    loadSuggestions(supabase, today),
   ]);
   const alerts = countBudgetAlerts(budgets.items.map((b) => b.usage));
   const bagian = [
@@ -42,6 +54,9 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
     // pb-16: ruang agar konten terakhir tidak tertutup tombol + melayang
     <div className="grid max-w-xl grid-cols-1 gap-4 pb-16">
       <PageHeader title={`Halo, ${profile?.display_name ?? "pengguna baru"}!`} description={period.label} />
+
+      <FormAlert tone={pesan?.tone ?? "success"} message={pesan?.text} />
+      <RecurringSuggestions items={saran.items} today={today} />
 
       {bagian.length > 0 && (
         <section aria-label="Peringatan budget">

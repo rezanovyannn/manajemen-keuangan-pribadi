@@ -6,7 +6,7 @@ import { isGuestOnlyPath, isProtectedPath, safeNextPath } from "@/lib/auth/route
 
 describe("isProtectedPath", () => {
   it("melindungi semua halaman aplikasi dan sub-halamannya", () => {
-    for (const p of ["/beranda", "/transaksi", "/akun", "/budget", "/profil", "/kategori"]) {
+    for (const p of ["/beranda", "/transaksi", "/akun", "/budget", "/profil", "/kategori", "/berulang"]) {
       expect(isProtectedPath(p)).toBe(true);
     }
     expect(isProtectedPath("/beranda/ringkasan")).toBe(true);

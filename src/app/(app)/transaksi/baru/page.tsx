@@ -6,9 +6,10 @@ import { PageHeader } from "@/components/page-header";
 import { TransactionForm } from "@/components/transactions/transaction-form";
 import { buttonVariants } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth/session";
-import { todayInJakarta } from "@/lib/dates";
+import { formatTanggal, isValidDateString, todayInJakarta } from "@/lib/dates";
 import { loadTransactionFormOptions } from "@/lib/transactions/options";
 import { cn } from "@/lib/utils";
+import { idSchema } from "@/lib/validators/common";
 import type { TransactionFormType } from "@/lib/validators/transaction";
 
 export const metadata: Metadata = { title: "Tambah Transaksi · Keuangan Pribadi" };
@@ -18,9 +19,25 @@ function asType(v: unknown): TransactionFormType {
 }
 
 export default async function TransaksiBaruPage({ searchParams }: PageProps<"/transaksi/baru">) {
-  const { tipe, akun, tersimpan } = await searchParams;
+  const { tipe, akun, tersimpan, jadwal, tanggal } = await searchParams;
   const { supabase } = await requireUser();
-  const { accounts, categories } = await loadTransactionFormOptions(supabase);
+
+  // Dibuka dari saran "Catat" di Beranda: isi form dari jadwal berulang.
+  const dariJadwal =
+    typeof jadwal === "string" && idSchema.safeParse(jadwal).success && typeof tanggal === "string" && isValidDateString(tanggal)
+      ? (
+          await supabase
+            .from("recurring_rules")
+            .select("id, name, type, account_id, category_id, amount, note")
+            .eq("id", jadwal)
+            .maybeSingle()
+        ).data
+      : null;
+
+  const { accounts, categories } = await loadTransactionFormOptions(
+    supabase,
+    dariJadwal ? [dariJadwal.account_id, dariJadwal.category_id] : [],
+  );
 
   if (accounts.length === 0) {
     return (
@@ -32,6 +49,34 @@ export default async function TransaksiBaruPage({ searchParams }: PageProps<"/tr
             Tambah akun
           </Link>
         </div>
+      </div>
+    );
+  }
+
+  if (dariJadwal && typeof tanggal === "string") {
+    // Jatuh tempo di masa depan tapi dicatat sekarang -> pakai tanggal hari ini.
+    const hariIni = todayInJakarta();
+    return (
+      <div className="grid max-w-xl grid-cols-1">
+        <PageHeader title="Catat dari jadwal" description={`${dariJadwal.name} · jadwal ${formatTanggal(tanggal)}`} />
+        <TransactionForm
+          action={createTransaction}
+          accounts={accounts}
+          categories={categories}
+          initial={{
+            type: dariJadwal.type,
+            accountId: dariJadwal.account_id,
+            categoryId: dariJadwal.category_id,
+            amount: String(dariJadwal.amount),
+            occurredOn: tanggal < hariIni ? tanggal : hariIni,
+            note: dariJadwal.note ?? dariJadwal.name,
+          }}
+          allowedTypes={["expense", "income"]}
+          hiddenFields={{ recurringRuleId: dariJadwal.id, recurringDate: tanggal }}
+          submitLabel="Simpan"
+          cancelHref="/beranda"
+          notice="Periksa nominal dan tanggal, ubah jika berbeda, lalu simpan."
+        />
       </div>
     );
   }

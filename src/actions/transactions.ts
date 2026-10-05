@@ -5,9 +5,13 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { requireUser } from "@/lib/auth/session";
+import { advanceRule } from "@/lib/recurring/advance";
 import { PESAN_GAGAL_TRANSAKSI, pesanErrorTransaksi } from "@/lib/transactions/errors";
 import { idSchema } from "@/lib/validators/common";
+import { recurringMarkSchema } from "@/lib/validators/recurring";
 import { transactionSchema, type TransactionInput } from "@/lib/validators/transaction";
+
+type RecurringMark = { ruleId: string; date: string };
 
 export type TransactionFormValues = {
   type?: string;
@@ -37,7 +41,16 @@ function bacaForm(formData: FormData): Required<TransactionFormValues> {
   return out;
 }
 
-async function simpanBaru(input: TransactionInput) {
+// Penanda jadwal berulang (dikirim saat menekan "Catat" dari saran di Beranda).
+function bacaPenanda(formData: FormData): RecurringMark | null | "invalid" {
+  const ruleId = formData.get("recurringRuleId");
+  const date = formData.get("recurringDate");
+  if (!ruleId && !date) return null;
+  const parsed = recurringMarkSchema.safeParse({ ruleId, date });
+  return parsed.success ? parsed.data : "invalid";
+}
+
+async function simpanBaru(input: TransactionInput, mark: RecurringMark | null) {
   const { supabase, user } = await requireUser();
   if (input.type === "transfer") {
     return supabase.rpc("create_transfer", {
@@ -56,6 +69,8 @@ async function simpanBaru(input: TransactionInput) {
     amount: input.amount,
     occurred_on: input.occurredOn,
     note: input.note,
+    // Kolom jadwal hanya dikirim jika transaksi berasal dari jadwal berulang.
+    ...(mark ? { recurring_rule_id: mark.ruleId, recurring_date: mark.date } : {}),
   });
 }
 
@@ -70,14 +85,29 @@ export async function createTransaction(
     return { fieldErrors: flat.fieldErrors, error: flat.formErrors[0], values };
   }
 
-  const { error } = await simpanBaru(parsed.data);
-  if (error) {
+  const mark = bacaPenanda(formData);
+  if (mark === "invalid" || (mark && parsed.data.type === "transfer")) {
+    return { error: PESAN_GAGAL_TRANSAKSI, values };
+  }
+
+  const { error } = await simpanBaru(parsed.data, mark);
+  // Jadwal ini sudah pernah dicatat (misal tombol ditekan dua kali): jangan buat duplikat.
+  const sudahDicatat = mark && error?.code === "23505" && error.message.includes("transactions_recurring_unique");
+  if (error && !sudahDicatat) {
     console.error("[transactions] tambah gagal", { code: error.code });
     return { error: pesanErrorTransaksi(error), values };
   }
 
   revalidatePath("/transaksi");
   revalidatePath("/akun");
+
+  if (mark) {
+    const adv = await advanceRule((await requireUser()).supabase, mark.ruleId, mark.date);
+    if (adv.error) console.error("[transactions] majukan jadwal gagal", { code: adv.error.code });
+    revalidatePath("/beranda");
+    revalidatePath("/berulang");
+    redirect(`/beranda?status=${sudahDicatat ? "sudah-dicatat" : "dicatat"}`);
+  }
 
   // "Simpan & tambah lagi": kembali ke form kosong dengan jenis & akun yang sama.
   if (formData.get("lanjut") === "1") {
