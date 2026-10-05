@@ -1,12 +1,21 @@
 import { describe, expect, it } from "vitest";
 
+import { isNavActive, NAV_ITEMS } from "@/components/app-nav/nav-items";
 import { pesanErrorAuth, PESAN_UMUM } from "@/lib/auth/errors";
 import { isGuestOnlyPath, isProtectedPath, safeNextPath } from "@/lib/auth/routes";
 
 describe("isProtectedPath", () => {
-  it("melindungi /beranda dan sub-halamannya", () => {
-    expect(isProtectedPath("/beranda")).toBe(true);
+  it("melindungi semua halaman aplikasi dan sub-halamannya", () => {
+    for (const p of ["/beranda", "/transaksi", "/budget", "/profil"]) {
+      expect(isProtectedPath(p)).toBe(true);
+    }
     expect(isProtectedPath("/beranda/ringkasan")).toBe(true);
+  });
+
+  it("melindungi setiap menu navigasi", () => {
+    for (const { href } of NAV_ITEMS) {
+      expect(isProtectedPath(href)).toBe(true);
+    }
   });
 
   it("tidak melindungi halaman publik atau path yang hanya mirip", () => {
@@ -33,6 +42,15 @@ describe("safeNextPath", () => {
     for (const bad of [null, "", "https://jahat.com", "//jahat.com", "/\\jahat.com", "beranda"]) {
       expect(safeNextPath(bad)).toBe("/beranda");
     }
+  });
+});
+
+describe("isNavActive", () => {
+  it("aktif di halaman menu dan sub-halamannya saja", () => {
+    expect(isNavActive("/transaksi", "/transaksi")).toBe(true);
+    expect(isNavActive("/transaksi/baru", "/transaksi")).toBe(true);
+    expect(isNavActive("/beranda", "/transaksi")).toBe(false);
+    expect(isNavActive("/budgeting", "/budget")).toBe(false);
   });
 });
 

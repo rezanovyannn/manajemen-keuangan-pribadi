@@ -1,0 +1,16 @@
+export function PageHeader({ title, description }: { title: string; description?: string }) {
+  return (
+    <header className="mb-6 grid gap-1">
+      <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+      {description && <p className="text-sm text-muted-foreground">{description}</p>}
+    </header>
+  );
+}
+
+export function SegeraHadir({ fase }: { fase: string }) {
+  return (
+    <div className="rounded-xl border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
+      Fitur ini sedang disiapkan ({fase}).
+    </div>
+  );
+}

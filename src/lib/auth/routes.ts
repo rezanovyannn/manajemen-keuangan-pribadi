@@ -4,7 +4,8 @@ export const HALAMAN_SETELAH_MASUK = "/beranda";
 export const HALAMAN_MASUK = "/masuk";
 
 // Halaman yang hanya boleh dibuka pengguna yang sudah login.
-const PREFIX_TERLINDUNGI = ["/beranda"];
+// Setiap halaman baru di src/app/(app)/ wajib ditambahkan di sini.
+const PREFIX_TERLINDUNGI = ["/beranda", "/transaksi", "/budget", "/profil"];
 
 // Halaman khusus tamu: pengguna yang sudah login diarahkan ke beranda.
 const HALAMAN_TAMU = ["/masuk", "/daftar"];
