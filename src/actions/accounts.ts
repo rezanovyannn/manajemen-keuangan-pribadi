@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { requireUser } from "@/lib/auth/session";
-import { accountSchema, idSchema } from "@/lib/validators/account";
+import { accountSchema } from "@/lib/validators/account";
+import { idSchema } from "@/lib/validators/common";
 
 export type AccountFormState = {
   error?: string;

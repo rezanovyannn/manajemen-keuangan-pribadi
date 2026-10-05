@@ -7,7 +7,7 @@ import { AccountForm } from "@/components/accounts/account-form";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth/session";
-import { idSchema } from "@/lib/validators/account";
+import { idSchema } from "@/lib/validators/common";
 
 export const metadata: Metadata = { title: "Ubah Akun · Keuangan Pribadi" };
 

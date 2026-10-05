@@ -1,5 +1,6 @@
-import { LogOut } from "lucide-react";
+import { ChevronRight, LogOut, Tags } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { keluar } from "@/actions/auth";
 import { PageHeader } from "@/components/page-header";
@@ -37,6 +38,15 @@ export default async function ProfilPage() {
           </dl>
         </CardContent>
       </Card>
+
+      <Link
+        href="/kategori"
+        className="flex items-center gap-3 rounded-xl border border-border px-4 py-3 text-sm font-medium outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
+      >
+        <Tags className="size-4 text-muted-foreground" aria-hidden />
+        <span className="flex-1">Kategori</span>
+        <ChevronRight className="size-4 text-muted-foreground" aria-hidden />
+      </Link>
 
       <Card>
         <CardHeader>

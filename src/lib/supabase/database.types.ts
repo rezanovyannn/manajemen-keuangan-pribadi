@@ -4,6 +4,7 @@
 // Setiap migrasi yang mengubah tabel wajib memperbarui file ini.
 
 export type AccountType = "cash" | "bank" | "ewallet";
+export type CategoryType = "income" | "expense";
 
 type Timestamps = { created_at: string; updated_at: string };
 
@@ -22,6 +23,15 @@ type AccountRow = {
   archived_at: string | null;
 } & Timestamps;
 
+type CategoryRow = {
+  id: string;
+  user_id: string;
+  parent_id: string | null;
+  name: string;
+  type: CategoryType;
+  archived_at: string | null;
+} & Timestamps;
+
 export type Database = {
   public: {
     Tables: {
@@ -36,6 +46,13 @@ export type Database = {
         Insert: Pick<AccountRow, "name" | "type"> &
           Partial<Omit<AccountRow, "name" | "type">>;
         Update: Partial<Omit<AccountRow, "id" | "user_id">>;
+        Relationships: [];
+      };
+      categories: {
+        Row: CategoryRow;
+        Insert: Pick<CategoryRow, "name" | "type"> &
+          Partial<Omit<CategoryRow, "name" | "type">>;
+        Update: Partial<Omit<CategoryRow, "id" | "user_id">>;
         Relationships: [];
       };
     };

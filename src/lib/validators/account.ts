@@ -14,6 +14,4 @@ export const accountSchema = z.object({
   openingBalance: rupiahInput({ label: "Saldo awal" }),
 });
 
-export const idSchema = z.uuid();
-
 export type AccountInput = z.infer<typeof accountSchema>;
