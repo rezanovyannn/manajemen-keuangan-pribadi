@@ -22,6 +22,11 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     needs: check
+    env:
+      # Supabase palsu: tidak ada server yang menjawab, jadi semua request
+      # dianggap tamu. Cukup untuk menguji proteksi halaman dan validasi form.
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-dummy-anon-key
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

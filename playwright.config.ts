@@ -1,5 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
 
+// Muat .env.local (jika ada) agar test bisa membaca E2E_EMAIL/E2E_PASSWORD.
+try {
+  process.loadEnvFile(".env.local");
+} catch {
+  // Tidak ada .env.local (misalnya di CI): test akun uji akan di-skip.
+}
+
 const PORT = 3000;
 
 export default defineConfig({
