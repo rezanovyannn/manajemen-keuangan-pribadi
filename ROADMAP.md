@@ -92,11 +92,11 @@ catat apa yang mengganggu, lalu sesuaikan prioritas fase berikutnya.
 
 ## Fase 6 — Transaksi berulang dan tagihan (±2–3 hari)
 
-- [ ] Tabel `recurring_rules` + RLS
-- [ ] Atur transaksi berulang (gaji, langganan, cicilan, sewa)
-- [ ] Job terjadwal (Vercel Cron atau Supabase Scheduled Functions) untuk membuat transaksi otomatis
-- [ ] Daftar tagihan yang akan jatuh tempo + pengingat
-- [ ] Unit test pembuatan transaksi berulang (tanpa duplikasi)
+- [x] Tabel `recurring_rules` + RLS
+- [x] Atur transaksi berulang (gaji, langganan, cicilan, sewa)
+- [x] Saran pencatatan dari jadwal berulang, tanpa auto-catat (menggantikan job terjadwal; keputusan 6 Okt 2026)
+- [x] Daftar tagihan yang akan jatuh tempo + pengingat (di Beranda; notifikasi email/push di Fase 9)
+- [x] Unit test pembuatan transaksi berulang (tanpa duplikasi)
 
 ---
 
