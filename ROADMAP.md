@@ -37,10 +37,10 @@ Tes manual: dua akun berbeda tidak bisa saling melihat data.
 
 ## Fase 2 — Akun/dompet dan kategori (±2 hari)
 
-- [ ] Tabel `accounts` + RLS, CRUD akun (tunai, bank, e-wallet), saldo awal
-- [ ] Tabel `categories` + RLS, CRUD kategori dan sub-kategori
-- [ ] Seed kategori default untuk pengguna baru (makan, transportasi, tagihan, gaji, dll)
-- [ ] Modul `src/lib/money/` + helper `formatRupiah` + unit test
+- [x] Tabel `accounts` + RLS, CRUD akun (tunai, bank, e-wallet), saldo awal
+- [x] Tabel `categories` + RLS, CRUD kategori dan sub-kategori
+- [x] Seed kategori default untuk pengguna baru (makan, transportasi, tagihan, gaji, dll)
+- [x] Modul `src/lib/money/` + helper `formatRupiah` + unit test
 
 **Selesai jika:** pengguna bisa membuat akun dan kategori, dan nominal tampil dalam format Rupiah.
 

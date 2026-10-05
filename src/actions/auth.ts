@@ -73,7 +73,8 @@ export async function daftar(_prev: AuthFormState, formData: FormData): Promise<
 
 export async function keluar() {
   const supabase = await createClient();
-  const { error } = await supabase.auth.signOut();
+  // scope "local": hanya keluar di perangkat ini, sesi di HP/laptop lain tetap aktif.
+  const { error } = await supabase.auth.signOut({ scope: "local" });
   if (error) console.error("[auth] keluar gagal", { code: error.code, status: error.status });
   redirect(HALAMAN_MASUK);
 }
