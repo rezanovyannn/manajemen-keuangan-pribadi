@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 // Kelompokkan digit dengan titik saat mengetik: "1250000" -> "1.250.000".
 export function formatDigits(raw: string) {
@@ -16,11 +17,13 @@ type MoneyInputProps = {
   label: string;
   defaultValue?: string;
   errors?: string[];
+  autoFocus?: boolean;
+  className?: string;
 };
 
 // Input nominal Rupiah: keyboard angka di HP, format ribuan otomatis.
 // Nilai yang dikirim tetap teks; server mem-parse dengan parseRupiah.
-export function MoneyInput({ name, label, defaultValue = "", errors }: MoneyInputProps) {
+export function MoneyInput({ name, label, defaultValue = "", errors, autoFocus, className }: MoneyInputProps) {
   const [value, setValue] = useState(() => formatDigits(defaultValue));
   const id = `field-${name}`;
   const errorId = `${id}-error`;
@@ -41,7 +44,8 @@ export function MoneyInput({ name, label, defaultValue = "", errors }: MoneyInpu
           name={name}
           inputMode="numeric"
           autoComplete="off"
-          className="h-10 pl-9 tabular-nums"
+          autoFocus={autoFocus}
+          className={cn("h-10 pl-9 tabular-nums", className)}
           value={value}
           onChange={(e) => setValue(formatDigits(e.target.value))}
           aria-invalid={error ? true : undefined}

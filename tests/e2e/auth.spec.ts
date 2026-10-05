@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { masuk, skipTanpaAkunUji } from "./helpers";
+
 for (const path of ["/beranda", "/transaksi", "/akun", "/budget", "/profil", "/kategori"]) {
   test(`${path} mengarahkan tamu ke /masuk`, async ({ page }) => {
     await page.goto(path);
@@ -24,20 +26,12 @@ test("form daftar menolak password pendek", async ({ page }) => {
   await expect(page.getByText("Password minimal 8 karakter.")).toBeVisible();
 });
 
-// Alur login sungguhan butuh akun uji di Supabase.
-// Isi E2E_EMAIL dan E2E_PASSWORD di .env.local (jangan pakai akun berisi data asli).
+// Alur login sungguhan butuh akun uji (lihat tests/e2e/helpers.ts).
 test.describe("dengan akun uji", () => {
-  const email = process.env.E2E_EMAIL;
-  const password = process.env.E2E_PASSWORD;
-  test.skip(!email || !password, "E2E_EMAIL/E2E_PASSWORD belum diisi");
+  skipTanpaAkunUji();
 
   test("login, navigasi, ganti tema, lalu keluar", async ({ page }) => {
-    await page.goto("/masuk");
-    await page.getByLabel("Email").fill(email!);
-    await page.getByLabel("Password").fill(password!);
-    await page.getByRole("button", { name: "Masuk" }).click();
-
-    await expect(page).toHaveURL(/\/beranda$/);
+    await masuk(page);
     await expect(page.getByRole("heading", { name: /^Halo, / })).toBeVisible();
 
     // Hanya satu navigasi yang terlihat: sidebar (desktop) atau bottom bar (HP).
