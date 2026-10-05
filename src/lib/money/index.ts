@@ -8,3 +8,4 @@ export {
   type BalanceTransaction,
   type TransactionType,
 } from "./balance";
+export { summarizeIncomeExpense, type SummaryRow } from "./summary";

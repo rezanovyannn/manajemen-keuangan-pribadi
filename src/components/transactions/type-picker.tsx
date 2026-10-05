@@ -18,15 +18,18 @@ const WARNA_AKTIF: Record<TransactionFormType, string> = {
 export function TypePicker({
   value,
   onChange,
+  allowed = ["expense", "income", "transfer"],
 }: {
   value: TransactionFormType;
   onChange: (v: TransactionFormType) => void;
+  allowed?: TransactionFormType[];
 }) {
+  const pilihan = JENIS_TRANSAKSI.filter((j) => allowed.includes(j.value));
   return (
     <fieldset>
       <legend className="sr-only">Jenis transaksi</legend>
-      <div className="grid grid-cols-3 gap-2">
-        {JENIS_TRANSAKSI.map((j) => (
+      <div className={cn("grid gap-2", pilihan.length === 3 ? "grid-cols-3" : "grid-cols-2")}>
+        {pilihan.map((j) => (
           <label
             key={j.value}
             className={cn(

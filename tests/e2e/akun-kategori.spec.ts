@@ -55,8 +55,10 @@ test.describe("akun dan kategori", () => {
     await arsip.getByRole("button", { name: "Pulihkan" }).click();
     await expect(page.getByRole("link", { name: sub })).toBeVisible();
 
-    // Bersihkan: arsipkan lagi.
+    // Bersihkan: arsipkan lagi (tunggu sampai benar-benar tersimpan).
     await page.getByRole("link", { name: sub }).click();
     await page.getByRole("button", { name: "Arsipkan kategori" }).click();
+    await expect(page).toHaveURL(/\/kategori\?tipe=pengeluaran$/);
+    await expect(page.getByRole("link", { name: sub })).toHaveCount(0);
   });
 });

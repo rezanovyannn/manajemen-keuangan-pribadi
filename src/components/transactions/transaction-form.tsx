@@ -23,8 +23,8 @@ type TransactionFormProps = {
   cancelHref: string;
   // Tampilkan tombol "Simpan & tambah lagi" (hanya untuk transaksi baru).
   allowContinue?: boolean;
-  // Jenis tidak bisa diganti saat mengubah transfer menjadi non-transfer atau sebaliknya.
-  lockType?: boolean;
+  // Saat edit: transfer tidak bisa diganti jenis; pemasukan/pengeluaran hanya bisa saling tukar.
+  allowedTypes?: TransactionFormType[];
   notice?: string;
 };
 
@@ -45,7 +45,7 @@ function FormBody({
   submitLabel,
   cancelHref,
   allowContinue,
-  lockType,
+  allowedTypes,
   notice,
   state,
   formAction,
@@ -65,10 +65,10 @@ function FormBody({
       <FormAlert message={state.error} tone="error" />
       <FormAlert message={state.error ? undefined : notice} tone="success" />
 
-      {lockType ? (
+      {allowedTypes?.length === 1 ? (
         <input type="hidden" name="type" value={type} />
       ) : (
-        <TypePicker value={type} onChange={setType} />
+        <TypePicker value={type} onChange={setType} allowed={allowedTypes} />
       )}
 
       <MoneyInput
