@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
+import { formatTanggal, todayInJakarta } from "../../src/lib/dates";
 import { arsipkanAkun, masuk, skipTanpaAkunUji } from "./helpers";
 
 // Setiap test memakai sub-kategori & akun unik agar desktop/HP yang paralel tidak bentrok.
@@ -45,7 +46,13 @@ async function bersihkan(page: Page, s: { sub: string; akun: string }, catatan: 
   await expect(page.getByRole("link", { name: s.sub })).toHaveCount(0);
 }
 
-const kartu = (page: Page, label: string) => page.getByRole("link").filter({ hasText: label });
+const kartu = (page: Page, label: string) => page.getByTestId("budget-card").filter({ hasText: label });
+
+// Buka panel kartu (klik ringkasan) lalu ke halaman ubah budget.
+async function bukaUbah(page: Page, label: string) {
+  await kartu(page, label).locator("summary").click();
+  await kartu(page, label).getByRole("link", { name: "Ubah budget" }).click();
+}
 
 test.describe("budget", () => {
   skipTanpaAkunUji();
@@ -75,12 +82,29 @@ test.describe("budget", () => {
     await page.goto("/budget");
     await expect(kartu(page, s.sub)).toContainText("Terlampaui");
     await expect(kartu(page, s.sub)).toContainText("Lewat Rp 5.000");
+    // Laporan kapan terlampaui terlihat tanpa membuka kartu.
+    await expect(kartu(page, s.sub)).toContainText(`Terlampaui sejak ${formatTanggal(todayInJakarta())}`);
+    // Rincian tersembunyi sampai kartu diketuk.
+    const rincian = kartu(page, s.sub).getByRole("table");
+    await expect(rincian).toBeHidden();
+    await kartu(page, s.sub).locator("summary").click();
+    await expect(rincian).toBeVisible();
+    const baris = rincian.locator("tbody tr");
+    await expect(baris).toHaveCount(2);
+    await expect(baris.nth(0)).toContainText(`b1 ${tag}`);
+    await expect(baris.nth(0)).toContainText("Mulai hampir habis");
+    await expect(baris.nth(0)).toContainText("Rp 85.000");
+    await expect(baris.nth(1)).toContainText("Mulai terlampaui");
+    await expect(baris.nth(1)).toContainText("Rp 105.000"); // total berjalan
+    await kartu(page, s.sub).locator("summary").click();
+    await expect(rincian).toBeHidden();
+
     await page.goto("/beranda");
     await expect(page.getByRole("region", { name: "Peringatan budget" })).toContainText("terlampaui");
 
     // Ubah batas -> aman lagi.
     await page.goto("/budget");
-    await kartu(page, s.sub).click();
+    await bukaUbah(page, s.sub);
     await page.getByLabel("Batas per bulan").fill("200000");
     await page.getByRole("button", { name: "Simpan perubahan" }).click();
     await expect(page.getByText("Perubahan tersimpan.")).toBeVisible();
@@ -88,7 +112,7 @@ test.describe("budget", () => {
     await expect(kartu(page, s.sub)).toContainText("Sisa Rp 95.000");
 
     // Hapus budget.
-    await kartu(page, s.sub).click();
+    await bukaUbah(page, s.sub);
     await page.getByRole("button", { name: "Hapus budget" }).click();
     await page.getByRole("button", { name: "Ya, hapus" }).click();
     await expect(page.getByText("Budget dihapus.")).toBeVisible();
@@ -121,7 +145,7 @@ test.describe("budget", () => {
     // Bersihkan kedua budget.
     for (const url of [page.url(), `/budget?bulan=${bulanLalu}`]) {
       await page.goto(url);
-      await kartu(page, s.sub).click();
+      await bukaUbah(page, s.sub);
       await page.getByRole("button", { name: "Hapus budget" }).click();
       await page.getByRole("button", { name: "Ya, hapus" }).click();
       await expect(page.getByText("Budget dihapus.")).toBeVisible();

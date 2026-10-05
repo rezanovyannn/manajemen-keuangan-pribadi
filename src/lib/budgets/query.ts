@@ -4,9 +4,11 @@ import { buildCategoryTree, type CategoryItem } from "@/lib/categories/tree";
 import { monthRange, shiftMonth } from "@/lib/dates";
 import {
   budgetSpent,
+  budgetTimeline,
   budgetUsage,
   compareBudgetStatus,
   expenseByCategory,
+  type BudgetTimelineItem,
   type BudgetUsage,
   type ExpenseRow,
 } from "@/lib/money";
@@ -15,7 +17,20 @@ import type { createClient } from "@/lib/supabase/server";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
-export type BudgetItem = { id: string; categoryId: string; label: string; usage: BudgetUsage };
+type DetailRow = ExpenseRow & { id: string; occurred_on: string; note: string | null };
+
+export type BudgetDetail = BudgetTimelineItem<{ id: string; amount: number; occurredOn: string; label: string; note: string | null }>;
+
+export type BudgetItem = {
+  id: string;
+  categoryId: string;
+  label: string;
+  usage: BudgetUsage;
+  // Rincian transaksi kategori ini (urut tanggal) dengan total berjalan.
+  details: BudgetDetail[];
+  warnDate: string | null; // tanggal mulai hampir habis (>= 80%)
+  overDate: string | null; // tanggal mulai terlampaui
+};
 
 // "2026-10" -> "2026-10-01" (format kolom budgets.month)
 export const monthToDate = (month: string) => `${month}-01`;
@@ -36,13 +51,16 @@ export async function loadMonthBudgets(supabase: Supabase, month: string) {
     supabase.from("categories").select("id, parent_id, name, type, archived_at"),
     supabase.from("budgets").select("id, category_id, amount").eq("month", monthToDate(month)),
     supabase.from("budgets").select("category_id").eq("month", monthToDate(shiftMonth(month, -1))),
-    fetchAllPages<ExpenseRow>((from, to) =>
+    fetchAllPages<DetailRow>((from, to) =>
       supabase
         .from("transactions")
-        .select("category_id, type, amount")
+        .select("id, category_id, type, amount, occurred_on, note")
         .eq("type", "expense")
         .gte("occurred_on", start)
         .lt("occurred_on", end)
+        // Urutan stabil: tanggal, lalu waktu dibuat, lalu id (juga dipakai total berjalan).
+        .order("occurred_on")
+        .order("created_at")
         .order("id")
         .range(from, to),
     ),
@@ -59,12 +77,30 @@ export async function loadMonthBudgets(supabase: Supabase, month: string) {
   const totals = expenseByCategory(expenses.rows);
 
   const items: BudgetItem[] = (budgetsRes.data ?? [])
-    .map((b) => ({
-      id: b.id,
-      categoryId: b.category_id,
-      label: labels.get(b.category_id) ?? "(kategori tidak ditemukan)",
-      usage: budgetUsage(b.amount, budgetSpent(b.category_id, totals, categories)),
-    }))
+    .map((b) => {
+      // Kategori budget + sub-kategorinya (sama seperti perhitungan pemakaian).
+      const ids = new Set([b.category_id, ...categories.filter((c) => c.parent_id === b.category_id).map((c) => c.id)]);
+      const rows = expenses.rows
+        .filter((r) => r.category_id !== null && ids.has(r.category_id))
+        .map((r) => ({
+          id: r.id,
+          amount: r.amount,
+          occurredOn: r.occurred_on,
+          note: r.note,
+          label: (r.category_id && labels.get(r.category_id)) || "",
+        }));
+      const timeline = budgetTimeline(b.amount, rows);
+      const tanggal = (id: string | null) => timeline.items.find((i) => i.id === id)?.occurredOn ?? null;
+      return {
+        id: b.id,
+        categoryId: b.category_id,
+        label: labels.get(b.category_id) ?? "(kategori tidak ditemukan)",
+        usage: budgetUsage(b.amount, budgetSpent(b.category_id, totals, categories)),
+        details: timeline.items,
+        warnDate: tanggal(timeline.warnId),
+        overDate: tanggal(timeline.overId),
+      };
+    })
     .sort((a, b) => compareBudgetStatus(a.usage.status, b.usage.status) || a.label.localeCompare(b.label, "id"));
 
   // Budget bulan lalu yang belum ada di bulan ini (untuk tombol "Salin dari bulan lalu").

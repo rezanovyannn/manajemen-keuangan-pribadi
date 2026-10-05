@@ -123,3 +123,9 @@ export function formatBulanPendek(month: string): string {
   const bulan = new Intl.DateTimeFormat("id-ID", { timeZone: "UTC", month: "short" }).format(new Date(Date.UTC(y, m - 1, 1)));
   return `${bulan} ${String(y).slice(2)}`;
 }
+
+// "2026-10-05" -> "5 Okt" (daftar ringkas)
+export function formatTanggalPendek(value: string): string {
+  const [y, m, d] = value.split("-").map(Number) as [number, number, number];
+  return new Intl.DateTimeFormat("id-ID", { timeZone: "UTC", day: "numeric", month: "short" }).format(new Date(Date.UTC(y, m - 1, d)));
+}

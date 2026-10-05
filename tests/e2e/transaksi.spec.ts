@@ -30,12 +30,18 @@ test.describe("tambah transaksi", () => {
 
     await page.getByLabel("Akun").selectOption({ label: namaAkun });
     await page.getByLabel("Kategori").selectOption({ label: "Makan & Minum" });
-    await page.getByLabel("Catatan (opsional)").fill("uji e2e");
+    await page.getByLabel("Catatan (opsional)").fill(`uji ${namaAkun}`);
     await page.getByRole("button", { name: "Simpan", exact: true }).click();
 
     await expect(page).toHaveURL(/\/transaksi\?tersimpan=1$/);
     await expect(page.getByText("Transaksi tersimpan.")).toBeVisible();
 
+    // Bersihkan: hapus transaksi uji lalu arsipkan akunnya.
+    await page.goto(`/transaksi?cari=${encodeURIComponent(`uji ${namaAkun}`)}`);
+    await page.getByRole("main").getByRole("listitem").first().getByRole("link").click();
+    await page.getByRole("button", { name: "Hapus transaksi" }).click();
+    await page.getByRole("button", { name: "Ya, hapus" }).click();
+    await expect(page.getByText("Transaksi dihapus.")).toBeVisible();
     await arsipkanAkun(page, namaAkun);
   });
 

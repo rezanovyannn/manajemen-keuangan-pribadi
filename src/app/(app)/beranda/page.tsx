@@ -3,16 +3,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { FormAlert } from "@/components/auth/form-field";
+import { AccountCashflowList } from "@/components/dashboard/account-cashflow";
 import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown";
 import { PeriodPicker } from "@/components/dashboard/period-picker";
 import { SummaryTiles } from "@/components/dashboard/summary-tiles";
-import { TrendChart } from "@/components/dashboard/trend-chart";
 import { PageHeader } from "@/components/page-header";
 import { RecurringSuggestions } from "@/components/recurring/suggestions";
 import { AddTransactionButton } from "@/components/transactions/add-button";
 import { requireUser } from "@/lib/auth/session";
 import { loadMonthBudgets } from "@/lib/budgets/query";
-import { BULAN_TREN, loadDashboard } from "@/lib/dashboard/query";
+import { loadDashboard } from "@/lib/dashboard/query";
 import { currentMonthInJakarta, resolvePeriod, todayInJakarta } from "@/lib/dates";
 import { countBudgetAlerts } from "@/lib/money";
 import { loadSuggestions } from "@/lib/recurring/suggestions";
@@ -84,11 +84,11 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
         <ExpenseBreakdown {...dash.breakdown} />
       </section>
 
-      <section aria-labelledby="judul-tren" className="grid grid-cols-1 gap-3 rounded-xl border border-border p-4">
-        <h2 id="judul-tren" className="font-medium">
-          Tren {BULAN_TREN} bulan
+      <section aria-labelledby="judul-akun" className="grid grid-cols-1 gap-3 rounded-xl border border-border p-4">
+        <h2 id="judul-akun" className="font-medium">
+          Arus kas per akun
         </h2>
-        <TrendChart data={dash.trend} />
+        <AccountCashflowList items={dash.perAkun} />
       </section>
 
       <AddTransactionButton />

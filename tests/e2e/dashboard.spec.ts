@@ -60,9 +60,17 @@ test.describe("dashboard", () => {
     await expect(rincian).toHaveAccessibleName("Pengeluaran per kategori, total Rp 200.000");
     await expect(rincian.getByRole("listitem")).toHaveText([/Makan & Minum\s*Rp 150\.000 · 75%/, /Transportasi\s*Rp 50\.000 · 25%/]);
 
-    // Tren: Maret = data periode, April = transaksi di luar periode.
-    await page.getByText("Lihat sebagai tabel").click();
-    await expect(page.getByRole("row", { name: new RegExp(`Maret ${tahun}`) })).toContainText("Rp 1.000.000Rp 200.000");
+    // Arus kas per akun: transfer terpisah, tapi ikut mengubah saldo; transaksi April tidak dihitung.
+    const perAkun = page.getByRole("region", { name: "Arus kas per akun" }).getByRole("listitem");
+    const akunA = perAkun.filter({ hasText: a1 });
+    await expect(akunA).toContainText("Masuk Rp 1.000.000");
+    await expect(akunA).toContainText("Keluar Rp 200.000");
+    await expect(akunA).toContainText("Transfer −Rp 100.000");
+    await expect(akunA.getByLabel("Perubahan saldo +Rp 700.000")).toBeVisible();
+    const akunB = perAkun.filter({ hasText: a2 });
+    await expect(akunB).toContainText("Transfer +Rp 100.000");
+    await expect(akunB.getByLabel("Perubahan saldo +Rp 100.000")).toBeVisible();
+    await expect(page.getByText(/Tren \d+ bulan/)).toHaveCount(0);
 
     // Periode kustom tidak valid -> peringatan + kembali ke bulan ini.
     await page.goto(`/beranda?periode=kustom&dari=${bulan}-31&sampai=${bulan}-01`);
