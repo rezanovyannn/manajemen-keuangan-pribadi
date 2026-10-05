@@ -25,10 +25,10 @@ Tujuan: kerangka proyek hidup di internet.
 
 ## Fase 1 — Auth dan profil (±1–2 hari)
 
-- [ ] Registrasi, login, logout (Supabase Auth)
-- [ ] Middleware untuk melindungi halaman yang butuh login
+- [x] Registrasi, login, logout (Supabase Auth)
+- [x] Middleware untuk melindungi halaman yang butuh login
 - [x] Tabel `profiles` + RLS
-- [ ] Layout aplikasi: navigasi (bottom bar di HP, sidebar di desktop), mode gelap
+- [x] Layout aplikasi: navigasi (bottom bar di HP, sidebar di desktop), mode gelap
 
 **Selesai jika:** pengguna bisa daftar, login, dan hanya melihat halaman miliknya.
 Tes manual: dua akun berbeda tidak bisa saling melihat data.
