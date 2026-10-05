@@ -14,7 +14,7 @@ Tujuan: kerangka proyek hidup di internet.
 
 - [x] Buat repo GitHub, tambahkan `AGENTS.md`, `ROADMAP.md`, `.gitignore`
 - [x] Scaffold Next.js (App Router, TypeScript, Tailwind) + shadcn/ui
-- [ ] Buat proyek Supabase, hubungkan ke Vercel (env vars)
+- [x] Buat proyek Supabase, hubungkan ke Vercel (env vars)
 - [x] Deploy pertama ke Vercel dari branch `main`
 - [x] Setup GitHub Actions: lint, typecheck, test
 - [x] Setup Vitest dan Playwright (satu test contoh)
