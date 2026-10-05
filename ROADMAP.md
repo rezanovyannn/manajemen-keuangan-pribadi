@@ -48,12 +48,12 @@ Tes manual: dua akun berbeda tidak bisa saling melihat data.
 
 ## Fase 3 — Transaksi (inti aplikasi) (±3–4 hari)
 
-- [ ] Tabel `transactions` + RLS
-- [ ] Form tambah transaksi (income, expense) yang cepat di HP
-- [ ] Transfer antar akun secara atomik
-- [ ] Daftar transaksi: filter (tanggal, akun, kategori), pencarian, edit, hapus
-- [ ] Perhitungan saldo akun dari transaksi
-- [ ] Unit test: saldo, transfer, edit/hapus transaksi
+- [x] Tabel `transactions` + RLS
+- [x] Form tambah transaksi (income, expense) yang cepat di HP
+- [x] Transfer antar akun secara atomik
+- [x] Daftar transaksi: filter (tanggal, akun, kategori), pencarian, edit, hapus
+- [x] Perhitungan saldo akun dari transaksi
+- [x] Unit test: saldo, transfer, edit/hapus transaksi
 
 **Selesai jika:** saldo setiap akun selalu konsisten dengan riwayat transaksi, termasuk setelah edit dan hapus.
 

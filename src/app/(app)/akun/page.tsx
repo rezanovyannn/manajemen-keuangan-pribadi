@@ -8,7 +8,8 @@ import { PageHeader } from "@/components/page-header";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { accountTypeLabel } from "@/lib/accounts/types";
 import { requireUser } from "@/lib/auth/session";
-import { formatRupiah } from "@/lib/money";
+import { formatRupiah, totalBalance } from "@/lib/money";
+import { loadAccountBalances } from "@/lib/transactions/balances";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Akun · Keuangan Pribadi" };
@@ -31,6 +32,11 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
   const aktif = accounts?.filter((a) => !a.archived_at) ?? [];
   const arsip = accounts?.filter((a) => a.archived_at) ?? [];
 
+  // Saldo terkini = saldo awal + seluruh transaksi (lihat src/lib/money/balance.ts).
+  const { balances, error: saldoError } = await loadAccountBalances(supabase, accounts ?? []);
+  const saldo = (id: string) => balances?.get(id);
+  const total = balances ? totalBalance(aktif.map((a) => balances.get(a.id) ?? 0)) : undefined;
+
   return (
     <div className="grid max-w-xl gap-4">
       <div className="flex items-start justify-between gap-4">
@@ -44,9 +50,24 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
       <FormAlert
         tone="error"
         message={
-          error ? "Daftar akun gagal dimuat." : typeof gagal === "string" ? PESAN_GAGAL[gagal] : undefined
+          error
+            ? "Daftar akun gagal dimuat."
+            : saldoError
+              ? "Saldo gagal dihitung. Coba muat ulang halaman."
+              : typeof gagal === "string"
+                ? PESAN_GAGAL[gagal]
+                : undefined
         }
       />
+
+      {aktif.length > 0 && total !== undefined && (
+        <div className="rounded-xl border border-border px-4 py-3">
+          <p className="text-xs text-muted-foreground">Total saldo akun aktif</p>
+          <p className="mt-1 text-2xl font-semibold tabular-nums" data-testid="total-saldo">
+            {formatRupiah(total)}
+          </p>
+        </div>
+      )}
 
       {aktif.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
@@ -65,8 +86,10 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
                   <p className="text-xs text-muted-foreground">{accountTypeLabel(a.type)}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium tabular-nums">{formatRupiah(a.opening_balance)}</p>
-                  <p className="text-xs text-muted-foreground">Saldo awal</p>
+                  <p className={cn("font-medium tabular-nums", (saldo(a.id) ?? 0) < 0 && "text-rose-700 dark:text-rose-400")}>
+                    {saldo(a.id) === undefined ? "—" : formatRupiah(saldo(a.id)!)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Awal {formatRupiah(a.opening_balance)}</p>
                 </div>
                 <ChevronRight className="size-4 text-muted-foreground" aria-hidden />
               </Link>
@@ -85,7 +108,10 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
               <li key={a.id} className="flex items-center gap-3 px-4 py-3">
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-muted-foreground">{a.name}</p>
-                  <p className="text-xs text-muted-foreground">{accountTypeLabel(a.type)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {accountTypeLabel(a.type)}
+                    {saldo(a.id) !== undefined && ` · saldo ${formatRupiah(saldo(a.id)!)}`}
+                  </p>
                 </div>
                 <form action={setAccountArchived.bind(null, a.id, false)}>
                   <Button type="submit" variant="outline" size="sm">
