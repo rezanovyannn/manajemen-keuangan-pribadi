@@ -11,10 +11,11 @@ test.describe("tujuan tabungan", () => {
     await masuk(page);
     const setoran = tagUji(info.project.name, "setoran tabungan");
     const tujuan = tagUji(info.project.name, "Liburan");
-    const akun = AKUN.mandiri;
+    // Cash On Hand: Mandiri dipakai tujuan tabungan contoh di akun uji (satu tujuan aktif per akun).
+    const akun = AKUN.cash;
     const target = 10_000_000;
 
-    // Isi tabungan Rp 4.200.000 ke Mandiri; progress = saldo Mandiri.
+    // Isi Rp 4.200.000 ke akun; progress = saldo akun itu.
     const awal = await saldoAkun(page, akun);
     await catat(page, { tipe: "income", nominal: "4200000", akun, kategori: "Bonus", catatan: setoran });
     const saldo = awal + 4_200_000;

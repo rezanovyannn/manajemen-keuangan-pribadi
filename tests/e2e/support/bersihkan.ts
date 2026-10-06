@@ -4,7 +4,7 @@
 // hanya data akun uji itu yang tersentuh. Tidak memakai service_role.
 //
 //   mode "e2e"   : hapus data bernama/berawalan "E2E" (dipakai otomatis setelah E2E)
-//   mode "semua" : hapus semua data akun uji, sisakan profil + 14 kategori default
+//   mode "semua" : hapus semua data akun uji, sisakan profil + 15 kategori default
 //   simulasi     : hanya hitung, tidak menghapus apa pun
 
 type Mode = "e2e" | "semua";
@@ -12,7 +12,7 @@ type Row = Record<string, unknown> & { id: string };
 
 const KATEGORI_DEFAULT = new Set([
   "expense:Makan & Minum", "expense:Transportasi", "expense:Belanja", "expense:Tagihan",
-  "expense:Kesehatan", "expense:Hiburan", "expense:Pendidikan", "expense:Cicilan & Utang", "expense:Lainnya",
+  "expense:Kesehatan", "expense:Hiburan", "expense:Pendidikan", "expense:Cicilan & Utang", "expense:Biaya Admin", "expense:Lainnya",
   "income:Gaji", "income:Bonus", "income:Hadiah", "income:Pelunasan Piutang", "income:Lainnya",
 ]);
 

@@ -106,6 +106,16 @@ describe("incomeStability", () => {
     expect(incomeStability(bulan, -5_000)?.runwayTenths).toBe(0);
   });
 
+  it("bulan awal tanpa transaksi tidak ikut dihitung (pengguna baru mulai mencatat)", () => {
+    const s = incomeStability([{ income: 0, expense: 0 }, { income: 0, expense: 0 }, ...bulan], 10_000_000);
+    expect(s).toMatchObject({ months: 3, avgIncome: 5_000_000, minIncome: 2_000_000 });
+  });
+
+  it("bulan kosong di tengah tetap dihitung (memang tidak ada pemasukan)", () => {
+    const s = incomeStability([bulan[0]!, { income: 0, expense: 1_000_000 }, bulan[1]!], 0);
+    expect(s).toMatchObject({ months: 3, minIncome: 0 });
+  });
+
   it("tanpa data atau tanpa pengeluaran", () => {
     expect(incomeStability([], 1_000)).toBeNull();
     expect(incomeStability([{ income: 1_000, expense: 0 }], 1_000)?.runwayTenths).toBeNull();

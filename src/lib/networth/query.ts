@@ -61,10 +61,13 @@ export async function loadNetWorth(supabase: Supabase, currentMonth: string) {
 
   // Penerimaan piutang adalah pengembalian uang, bukan pendapatan: tidak ikut rata-rata pemasukan.
   const riwayat = history.rows.filter((r) => !(r.type === "income" && r.debt_id));
-  const stabilitas = incomeStability(monthlyTrend(riwayat, months), totalAkun);
+  const trend = monthlyTrend(riwayat, months);
+  const stabilitas = incomeStability(trend, totalAkun);
+  // Bulan yang benar-benar dihitung (bulan awal tanpa data diabaikan).
+  const bulanDihitung = months.slice(months.length - (stabilitas?.months ?? 0));
 
   return {
     error: null,
-    data: { ...nw, totalAkun, perJenis, utang, piutang, stabilitas, months },
+    data: { ...nw, totalAkun, perJenis, utang, piutang, stabilitas, months: bulanDihitung },
   };
 }

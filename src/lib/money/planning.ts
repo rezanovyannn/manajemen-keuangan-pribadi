@@ -122,7 +122,15 @@ export type IncomeStability = {
   runwayTenths: number | null;
 };
 
-export function incomeStability(points: { income: number; expense: number }[], totalSaldo: number): IncomeStability | null {
+// Bulan-bulan awal tanpa transaksi sama sekali (sebelum pengguna mulai mencatat)
+// tidak ikut dihitung, agar rata-rata dan "terendah" tidak tertarik ke Rp 0.
+export function trimLeadingEmptyMonths<T extends { income: number; expense: number }>(points: T[]): T[] {
+  const i = points.findIndex((p) => p.income !== 0 || p.expense !== 0);
+  return i === -1 ? [] : points.slice(i);
+}
+
+export function incomeStability(allPoints: { income: number; expense: number }[], totalSaldo: number): IncomeStability | null {
+  const points = trimLeadingEmptyMonths(allPoints);
   if (points.length === 0) return null;
   const n = BigInt(points.length);
   const sumIncome = points.reduce((s, p) => addAmounts(s, p.income), 0);

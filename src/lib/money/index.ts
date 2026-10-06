@@ -46,6 +46,7 @@ export {
   monthsUntil,
   netWorth,
   paidByDebt,
+  trimLeadingEmptyMonths,
   type DebtStatus,
   type GoalProgress,
   type IncomeStability,

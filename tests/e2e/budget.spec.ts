@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { formatTanggal, todayInJakarta } from "../../src/lib/dates";
+import { currentMonthInJakarta, formatTanggal, shiftMonth, todayInJakarta } from "../../src/lib/dates";
 import { AKUN, catat, hapusTransaksi, masuk, skipTanpaAkunUji } from "./helpers";
 
 // Setiap test memakai sub-kategori unik (budget per kategori per bulan) dan akun tetap Cash On Hand.
@@ -26,7 +26,9 @@ async function bersihkan(page: Page, s: { sub: string }, catatan: string[]) {
   await expect(page.getByRole("link", { name: s.sub })).toHaveCount(0);
 }
 
-const kartu = (page: Page, label: string) => page.getByTestId("budget-card").filter({ hasText: label });
+// Cocokkan judul kartu saja: rincian tersembunyi kartu induk (misal "Hiburan") juga memuat nama sub-kategori.
+const kartu = (page: Page, label: string) =>
+  page.getByTestId("budget-card").filter({ has: page.locator("summary p").first().filter({ hasText: label }) });
 
 // Buka panel kartu (klik ringkasan) lalu ke halaman ubah budget.
 async function bukaUbah(page: Page, label: string) {
@@ -106,24 +108,27 @@ test.describe("budget", () => {
     const tag = `${info.project.name} salin ${Date.now()}`;
     const s = await siapkan(page, tag);
 
+    // Bulan ditentukan lewat URL (bukan klik navigasi) agar tidak salah bulan saat halaman
+    // belum selesai berpindah, yang bisa menyalin budget ke bulan yang salah.
+    const bulanIni = currentMonthInJakarta();
+    const bulanLalu = shiftMonth(bulanIni, -1);
+
     // Buat budget di bulan lalu.
-    await page.goto("/budget");
-    await page.getByRole("link", { name: "Bulan sebelumnya" }).click();
-    const bulanLalu = new URL(page.url()).searchParams.get("bulan")!;
-    await page.getByRole("link", { name: "Tambah" }).click();
+    await page.goto(`/budget/baru?bulan=${bulanLalu}`);
     await page.getByLabel("Kategori pengeluaran").selectOption({ label: s.label });
     await page.getByLabel("Batas per bulan").fill("75000");
     await page.getByRole("button", { name: "Simpan" }).click();
     await expect(page.getByText("Budget tersimpan.")).toBeVisible();
 
     // Bulan ini: salin.
-    await page.getByRole("link", { name: "Bulan berikutnya" }).click();
+    await page.goto(`/budget?bulan=${bulanIni}`);
     await page.getByRole("button", { name: /^Salin \d+ budget dari bulan lalu$/ }).click();
     await expect(page.getByText("Budget bulan lalu sudah disalin.")).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`bulan=${bulanIni}`));
     await expect(kartu(page, s.sub)).toContainText("dari Rp 75.000");
 
     // Bersihkan kedua budget.
-    for (const url of [page.url(), `/budget?bulan=${bulanLalu}`]) {
+    for (const url of [`/budget?bulan=${bulanIni}`, `/budget?bulan=${bulanLalu}`]) {
       await page.goto(url);
       await bukaUbah(page, s.sub);
       await page.getByRole("button", { name: "Hapus budget" }).click();
