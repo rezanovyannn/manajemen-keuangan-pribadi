@@ -18,6 +18,13 @@ export async function arsipkanAkun(page: Page, nama: string) {
   await expect(page).toHaveURL(/\/akun$/);
 }
 
+// Klik menu navigasi. Di HP, menu ada di laci yang dibuka lewat tombol "Buka menu".
+export async function bukaMenu(page: Page, label: string) {
+  const tombol = page.getByRole("button", { name: "Buka menu" });
+  if (await tombol.isVisible()) await tombol.click();
+  await page.getByRole("navigation", { name: "Navigasi utama" }).locator("visible=true").getByRole("link", { name: label, exact: true }).click();
+}
+
 export async function masuk(page: Page) {
   await page.goto("/masuk");
   await page.getByLabel("Email").fill(akunUji.email);

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { masuk, skipTanpaAkunUji } from "./helpers";
+import { bukaMenu, masuk, skipTanpaAkunUji } from "./helpers";
 
 for (const path of ["/beranda", "/transaksi", "/akun", "/budget", "/profil", "/kategori", "/berulang"]) {
   test(`${path} mengarahkan tamu ke /masuk`, async ({ page }) => {
@@ -34,9 +34,11 @@ test.describe("dengan akun uji", () => {
     await masuk(page);
     await expect(page.getByRole("heading", { name: /^Halo, / })).toBeVisible();
 
-    // Hanya satu navigasi yang terlihat: sidebar (desktop) atau bottom bar (HP).
-    const nav = page.getByRole("navigation", { name: "Navigasi utama" }).locator("visible=true");
-    await nav.getByRole("link", { name: "Profil" }).click();
+    // Desktop: sidebar. HP: menu laci lewat tombol "Buka menu" (laci tertutup setelah memilih).
+    await bukaMenu(page, "Transaksi berulang");
+    await expect(page).toHaveURL(/\/berulang$/);
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await bukaMenu(page, "Profil");
     await expect(page).toHaveURL(/\/profil$/);
 
     await page.getByRole("main").getByRole("radio", { name: "Gelap" }).click();

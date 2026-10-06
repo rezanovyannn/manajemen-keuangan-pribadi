@@ -17,6 +17,8 @@ export default defineConfig({
   reporter: "list",
   // Simpan data ke Supabase bisa lambat saat banyak test berjalan paralel.
   expect: { timeout: 15_000 },
+  // Alur E2E panjang (belasan langkah simpan & muat) butuh lebih dari default 30 detik.
+  timeout: 90_000,
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: "on-first-retry",
