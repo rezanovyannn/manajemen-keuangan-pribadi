@@ -5,6 +5,7 @@ import {
   PiggyBank,
   Repeat,
   Tags,
+  Target,
   Wallet,
   type LucideIcon,
 } from "lucide-react";
@@ -25,7 +26,10 @@ export const NAV_GROUPS: NavGroup[] = [
   },
   {
     label: "Perencanaan",
-    items: [{ href: "/berulang", label: "Transaksi berulang", Icon: Repeat }],
+    items: [
+      { href: "/tujuan", label: "Tujuan tabungan", Icon: Target },
+      { href: "/berulang", label: "Transaksi berulang", Icon: Repeat },
+    ],
   },
   {
     label: "Pengaturan",
