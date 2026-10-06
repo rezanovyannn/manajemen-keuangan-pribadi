@@ -22,7 +22,11 @@ export async function arsipkanAkun(page: Page, nama: string) {
 export async function bukaMenu(page: Page, label: string) {
   const tombol = page.getByRole("button", { name: "Buka menu" });
   if (await tombol.isVisible()) await tombol.click();
-  await page.getByRole("navigation", { name: "Navigasi utama" }).locator("visible=true").getByRole("link", { name: label, exact: true }).click();
+  const link = page.getByRole("navigation", { name: "Navigasi utama" }).locator("visible=true").getByRole("link", { name: label, exact: true });
+  const href = (await link.getAttribute("href")) ?? "";
+  await link.click();
+  // Tunggu halaman tujuan benar-benar terbuka sebelum langkah berikutnya.
+  await page.waitForURL((url) => url.pathname === href);
 }
 
 export async function masuk(page: Page) {

@@ -102,10 +102,10 @@ catat apa yang mengganggu, lalu sesuaikan prioritas fase berikutnya.
 
 ## Fase 7 — Tujuan tabungan, utang, net worth (±3–4 hari)
 
-- [ ] Tabel `goals`: target tabungan, progress, tenggat
-- [ ] Pencatatan utang dan cicilan
-- [ ] Halaman net worth: total aset dikurangi kewajiban
-- [ ] Dukungan pendapatan tidak tetap (rata-rata, buffer)
+- [x] Tabel `goals`: target tabungan, progress, tenggat
+- [x] Pencatatan utang dan cicilan (+ piutang, keputusan 6 Okt 2026)
+- [x] Halaman net worth: total aset dikurangi kewajiban
+- [x] Dukungan pendapatan tidak tetap (rata-rata, buffer)
 
 ---
 

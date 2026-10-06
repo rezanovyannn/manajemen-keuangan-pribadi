@@ -6,6 +6,8 @@ test.describe("utang & piutang", () => {
   skipTanpaAkunUji();
 
   test("bayar utang mengurangi sisa sampai lunas, terima piutang, tidak bisa dihapus jika ada pembayaran", async ({ page }, info) => {
+    // Alur panjang: 3x bayar + terima + pembersihan.
+    test.setTimeout(180_000);
     await masuk(page);
     const tag = `${info.project.name} ${Date.now()}`;
     const akun = `E2E Utang Akun ${tag}`;
@@ -72,7 +74,9 @@ test.describe("utang & piutang", () => {
     }
     for (const [nama, jenis] of [[utang, "utang"], [piutang, "piutang"]] as const) {
       await page.goto(`/utang?jenis=${jenis}`);
-      await page.getByText(/^Lunas \/ diarsipkan/).click().catch(() => {});
+      // Item lunas ada di bagian terlipat; buka hanya jika bagian itu ada.
+      const terlipat = page.getByText(/^Lunas \/ diarsipkan/);
+      if (await terlipat.isVisible()) await terlipat.click();
       await page.getByRole("link", { name: new RegExp(nama) }).first().click();
       await page.getByRole("button", { name: "Hapus" }).click();
       await page.getByRole("button", { name: "Ya, hapus" }).click();
