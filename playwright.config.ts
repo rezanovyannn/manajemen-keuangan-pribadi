@@ -11,6 +11,8 @@ const PORT = 3000;
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  // Bersihkan data uji "E2E ..." dari akun uji setelah semua test selesai.
+  globalTeardown: "./tests/e2e/global-teardown.ts",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
