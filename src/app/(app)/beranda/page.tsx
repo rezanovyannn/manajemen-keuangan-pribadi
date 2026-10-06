@@ -13,8 +13,9 @@ import { AddTransactionButton } from "@/components/transactions/add-button";
 import { requireUser } from "@/lib/auth/session";
 import { loadMonthBudgets } from "@/lib/budgets/query";
 import { loadDashboard } from "@/lib/dashboard/query";
+import { loadDebts } from "@/lib/debts/query";
 import { currentMonthInJakarta, resolvePeriod, todayInJakarta } from "@/lib/dates";
-import { countBudgetAlerts } from "@/lib/money";
+import { countBudgetAlerts, netWorth, totalBalance } from "@/lib/money";
 import { loadSuggestions } from "@/lib/recurring/suggestions";
 
 export const metadata: Metadata = { title: "Beranda · Keuangan Pribadi" };
@@ -38,12 +39,22 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
   const pesan = PESAN[teks(sp.status) ?? ""];
   const { supabase, user } = await requireUser();
 
-  const [{ data: profile }, budgets, dash, saran] = await Promise.all([
+  const [{ data: profile }, budgets, dash, saran, debts] = await Promise.all([
     supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
     loadMonthBudgets(supabase, month),
     loadDashboard(supabase, period),
     loadSuggestions(supabase, today),
+    loadDebts(supabase),
   ]);
+  const terbuka = debts.items.filter((d) => !d.archived && !d.status.settled);
+  const nilaiBersih =
+    dash.totalSaldo === null || debts.error
+      ? null
+      : netWorth({
+          accounts: dash.totalSaldo,
+          receivables: totalBalance(terbuka.filter((d) => d.kind === "piutang").map((d) => d.status.remaining)),
+          payables: totalBalance(terbuka.filter((d) => d.kind === "utang").map((d) => d.status.remaining)),
+        }).netWorth;
   const alerts = countBudgetAlerts(budgets.items.map((b) => b.usage));
   const bagian = [
     alerts.terlampaui > 0 && `${alerts.terlampaui} budget terlampaui`,
@@ -75,7 +86,7 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
       <PeriodPicker period={period} />
       <FormAlert tone="error" message={dash.error ? "Sebagian data gagal dimuat. Coba muat ulang halaman." : undefined} />
 
-      <SummaryTiles {...dash.summary} totalSaldo={dash.totalSaldo} />
+      <SummaryTiles {...dash.summary} totalSaldo={dash.totalSaldo} netWorth={nilaiBersih} />
 
       <section aria-labelledby="judul-kategori" className="grid grid-cols-1 gap-3 rounded-xl border border-border p-4">
         <h2 id="judul-kategori" className="font-medium">

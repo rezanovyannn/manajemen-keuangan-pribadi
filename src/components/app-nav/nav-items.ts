@@ -5,6 +5,7 @@ import {
   House,
   PiggyBank,
   Repeat,
+  Scale,
   Tags,
   Target,
   Wallet,
@@ -28,6 +29,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Perencanaan",
     items: [
+      { href: "/net-worth", label: "Net worth", Icon: Scale },
       { href: "/tujuan", label: "Tujuan tabungan", Icon: Target },
       { href: "/utang", label: "Utang & piutang", Icon: HandCoins },
       { href: "/berulang", label: "Transaksi berulang", Icon: Repeat },
