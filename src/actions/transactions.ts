@@ -50,7 +50,14 @@ function bacaPenanda(formData: FormData): RecurringMark | null | "invalid" {
   return parsed.success ? parsed.data : "invalid";
 }
 
-async function simpanBaru(input: TransactionInput, mark: RecurringMark | null) {
+// Penanda utang/piutang (dikirim saat menekan "Bayar"/"Terima" dari halaman utang).
+function bacaUtang(formData: FormData): string | null | "invalid" {
+  const debtId = formData.get("debtId");
+  if (!debtId) return null;
+  return idSchema.safeParse(debtId).success ? String(debtId) : "invalid";
+}
+
+async function simpanBaru(input: TransactionInput, mark: RecurringMark | null, debtId: string | null) {
   const { supabase, user } = await requireUser();
   if (input.type === "transfer") {
     return supabase.rpc("create_transfer", {
@@ -71,6 +78,7 @@ async function simpanBaru(input: TransactionInput, mark: RecurringMark | null) {
     note: input.note,
     // Kolom jadwal hanya dikirim jika transaksi berasal dari jadwal berulang.
     ...(mark ? { recurring_rule_id: mark.ruleId, recurring_date: mark.date } : {}),
+    ...(debtId ? { debt_id: debtId } : {}),
   });
 }
 
@@ -86,20 +94,31 @@ export async function createTransaction(
   }
 
   const mark = bacaPenanda(formData);
-  if (mark === "invalid" || (mark && parsed.data.type === "transfer")) {
+  const debtId = bacaUtang(formData);
+  if (mark === "invalid" || debtId === "invalid" || ((mark || debtId) && parsed.data.type === "transfer")) {
     return { error: PESAN_GAGAL_TRANSAKSI, values };
   }
 
-  const { error } = await simpanBaru(parsed.data, mark);
+  const { error } = await simpanBaru(parsed.data, mark, debtId);
   // Jadwal ini sudah pernah dicatat (misal tombol ditekan dua kali): jangan buat duplikat.
   const sudahDicatat = mark && error?.code === "23505" && error.message.includes("transactions_recurring_unique");
   if (error && !sudahDicatat) {
     console.error("[transactions] tambah gagal", { code: error.code });
+    // Bayar utang harus pengeluaran, terima piutang harus pemasukan (dijaga FK).
+    if (debtId && error.message.includes("transactions_debt_fkey")) {
+      return { error: "Bayar utang dicatat sebagai pengeluaran, terima piutang sebagai pemasukan.", values };
+    }
     return { error: pesanErrorTransaksi(error), values };
   }
 
   revalidatePath("/transaksi");
   revalidatePath("/akun");
+
+  if (debtId) {
+    revalidatePath("/utang");
+    revalidatePath("/net-worth");
+    redirect(`/utang/${debtId}?status=dibayar`);
+  }
 
   if (mark) {
     const adv = await advanceRule((await requireUser()).supabase, mark.ruleId, mark.date);
@@ -117,83 +136,4 @@ export async function createTransaction(
     redirect(`/transaksi/baru?${params}`);
   }
   redirect("/transaksi?tersimpan=1");
-}
-
-// Transaksi yang sedang diedit. transferId terisi jika transaksi berupa transfer.
-export type EditTarget = { id: string; transferId: string | null };
-
-function targetValid(target: EditTarget) {
-  return idSchema.safeParse(target.id).success && (target.transferId === null || idSchema.safeParse(target.transferId).success);
-}
-
-export async function updateTransaction(
-  target: EditTarget,
-  _prev: TransactionFormState,
-  formData: FormData,
-): Promise<TransactionFormState> {
-  const values = bacaForm(formData);
-  const parsed = transactionSchema.safeParse(values);
-  if (!parsed.success) {
-    const flat = z.flattenError(parsed.error);
-    return { fieldErrors: flat.fieldErrors, error: flat.formErrors[0], values };
-  }
-  const input = parsed.data;
-  // Transfer tidak bisa diubah menjadi pemasukan/pengeluaran atau sebaliknya.
-  if (!targetValid(target) || (target.transferId !== null) !== (input.type === "transfer")) {
-    return { error: PESAN_GAGAL_TRANSAKSI, values };
-  }
-
-  const { supabase } = await requireUser();
-  const { error, count } =
-    input.type === "transfer"
-      ? await supabase
-          .rpc("update_transfer", {
-            p_transfer_id: target.transferId!,
-            p_from_account_id: input.fromAccountId,
-            p_to_account_id: input.toAccountId,
-            p_amount: input.amount,
-            p_occurred_on: input.occurredOn,
-            p_note: input.note,
-          })
-          .then((r) => ({ error: r.error, count: 1 }))
-      : await supabase
-          .from("transactions")
-          .update(
-            {
-              type: input.type,
-              account_id: input.accountId,
-              category_id: input.categoryId,
-              amount: input.amount,
-              occurred_on: input.occurredOn,
-              note: input.note,
-            },
-            { count: "exact" },
-          )
-          .eq("id", target.id);
-
-  if (error || count === 0) {
-    if (error) console.error("[transactions] ubah gagal", { code: error.code });
-    return { error: error ? pesanErrorTransaksi(error) : "Transaksi tidak ditemukan.", values };
-  }
-
-  revalidatePath("/transaksi");
-  revalidatePath("/akun");
-  redirect(`/transaksi?bulan=${input.occurredOn.slice(0, 7)}&status=diubah`);
-}
-
-export async function deleteTransaction(target: EditTarget) {
-  if (!targetValid(target)) redirect("/transaksi");
-
-  const { supabase } = await requireUser();
-  const { error } = target.transferId
-    ? await supabase.rpc("delete_transfer", { p_transfer_id: target.transferId })
-    : await supabase.from("transactions").delete().eq("id", target.id);
-  if (error) {
-    console.error("[transactions] hapus gagal", { code: error.code });
-    redirect(`/transaksi/${target.id}?gagal=hapus`);
-  }
-
-  revalidatePath("/transaksi");
-  revalidatePath("/akun");
-  redirect("/transaksi?status=dihapus");
 }

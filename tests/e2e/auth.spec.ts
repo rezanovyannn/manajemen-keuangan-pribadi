@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { bukaMenu, masuk, skipTanpaAkunUji } from "./helpers";
 
-for (const path of ["/beranda", "/transaksi", "/akun", "/budget", "/profil", "/kategori", "/berulang", "/tujuan"]) {
+for (const path of ["/beranda", "/transaksi", "/akun", "/budget", "/profil", "/kategori", "/berulang", "/tujuan", "/utang"]) {
   test(`${path} mengarahkan tamu ke /masuk`, async ({ page }) => {
     await page.goto(path);
     await expect(page).toHaveURL(new RegExp(`/masuk\\?next=${encodeURIComponent(path)}$`));

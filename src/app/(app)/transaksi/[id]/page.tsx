@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { deleteTransaction, updateTransaction, type EditTarget } from "@/actions/transactions";
+import { deleteTransaction, updateTransaction, type EditTarget } from "@/actions/transactions-edit";
 import { FormAlert } from "@/components/auth/form-field";
 import { PageHeader } from "@/components/page-header";
 import { DeleteTransactionButton } from "@/components/transactions/delete-button";
