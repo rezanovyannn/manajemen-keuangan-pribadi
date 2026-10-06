@@ -1,45 +1,25 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { formatTanggal, todayInJakarta } from "../../src/lib/dates";
-import { arsipkanAkun, masuk, skipTanpaAkunUji } from "./helpers";
+import { AKUN, catat, hapusTransaksi, masuk, skipTanpaAkunUji } from "./helpers";
 
-// Setiap test memakai sub-kategori & akun unik agar desktop/HP yang paralel tidak bentrok.
+// Setiap test memakai sub-kategori unik (budget per kategori per bulan) dan akun tetap Cash On Hand.
 async function siapkan(page: Page, tag: string) {
   const sub = `E2E Budget ${tag}`;
-  const akun = `E2E Budget Akun ${tag}`;
   await page.goto("/kategori/baru?tipe=pengeluaran");
   await page.getByLabel("Nama kategori").fill(sub);
   await page.getByLabel("Masuk ke dalam").selectOption({ label: "Hiburan" });
   await page.getByRole("button", { name: "Simpan" }).click();
   await expect(page).toHaveURL(/\/kategori\?tipe=pengeluaran$/);
-
-  await page.goto("/akun/baru");
-  await page.getByLabel("Nama akun").fill(akun);
-  await page.getByLabel("Saldo awal").fill("1000000");
-  await page.getByRole("button", { name: "Simpan" }).click();
-  await expect(page).toHaveURL(/\/akun$/);
-  return { sub, label: `Hiburan › ${sub}`, akun };
+  return { sub, label: `Hiburan › ${sub}`, akun: AKUN.cash };
 }
 
 async function belanja(page: Page, akun: string, kategori: string, nominal: string, catatan: string) {
-  await page.goto("/transaksi/baru");
-  await page.getByLabel("Nominal").fill(nominal);
-  await page.getByLabel("Akun").selectOption({ label: akun });
-  await page.getByLabel("Kategori").selectOption({ label: kategori });
-  await page.getByLabel("Catatan (opsional)").fill(catatan);
-  await page.getByRole("button", { name: "Simpan", exact: true }).click();
-  await expect(page).toHaveURL(/tersimpan=1/);
+  await catat(page, { tipe: "expense", nominal, akun, kategori, catatan });
 }
 
-async function bersihkan(page: Page, s: { sub: string; akun: string }, catatan: string[]) {
-  for (const c of catatan) {
-    await page.goto(`/transaksi?cari=${encodeURIComponent(c)}`);
-    await page.getByRole("main").getByRole("listitem").first().getByRole("link").click();
-    await page.getByRole("button", { name: "Hapus transaksi" }).click();
-    await page.getByRole("button", { name: "Ya, hapus" }).click();
-    await expect(page.getByText("Transaksi dihapus.")).toBeVisible();
-  }
-  await arsipkanAkun(page, s.akun);
+async function bersihkan(page: Page, s: { sub: string }, catatan: string[]) {
+  for (const c of catatan) await hapusTransaksi(page, c);
   await page.goto("/kategori?tipe=pengeluaran");
   await page.getByRole("link", { name: s.sub }).click();
   await page.getByRole("button", { name: "Arsipkan kategori" }).click();
@@ -72,13 +52,13 @@ test.describe("budget", () => {
     await expect(kartu(page, s.sub)).toContainText("Sisa Rp 100.000");
 
     // 85% -> hampir habis.
-    await belanja(page, s.akun, s.label, "85000", `b1 ${tag}`);
+    await belanja(page, s.akun, s.label, "85000", `E2E b1 ${tag}`);
     await page.goto("/budget");
     await expect(kartu(page, s.sub)).toContainText("Hampir habis");
     await expect(kartu(page, s.sub).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "85");
 
     // 105% -> terlampaui, dan Beranda menampilkan peringatan.
-    await belanja(page, s.akun, s.label, "20000", `b2 ${tag}`);
+    await belanja(page, s.akun, s.label, "20000", `E2E b2 ${tag}`);
     await page.goto("/budget");
     await expect(kartu(page, s.sub)).toContainText("Terlampaui");
     await expect(kartu(page, s.sub)).toContainText("Lewat Rp 5.000");
@@ -91,7 +71,7 @@ test.describe("budget", () => {
     await expect(rincian).toBeVisible();
     const baris = rincian.locator("tbody tr");
     await expect(baris).toHaveCount(2);
-    await expect(baris.nth(0)).toContainText(`b1 ${tag}`);
+    await expect(baris.nth(0)).toContainText(`E2E b1 ${tag}`);
     await expect(baris.nth(0)).toContainText("Mulai hampir habis");
     await expect(baris.nth(0)).toContainText("Rp 85.000");
     await expect(baris.nth(1)).toContainText("Mulai terlampaui");
@@ -118,7 +98,7 @@ test.describe("budget", () => {
     await expect(page.getByText("Budget dihapus.")).toBeVisible();
     await expect(kartu(page, s.sub)).toHaveCount(0);
 
-    await bersihkan(page, s, [`b1 ${tag}`, `b2 ${tag}`]);
+    await bersihkan(page, s, [`E2E b1 ${tag}`, `E2E b2 ${tag}`]);
   });
 
   test("salin budget dari bulan lalu", async ({ page }, info) => {

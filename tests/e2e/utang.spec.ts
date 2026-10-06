@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { arsipkanAkun, bukaMenu, masuk, skipTanpaAkunUji } from "./helpers";
+import { AKUN, bukaMenu, hapusTransaksi, masuk, saldoAkun, skipTanpaAkunUji } from "./helpers";
 
 test.describe("utang & piutang", () => {
   skipTanpaAkunUji();
@@ -10,15 +10,10 @@ test.describe("utang & piutang", () => {
     test.setTimeout(180_000);
     await masuk(page);
     const tag = `${info.project.name} ${Date.now()}`;
-    const akun = `E2E Utang Akun ${tag}`;
+    const akun = AKUN.bri;
     const utang = `E2E Paylater ${tag}`;
     const piutang = `E2E Pinjam Budi ${tag}`;
-
-    await page.goto("/akun/baru");
-    await page.getByLabel("Nama akun").fill(akun);
-    await page.getByLabel("Saldo awal").fill("5000000");
-    await page.getByRole("button", { name: "Simpan" }).click();
-    await expect(page).toHaveURL(/\/akun$/);
+    const awal = await saldoAkun(page, akun);
 
     // Utang Rp 600.000, cicilan Rp 250.000.
     await bukaMenu(page, "Utang & piutang");
@@ -58,20 +53,12 @@ test.describe("utang & piutang", () => {
     await expect(page.getByText("Pembayaran tercatat.")).toBeVisible();
     await expect(page.getByRole("link", { name: new RegExp(`${piutang}, sisa Rp 200.000`) })).toBeVisible();
 
-    // Saldo akun ikut berubah: 5.000.000 - 600.000 + 100.000.
-    await page.goto("/akun");
-    await expect(page.getByRole("link", { name: new RegExp(akun) }).locator("p.tabular-nums")).toHaveText("Rp 4.500.000");
+    // Saldo akun ikut berubah: -600.000 (bayar utang) + 100.000 (terima piutang).
+    expect(await saldoAkun(page, akun)).toBe(awal - 500_000);
 
-    // Bersihkan: hapus transaksi uji, hapus utang/piutang, arsipkan akun.
-    await page.goto(`/transaksi?cari=${encodeURIComponent(tag)}`);
-    const daftar = page.getByRole("main").getByRole("listitem");
-    while ((await daftar.count()) > 0) {
-      await daftar.first().getByRole("link").click();
-      await page.getByRole("button", { name: "Hapus transaksi" }).click();
-      await page.getByRole("button", { name: "Ya, hapus" }).click();
-      await expect(page.getByText("Transaksi dihapus.")).toBeVisible();
-      await page.goto(`/transaksi?cari=${encodeURIComponent(tag)}`);
-    }
+    // Bersihkan: hapus transaksi uji (catatan memuat tag), lalu hapus utang/piutang.
+    await hapusTransaksi(page, tag);
+    expect(await saldoAkun(page, akun)).toBe(awal);
     for (const [nama, jenis] of [[utang, "utang"], [piutang, "piutang"]] as const) {
       await page.goto(`/utang?jenis=${jenis}`);
       // Item lunas ada di bagian terlipat; buka hanya jika bagian itu ada.
@@ -82,6 +69,5 @@ test.describe("utang & piutang", () => {
       await page.getByRole("button", { name: "Ya, hapus" }).click();
       await expect(page.getByText("Dihapus.")).toBeVisible();
     }
-    await arsipkanAkun(page, akun);
   });
 });

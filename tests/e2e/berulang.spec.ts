@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { addDays, todayInJakarta } from "../../src/lib/dates";
-import { arsipkanAkun, masuk, skipTanpaAkunUji } from "./helpers";
+import { AKUN, hapusTransaksi, masuk, skipTanpaAkunUji } from "./helpers";
 
 async function buatJadwal(page: Page, j: { nama: string; akun: string; nominal: string; frekuensi: string; mulai: string }) {
   await page.goto("/berulang/baru");
@@ -33,15 +33,9 @@ test.describe("transaksi berulang (saran, tanpa auto-catat)", () => {
     await masuk(page);
     const today = todayInJakarta();
     const tag = `${info.project.name} ${Date.now()}`;
-    const akun = `E2E Rutin ${tag}`;
+    const akun = AKUN.gopay;
     const tagihan = `E2E Netflix ${tag}`;
     const mingguan = `E2E Laundry ${tag}`;
-
-    await page.goto("/akun/baru");
-    await page.getByLabel("Nama akun").fill(akun);
-    await page.getByLabel("Saldo awal").fill("1000000");
-    await page.getByRole("button", { name: "Simpan" }).click();
-    await expect(page).toHaveURL(/\/akun$/);
 
     // Jadwal bulanan jatuh tempo hari ini.
     await buatJadwal(page, { nama: tagihan, akun, nominal: "186000", frekuensi: "Bulanan", mulai: today });
@@ -95,11 +89,6 @@ test.describe("transaksi berulang (saran, tanpa auto-catat)", () => {
     // Bersihkan.
     await hapusJadwal(page, tagihan);
     await hapusJadwal(page, mingguan);
-    await page.goto(`/transaksi?cari=${encodeURIComponent(tagihan)}`);
-    await daftar.first().getByRole("link").click();
-    await page.getByRole("button", { name: "Hapus transaksi" }).click();
-    await page.getByRole("button", { name: "Ya, hapus" }).click();
-    await expect(page.getByText("Transaksi dihapus.")).toBeVisible();
-    await arsipkanAkun(page, akun);
+    await hapusTransaksi(page, tagihan);
   });
 });

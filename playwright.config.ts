@@ -13,7 +13,10 @@ export default defineConfig({
   testDir: "./tests/e2e",
   // Bersihkan data uji "E2E ..." dari akun uji setelah semua test selesai.
   globalTeardown: "./tests/e2e/global-teardown.ts",
-  fullyParallel: true,
+  // Test memakai 4 akun tetap di akun uji (BRI, Mandiri, GoPay, Cash On Hand),
+  // jadi dijalankan berurutan agar saldo tidak saling memengaruhi.
+  fullyParallel: false,
+  workers: 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: "list",
