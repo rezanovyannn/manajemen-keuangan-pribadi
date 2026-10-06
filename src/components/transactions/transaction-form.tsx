@@ -98,6 +98,15 @@ function FormBody({
         </div>
       )}
 
+      <div className="grid gap-2">
+        <MoneyInput name="fee" label="Biaya admin (opsional)" defaultValue={values.fee} errors={err.fee} />
+        <p className="text-xs text-muted-foreground">
+          {type === "transfer"
+            ? "Dicatat sebagai pengeluaran \"Biaya Admin\" dari akun asal."
+            : "Dicatat sebagai pengeluaran \"Biaya Admin\" terpisah dari akun yang sama."}
+        </p>
+      </div>
+
       <FormField name="occurredOn" label="Tanggal" type="date" required defaultValue={values.occurredOn} errors={err.occurredOn} />
       <FormField name="note" label="Catatan (opsional)" placeholder="Contoh: makan siang" maxLength={200} autoComplete="off" defaultValue={values.note} errors={err.note} />
 

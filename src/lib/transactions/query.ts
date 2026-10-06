@@ -15,7 +15,7 @@ export type TransactionFilters = {
   search?: string;
 };
 
-const KOLOM = "id, account_id, category_id, type, amount, occurred_on, note, transfer_id, created_at";
+const KOLOM = "id, account_id, category_id, type, amount, occurred_on, note, transfer_id, created_at, fee_for_id";
 
 // Muat transaksi satu bulan beserta nama akun & label kategori, sudah difilter.
 export async function loadMonthTransactions(supabase: Supabase, filters: TransactionFilters) {
@@ -43,15 +43,29 @@ export async function loadMonthTransactions(supabase: Supabase, filters: Transac
     query = query.ilike("note", `%${escapeLike(filters.search)}%`);
   }
 
-  const { data: rows, error } = await query.returns<TransactionRowLite[]>();
-  const firstError = accountsRes.error ?? categoriesRes.error ?? error;
+  const { data, error } = await query.returns<TransactionRowLite[]>();
+  const rows = data ?? [];
+
+  // Dengan filter kategori/cari, baris biaya admin bisa tidak ikut terambil:
+  // ambil terpisah agar tetap menempel ke transaksi induknya.
+  let feeError: { code?: string } | null = null;
+  if (filters.categoryId || filters.search) {
+    const punyaFee = new Set(rows.map((r) => r.fee_for_id).filter(Boolean));
+    const induk = rows.filter((r) => !r.fee_for_id && r.type !== "transfer_in" && !punyaFee.has(r.id)).map((r) => r.id);
+    for (let i = 0; i < induk.length; i += 100) {
+      const res = await supabase.from("transactions").select(KOLOM).in("fee_for_id", induk.slice(i, i + 100)).returns<TransactionRowLite[]>();
+      if (res.error) feeError = res.error;
+      rows.push(...(res.data ?? []));
+    }
+  }
+  const firstError = accountsRes.error ?? categoriesRes.error ?? error ?? feeError;
   if (firstError) console.error("[transactions] daftar gagal", { code: firstError.code });
 
   const accountNames = new Map(accounts.map((a) => [a.id, a.name]));
   const allCategoryOptions = categoryOptions(categories);
   const categoryLabels = new Map(allCategoryOptions.map((c) => [c.value, c.label]));
 
-  const items = filterByAccount(toListItems(rows ?? [], accountNames, categoryLabels), filters.accountId);
+  const items = filterByAccount(toListItems(rows, accountNames, categoryLabels), filters.accountId);
 
   return {
     items,

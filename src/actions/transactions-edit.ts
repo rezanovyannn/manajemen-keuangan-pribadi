@@ -10,7 +10,7 @@ import { PESAN_GAGAL_TRANSAKSI, pesanErrorTransaksi } from "@/lib/transactions/e
 import { idSchema } from "@/lib/validators/common";
 import { transactionSchema } from "@/lib/validators/transaction";
 
-const FIELDS = ["type", "amount", "accountId", "categoryId", "fromAccountId", "toAccountId", "occurredOn", "note"] as const;
+const FIELDS = ["type", "amount", "accountId", "categoryId", "fromAccountId", "toAccountId", "occurredOn", "note", "fee"] as const;
 
 function bacaForm(formData: FormData) {
   return Object.fromEntries(
@@ -21,8 +21,9 @@ function bacaForm(formData: FormData) {
   ) as Record<(typeof FIELDS)[number], string>;
 }
 
-// Transaksi yang sedang diedit. transferId terisi jika transaksi berupa transfer.
-export type EditTarget = { id: string; transferId: string | null };
+// Transaksi yang sedang diedit. transferId terisi jika transaksi berupa transfer;
+// hasFee = saat ini sudah punya biaya admin.
+export type EditTarget = { id: string; transferId: string | null; hasFee: boolean };
 
 function targetValid(target: EditTarget) {
   return idSchema.safeParse(target.id).success && (target.transferId === null || idSchema.safeParse(target.transferId).success);
@@ -46,36 +47,50 @@ export async function updateTransaction(
   }
 
   const { supabase } = await requireUser();
-  const { error, count } =
-    input.type === "transfer"
-      ? await supabase
-          .rpc("update_transfer", {
-            p_transfer_id: target.transferId!,
-            p_from_account_id: input.fromAccountId,
-            p_to_account_id: input.toAccountId,
-            p_amount: input.amount,
-            p_occurred_on: input.occurredOn,
-            p_note: input.note,
-          })
-          .then((r) => ({ error: r.error, count: 1 }))
-      : await supabase
-          .from("transactions")
-          .update(
-            {
-              type: input.type,
-              account_id: input.accountId,
-              category_id: input.categoryId,
-              amount: input.amount,
-              occurred_on: input.occurredOn,
-              note: input.note,
-            },
-            { count: "exact" },
-          )
-          .eq("id", target.id);
+  // Biaya admin perlu disentuh jika diisi sekarang atau sebelumnya sudah ada (untuk dihapus).
+  const aturBiaya = input.fee !== null || target.hasFee;
+  let error: { code?: string; message?: string } | null;
+  let count: number | null = 1;
+  if (input.type === "transfer") {
+    const args = {
+      p_transfer_id: target.transferId!,
+      p_from_account_id: input.fromAccountId,
+      p_to_account_id: input.toAccountId,
+      p_amount: input.amount,
+      p_occurred_on: input.occurredOn,
+      p_note: input.note,
+    };
+    ({ error } = aturBiaya
+      ? await supabase.rpc("update_transfer_with_fee", { ...args, p_fee: input.fee })
+      : await supabase.rpc("update_transfer", args));
+  } else {
+    ({ error, count } = await supabase
+      .from("transactions")
+      .update(
+        {
+          type: input.type,
+          account_id: input.accountId,
+          category_id: input.categoryId,
+          amount: input.amount,
+          occurred_on: input.occurredOn,
+          note: input.note,
+        },
+        { count: "exact" },
+      )
+      .eq("id", target.id));
+  }
 
   if (error || count === 0) {
     if (error) console.error("[transactions] ubah gagal", { code: error.code });
     return { error: error ? pesanErrorTransaksi(error) : "Transaksi tidak ditemukan.", values };
+  }
+  // Pemasukan/pengeluaran: samakan biaya admin (buat/ubah/hapus, ikut akun & tanggal induk).
+  if (input.type !== "transfer" && aturBiaya) {
+    const fee = await supabase.rpc("set_transaction_fee", { p_parent_id: target.id, p_amount: input.fee });
+    if (fee.error) {
+      console.error("[transactions] ubah biaya gagal", { code: fee.error.code });
+      return { error: "Transaksi tersimpan, tapi biaya admin gagal disimpan. Silakan coba lagi.", values };
+    }
   }
 
   revalidatePath("/transaksi");

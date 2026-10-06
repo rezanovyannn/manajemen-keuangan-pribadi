@@ -51,6 +51,7 @@ type TransactionRow = {
   recurring_date: string | null;
   debt_id: string | null;
   debt_kind: DebtKind | null;
+  fee_for_id: string | null; // terisi jika baris ini biaya admin untuk transaksi lain
 } & Timestamps;
 
 type BudgetRow = {
@@ -174,6 +175,10 @@ export type Database = {
       create_transfer: { Args: TransferArgs; Returns: string };
       update_transfer: { Args: TransferArgs & { p_transfer_id: string }; Returns: undefined };
       delete_transfer: { Args: { p_transfer_id: string }; Returns: undefined };
+      ensure_fee_category: { Args: Record<string, never>; Returns: string };
+      set_transaction_fee: { Args: { p_parent_id: string; p_amount: number | null }; Returns: undefined };
+      create_transfer_with_fee: { Args: TransferArgs & { p_fee?: number | null }; Returns: string };
+      update_transfer_with_fee: { Args: TransferArgs & { p_transfer_id: string; p_fee?: number | null }; Returns: undefined };
     };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };

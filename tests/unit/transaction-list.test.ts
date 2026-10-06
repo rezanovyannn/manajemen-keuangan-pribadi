@@ -6,6 +6,7 @@ import {
   escapeLike,
   filterByAccount,
   groupByDate,
+  summaryRows,
   toListItems,
   type TransactionRowLite,
 } from "@/lib/transactions/list";
@@ -127,5 +128,34 @@ describe("helper bulan", () => {
 describe("escapeLike", () => {
   it("meng-escape wildcard ILIKE", () => {
     expect(escapeLike("diskon 50%_a\\b")).toBe("diskon 50\\%\\_a\\\\b");
+  });
+});
+
+describe("biaya admin di daftar", () => {
+  const dasar = [
+    row({ id: "e1", type: "expense", amount: 100_000, category_id: "makan" }),
+    row({ id: "f1", type: "expense", amount: 2_500, category_id: "admin", fee_for_id: "e1" }),
+    row({ id: "t-out", type: "transfer_out", amount: 300_000, account_id: "bca", transfer_id: "T1" }),
+    row({ id: "t-in", type: "transfer_in", amount: 300_000, transfer_id: "T1" }),
+    row({ id: "f2", type: "expense", amount: 6_500, account_id: "bca", category_id: "admin", fee_for_id: "t-out" }),
+  ];
+
+  it("biaya menempel ke induk dan tidak tampil sebagai baris sendiri", () => {
+    const items = toListItems(dasar, akun, kategori);
+    expect(items.map((i) => [i.id, i.fee])).toEqual([
+      ["e1", 2_500],
+      ["t-out", 6_500],
+    ]);
+  });
+
+  it("ringkasan menghitung biaya sebagai pengeluaran (transfer tetap tidak dihitung)", () => {
+    const items = toListItems(dasar, akun, kategori);
+    expect(summarizeIncomeExpense(summaryRows(items))).toEqual({ income: 0, expense: 109_000, net: -109_000 });
+  });
+
+  it("biaya tanpa induk di daftar (misal difilter) tampil sendiri", () => {
+    const items = toListItems([dasar[1]!], akun, kategori);
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({ id: "f1", kind: "expense", amount: 2_500 });
   });
 });

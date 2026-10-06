@@ -22,6 +22,7 @@ export type TransactionFormValues = {
   toAccountId?: string;
   occurredOn?: string;
   note?: string;
+  fee?: string;
 };
 
 export type TransactionFormState = {
@@ -30,7 +31,7 @@ export type TransactionFormState = {
   values?: TransactionFormValues;
 };
 
-const FIELDS = ["type", "amount", "accountId", "categoryId", "fromAccountId", "toAccountId", "occurredOn", "note"] as const;
+const FIELDS = ["type", "amount", "accountId", "categoryId", "fromAccountId", "toAccountId", "occurredOn", "note", "fee"] as const;
 
 function bacaForm(formData: FormData): Required<TransactionFormValues> {
   const out = {} as Required<TransactionFormValues>;
@@ -60,15 +61,18 @@ function bacaUtang(formData: FormData): string | null | "invalid" {
 async function simpanBaru(input: TransactionInput, mark: RecurringMark | null, debtId: string | null) {
   const { supabase, user } = await requireUser();
   if (input.type === "transfer") {
-    return supabase.rpc("create_transfer", {
+    const args = {
       p_from_account_id: input.fromAccountId,
       p_to_account_id: input.toAccountId,
       p_amount: input.amount,
       p_occurred_on: input.occurredOn,
       p_note: input.note,
-    });
+    };
+    // Biaya admin transfer dipotong dari akun asal, dalam satu fungsi database (atomik).
+    return input.fee ? supabase.rpc("create_transfer_with_fee", { ...args, p_fee: input.fee }) : supabase.rpc("create_transfer", args);
   }
-  return supabase.from("transactions").insert({
+
+  const induk = {
     user_id: user.id,
     type: input.type,
     account_id: input.accountId,
@@ -76,10 +80,29 @@ async function simpanBaru(input: TransactionInput, mark: RecurringMark | null, d
     amount: input.amount,
     occurred_on: input.occurredOn,
     note: input.note,
-    // Kolom jadwal hanya dikirim jika transaksi berasal dari jadwal berulang.
+    // Kolom penanda hanya dikirim jika memang dipakai.
     ...(mark ? { recurring_rule_id: mark.ruleId, recurring_date: mark.date } : {}),
     ...(debtId ? { debt_id: debtId } : {}),
-  });
+  };
+  if (!input.fee) return supabase.from("transactions").insert(induk);
+
+  // Dengan biaya admin: induk + biaya disimpan dalam SATU perintah insert (atomik).
+  const kategori = await supabase.rpc("ensure_fee_category");
+  if (kategori.error) return kategori;
+  const id = crypto.randomUUID();
+  return supabase.from("transactions").insert([
+    { ...induk, id },
+    {
+      user_id: user.id,
+      type: "expense" as const,
+      account_id: input.accountId,
+      category_id: kategori.data,
+      amount: input.fee,
+      occurred_on: input.occurredOn,
+      note: "Biaya admin",
+      fee_for_id: id,
+    },
+  ]);
 }
 
 export async function createTransaction(

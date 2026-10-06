@@ -9,6 +9,7 @@ import { TransactionList } from "@/components/transactions/transaction-list";
 import { requireUser } from "@/lib/auth/session";
 import { currentMonthInJakarta, isValidMonthString } from "@/lib/dates";
 import { formatRupiah, summarizeIncomeExpense } from "@/lib/money";
+import { summaryRows } from "@/lib/transactions/list";
 import { loadMonthTransactions, type TransactionFilters } from "@/lib/transactions/query";
 import { cn } from "@/lib/utils";
 import { idSchema } from "@/lib/validators/common";
@@ -40,7 +41,8 @@ export default async function TransaksiPage({ searchParams }: PageProps<"/transa
   };
 
   const { items, accountOptions, categoryOptions, error } = await loadMonthTransactions(supabase, filters);
-  const ringkasan = summarizeIncomeExpense(items.map((i) => ({ type: i.kind, amount: i.amount })));
+  // Biaya admin ikut dihitung sebagai pengeluaran.
+  const ringkasan = summarizeIncomeExpense(summaryRows(items));
   const pesan = sp.tersimpan === "1" ? PESAN.tersimpan : PESAN[teks(sp.status)];
 
   return (

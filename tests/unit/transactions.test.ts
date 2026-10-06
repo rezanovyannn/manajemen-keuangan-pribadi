@@ -50,7 +50,20 @@ describe("transactionSchema", () => {
       amount: 35_000,
       occurredOn: "2026-10-05",
       note: "makan siang",
+      fee: null,
     });
+  });
+
+  it("biaya admin opsional: kosong/0 = tanpa biaya, angka bulat diterima, desimal ditolak", () => {
+    const base = { type: "expense", accountId: A1, categoryId: K1, ...umum };
+    expect(transactionSchema.parse(base).fee).toBeNull();
+    expect(transactionSchema.parse({ ...base, fee: "" }).fee).toBeNull();
+    expect(transactionSchema.parse({ ...base, fee: "0" }).fee).toBeNull();
+    expect(transactionSchema.parse({ ...base, fee: "2.500" }).fee).toBe(2_500);
+    expect(transactionSchema.parse({ type: "transfer", fromAccountId: A1, toAccountId: A2, ...umum, fee: "6500" }).fee).toBe(6_500);
+    const r = transactionSchema.safeParse({ ...base, fee: "2,5" });
+    expect(r.success).toBe(false);
+    expect(r.error?.issues[0]?.path).toEqual(["fee"]);
   });
 
   it("catatan kosong menjadi null", () => {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { deleteTransaction, updateTransaction, type EditTarget } from "@/actions/transactions-edit";
 import { FormAlert } from "@/components/auth/form-field";
@@ -12,7 +12,7 @@ import { idSchema } from "@/lib/validators/common";
 
 export const metadata: Metadata = { title: "Ubah Transaksi · Keuangan Pribadi" };
 
-const KOLOM = "id, account_id, category_id, type, amount, occurred_on, note, transfer_id";
+const KOLOM = "id, account_id, category_id, type, amount, occurred_on, note, transfer_id, fee_for_id";
 
 export default async function UbahTransaksiPage({ params, searchParams }: PageProps<"/transaksi/[id]">) {
   const { id } = await params;
@@ -23,23 +23,30 @@ export default async function UbahTransaksiPage({ params, searchParams }: PagePr
   // RLS: transaksi milik pengguna lain tidak akan ditemukan.
   const { data: row } = await supabase.from("transactions").select(KOLOM).eq("id", id).maybeSingle();
   if (!row) notFound();
+  // Baris biaya admin diubah lewat transaksi utamanya.
+  if (row.fee_for_id) redirect(`/transaksi/${row.fee_for_id}`);
 
-  // Transfer: ambil kedua sisinya.
-  let pasangan: { from: string; to: string } | null = null;
+  // Transfer: ambil kedua sisinya. Biaya admin transfer menempel di sisi transfer_out.
+  let pasangan: { from: string; to: string; outId: string } | null = null;
   if (row.transfer_id) {
-    const { data: sisi } = await supabase.from("transactions").select("account_id, type").eq("transfer_id", row.transfer_id);
-    const from = sisi?.find((s) => s.type === "transfer_out")?.account_id;
+    const { data: sisi } = await supabase.from("transactions").select("id, account_id, type").eq("transfer_id", row.transfer_id);
+    const out = sisi?.find((s) => s.type === "transfer_out");
     const to = sisi?.find((s) => s.type === "transfer_in")?.account_id;
-    if (!from || !to) notFound();
-    pasangan = { from, to };
+    if (!out || !to) notFound();
+    pasangan = { from: out.account_id, to, outId: out.id };
   }
+  const { data: biaya } = await supabase
+    .from("transactions")
+    .select("amount")
+    .eq("fee_for_id", pasangan?.outId ?? row.id)
+    .maybeSingle();
 
   const dipakai = [row.account_id, row.category_id, pasangan?.from, pasangan?.to].filter((v): v is string => Boolean(v));
   const { accounts, categories } = await loadTransactionFormOptions(supabase, dipakai);
 
-  const target: EditTarget = { id: row.id, transferId: row.transfer_id };
+  const target: EditTarget = { id: row.id, transferId: row.transfer_id, hasFee: Boolean(biaya) };
   const isTransfer = pasangan !== null;
-  const common = { amount: String(row.amount), occurredOn: row.occurred_on, note: row.note ?? "" };
+  const common = { amount: String(row.amount), occurredOn: row.occurred_on, note: row.note ?? "", fee: biaya ? String(biaya.amount) : "" };
   const initial = pasangan
     ? { type: "transfer" as const, fromAccountId: pasangan.from, toAccountId: pasangan.to, ...common }
     : {

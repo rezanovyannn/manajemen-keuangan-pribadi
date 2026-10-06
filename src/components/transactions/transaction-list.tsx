@@ -51,6 +51,7 @@ function Baris({ item }: { item: TransactionListItem }) {
         <p className="truncate text-xs text-muted-foreground">
           {sub}
           {item.note ? ` · ${item.note}` : ""}
+          {item.fee ? ` · admin ${formatRupiah(item.fee)}` : ""}
         </p>
       </div>
       <p
