@@ -7,6 +7,7 @@ import type { TransactionType } from "@/lib/money/balance";
 
 export type AccountType = "cash" | "bank" | "ewallet";
 export type CategoryType = "income" | "expense";
+export type DebtKind = "utang" | "piutang";
 export type { TransactionType };
 
 type Timestamps = { created_at: string; updated_at: string };
@@ -48,6 +49,8 @@ type TransactionRow = {
   transfer_id: string | null;
   recurring_rule_id: string | null;
   recurring_date: string | null;
+  debt_id: string | null;
+  debt_kind: DebtKind | null;
 } & Timestamps;
 
 type BudgetRow = {
@@ -74,6 +77,30 @@ type RecurringRuleRow = {
   end_date: string | null;
   next_due_date: string;
   paused: boolean;
+} & Timestamps;
+
+type GoalRow = {
+  id: string;
+  user_id: string;
+  name: string;
+  account_id: string;
+  target_amount: number;
+  deadline: string | null;
+  archived_at: string | null;
+} & Timestamps;
+
+type DebtRow = {
+  id: string;
+  user_id: string;
+  kind: DebtKind;
+  name: string;
+  counterparty: string | null;
+  principal: number;
+  installment_amount: number | null;
+  start_date: string;
+  due_date: string | null;
+  note: string | null;
+  archived_at: string | null;
 } & Timestamps;
 
 type TransferArgs = {
@@ -111,8 +138,8 @@ export type Database = {
         Row: TransactionRow;
         // Insert/update langsung hanya untuk income/expense (RLS); transfer lewat Functions.
         Insert: Pick<TransactionRow, "account_id" | "type" | "amount"> &
-          Partial<Omit<TransactionRow, "id" | "category_type" | "account_id" | "type" | "amount">>;
-        Update: Partial<Omit<TransactionRow, "id" | "user_id" | "category_type" | "transfer_id">>;
+          Partial<Omit<TransactionRow, "id" | "category_type" | "debt_kind" | "account_id" | "type" | "amount">>;
+        Update: Partial<Omit<TransactionRow, "id" | "user_id" | "category_type" | "debt_kind" | "transfer_id">>;
         Relationships: [];
       };
       recurring_rules: {
@@ -120,6 +147,19 @@ export type Database = {
         Insert: Omit<RecurringRuleRow, "id" | "user_id" | "category_type" | "created_at" | "updated_at" | "paused" | "note" | "end_date"> &
           Partial<Pick<RecurringRuleRow, "id" | "user_id" | "paused" | "note" | "end_date">>;
         Update: Partial<Omit<RecurringRuleRow, "id" | "user_id" | "category_type" | "created_at" | "updated_at">>;
+        Relationships: [];
+      };
+      goals: {
+        Row: GoalRow;
+        Insert: Pick<GoalRow, "name" | "account_id" | "target_amount"> & Partial<Pick<GoalRow, "id" | "user_id" | "deadline" | "archived_at">>;
+        Update: Partial<Pick<GoalRow, "name" | "account_id" | "target_amount" | "deadline" | "archived_at">>;
+        Relationships: [];
+      };
+      debts: {
+        Row: DebtRow;
+        Insert: Pick<DebtRow, "kind" | "name" | "principal" | "start_date"> &
+          Partial<Pick<DebtRow, "id" | "user_id" | "counterparty" | "installment_amount" | "due_date" | "note" | "archived_at">>;
+        Update: Partial<Omit<DebtRow, "id" | "user_id" | "created_at" | "updated_at">>;
         Relationships: [];
       };
       budgets: {
