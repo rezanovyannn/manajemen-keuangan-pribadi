@@ -46,7 +46,9 @@ test.describe("transaksi", () => {
 
     // Filter akun tujuan (GoPay) + cari: transfer tampil sebagai satu baris BRI → GoPay.
     let daftar = await cariTransaksi(page, tarik);
-    await page.getByText(/^Filter & cari/).click();
+    // Panel filter sudah terbuka otomatis saat pencarian aktif; buka hanya jika tertutup.
+    const panel = page.locator("details").filter({ hasText: "Filter & cari" });
+    if ((await panel.getAttribute("open")) === null) await page.getByText(/^Filter & cari/).click();
     await page.getByLabel("Filter akun").selectOption({ label: AKUN.gopay });
     await page.getByRole("button", { name: "Terapkan" }).click();
     await expect(daftar).toHaveCount(1);

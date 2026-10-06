@@ -139,7 +139,7 @@ export type Database = {
         Row: TransactionRow;
         // Insert/update langsung hanya untuk income/expense (RLS); transfer lewat Functions.
         Insert: Pick<TransactionRow, "account_id" | "type" | "amount"> &
-          Partial<Omit<TransactionRow, "id" | "category_type" | "debt_kind" | "account_id" | "type" | "amount">>;
+          Partial<Omit<TransactionRow, "category_type" | "debt_kind" | "account_id" | "type" | "amount">>;
         Update: Partial<Omit<TransactionRow, "id" | "user_id" | "category_type" | "debt_kind" | "transfer_id">>;
         Relationships: [];
       };

@@ -87,12 +87,15 @@ async function simpanBaru(input: TransactionInput, mark: RecurringMark | null, d
   if (!input.fee) return supabase.from("transactions").insert(induk);
 
   // Dengan biaya admin: induk + biaya disimpan dalam SATU perintah insert (atomik).
+  // Kedua baris wajib punya id sendiri: pada insert banyak baris, kolom yang tidak
+  // diisi dikirim sebagai NULL (bukan default), sehingga id kosong akan ditolak.
   const kategori = await supabase.rpc("ensure_fee_category");
   if (kategori.error) return kategori;
   const id = crypto.randomUUID();
   return supabase.from("transactions").insert([
     { ...induk, id },
     {
+      id: crypto.randomUUID(),
       user_id: user.id,
       type: "expense" as const,
       account_id: input.accountId,
