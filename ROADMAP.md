@@ -122,7 +122,7 @@ catat apa yang mengganggu, lalu sesuaikan prioritas fase berikutnya.
 ## Fase 9 — PWA dan kolaborasi (±3–4 hari)
 
 - [x] PWA: bisa di-install di HP, ikon, tampilan layar penuh
-- [ ] Dukungan offline sederhana untuk input transaksi (sinkron saat online)
+- [x] Dukungan offline sederhana untuk input transaksi (sinkron saat online)
 - ~~Shared budget untuk pasangan (anggota dengan izin terbatas)~~ (dilewati, keputusan 7 Okt 2026)
 - ~~Notifikasi (email via Resend atau push)~~ (dilewati, keputusan 7 Okt 2026)
 

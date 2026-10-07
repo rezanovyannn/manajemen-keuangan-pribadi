@@ -1,5 +1,6 @@
 import { AppMobileBar } from "@/components/app-nav/app-mobile-bar";
 import { AppSidebar } from "@/components/app-nav/app-sidebar";
+import { OfflineSync } from "@/components/offline/offline-sync";
 
 // Layout halaman setelah login: sidebar di desktop, bar atas + menu laci di HP.
 export default function AppLayout({ children }: LayoutProps<"/">) {
@@ -8,7 +9,12 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
       <AppSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <AppMobileBar />
-        <main className="flex min-w-0 flex-1 flex-col px-4 pt-4 pb-8 md:px-8 md:pt-8">{children}</main>
+        <main className="flex min-w-0 flex-1 flex-col px-4 pt-4 pb-8 md:px-8 md:pt-8">
+          <div className="w-full max-w-xl">
+            <OfflineSync />
+          </div>
+          {children}
+        </main>
       </div>
     </div>
   );

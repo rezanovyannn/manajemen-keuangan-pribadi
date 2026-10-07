@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { RegisterServiceWorker } from "@/components/offline/register-sw";
 import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <ThemeProvider>{children}</ThemeProvider>
+        <RegisterServiceWorker />
       </body>
     </html>
   );

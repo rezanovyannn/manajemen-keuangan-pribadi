@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { createTransaction } from "@/actions/transactions";
+import { SaveOfflineOptions } from "@/components/offline/save-offline-options";
 import { PageHeader } from "@/components/page-header";
 import { TransactionForm } from "@/components/transactions/transaction-form";
 import { buttonVariants } from "@/components/ui/button";
@@ -113,6 +114,8 @@ export default async function TransaksiBaruPage({ searchParams }: PageProps<"/tr
 
   return (
     <div className="grid max-w-xl grid-cols-1">
+      {/* Simpan daftar akun & kategori di HP untuk form offline. */}
+      <SaveOfflineOptions accounts={accounts} categories={categories} />
       <PageHeader title="Tambah transaksi" />
       <TransactionForm
         action={createTransaction}
