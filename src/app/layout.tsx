@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+
 import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
@@ -14,9 +15,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Warna bar status/browser di HP mengikuti tema terang/gelap.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
+};
+
 export const metadata: Metadata = {
   title: "Keuangan Pribadi",
   description: "Aplikasi manajemen keuangan pribadi",
+  applicationName: "Keuangan Pribadi",
+  // iPhone: buka layar penuh saat dipasang lewat "Add to Home Screen".
+  appleWebApp: { capable: true, title: "Keuangan", statusBarStyle: "default" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

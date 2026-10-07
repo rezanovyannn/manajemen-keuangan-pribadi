@@ -60,6 +60,27 @@ export default async function ProfilPage() {
       <Card>
         <CardHeader>
           <CardTitle>
+            <h2>Pasang di HP</h2>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-2 text-sm text-muted-foreground">
+          <p>Pasang aplikasi ini di layar utama agar terbuka layar penuh seperti aplikasi biasa.</p>
+          <ul className="grid list-disc gap-1 pl-5">
+            <li>
+              <span className="font-medium text-foreground">Android (Chrome):</span> ketuk menu ⋮ lalu &quot;Instal aplikasi&quot;
+              atau &quot;Tambahkan ke Layar utama&quot;.
+            </li>
+            <li>
+              <span className="font-medium text-foreground">iPhone (Safari):</span> ketuk tombol Bagikan lalu &quot;Tambah ke Layar
+              Utama&quot;.
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>
             <h2>Tampilan</h2>
           </CardTitle>
         </CardHeader>

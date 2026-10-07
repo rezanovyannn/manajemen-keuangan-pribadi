@@ -44,7 +44,7 @@ function redirectWithCookies(
 
 export const config = {
   matcher: [
-    // Lewati file statis, optimasi gambar, dan aset publik.
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    // Lewati file statis, optimasi gambar, aset publik, dan file PWA (manifest, service worker).
+    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

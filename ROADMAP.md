@@ -109,22 +109,22 @@ catat apa yang mengganggu, lalu sesuaikan prioritas fase berikutnya.
 
 ---
 
-## Fase 8 — Import dan input cepat (±3–4 hari)
+## Fase 8 — Import dan input cepat (±3–4 hari) — DILEWATI (keputusan 7 Okt 2026: target aplikasi gratis)
 
-- [ ] Import CSV mutasi bank/e-wallet dengan pemetaan kolom
-- [ ] Deteksi duplikat saat import
-- [ ] Aturan kategori otomatis (contoh: "Indomaret" → Belanja harian)
-- [ ] Input bahasa natural, contoh "makan siang 35rb gopay" (memakai LLM API)
-- [ ] Upload foto struk ke Supabase Storage (private bucket)
+- ~~Import CSV mutasi bank/e-wallet dengan pemetaan kolom~~
+- ~~Deteksi duplikat saat import~~
+- ~~Aturan kategori otomatis (contoh: "Indomaret" → Belanja harian)~~
+- ~~Input bahasa natural, contoh "makan siang 35rb gopay" (memakai LLM API)~~
+- ~~Upload foto struk ke Supabase Storage (private bucket)~~
 
 ---
 
 ## Fase 9 — PWA dan kolaborasi (±3–4 hari)
 
-- [ ] PWA: bisa di-install di HP, ikon, tampilan layar penuh
+- [x] PWA: bisa di-install di HP, ikon, tampilan layar penuh
 - [ ] Dukungan offline sederhana untuk input transaksi (sinkron saat online)
-- [ ] Shared budget untuk pasangan (anggota dengan izin terbatas)
-- [ ] Notifikasi (email via Resend atau push)
+- ~~Shared budget untuk pasangan (anggota dengan izin terbatas)~~ (dilewati, keputusan 7 Okt 2026)
+- ~~Notifikasi (email via Resend atau push)~~ (dilewati, keputusan 7 Okt 2026)
 
 ---
 
