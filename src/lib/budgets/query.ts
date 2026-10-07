@@ -24,6 +24,8 @@ export type BudgetDetail = BudgetTimelineItem<{ id: string; amount: number; occu
 export type BudgetItem = {
   id: string;
   categoryId: string;
+  // Kategori budget + sub-kategorinya.
+  categoryIds: string[];
   label: string;
   usage: BudgetUsage;
   // Rincian transaksi kategori ini (urut tanggal) dengan total berjalan.
@@ -94,6 +96,7 @@ export async function loadMonthBudgets(supabase: Supabase, month: string) {
       return {
         id: b.id,
         categoryId: b.category_id,
+        categoryIds: [...ids],
         label: labels.get(b.category_id) ?? "(kategori tidak ditemukan)",
         usage: budgetUsage(b.amount, budgetSpent(b.category_id, totals, categories)),
         details: timeline.items,

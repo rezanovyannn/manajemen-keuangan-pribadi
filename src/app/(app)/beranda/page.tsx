@@ -6,6 +6,7 @@ import { FormAlert } from "@/components/auth/form-field";
 import { AccountCashflowList } from "@/components/dashboard/account-cashflow";
 import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown";
 import { PeriodPicker } from "@/components/dashboard/period-picker";
+import { SafeToSpendCard } from "@/components/insight/safe-to-spend-card";
 import { SummaryTiles } from "@/components/dashboard/summary-tiles";
 import { PageHeader } from "@/components/page-header";
 import { RecurringSuggestions } from "@/components/recurring/suggestions";
@@ -14,6 +15,7 @@ import { requireUser } from "@/lib/auth/session";
 import { loadMonthBudgets } from "@/lib/budgets/query";
 import { loadDashboard } from "@/lib/dashboard/query";
 import { loadDebts } from "@/lib/debts/query";
+import { buildSafeToSpend, loadMonthRules } from "@/lib/insight/query";
 import { currentMonthInJakarta, resolvePeriod, todayInJakarta } from "@/lib/dates";
 import { countBudgetAlerts, netWorth, totalBalance } from "@/lib/money";
 import { loadSuggestions } from "@/lib/recurring/suggestions";
@@ -39,13 +41,15 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
   const pesan = PESAN[teks(sp.status) ?? ""];
   const { supabase, user } = await requireUser();
 
-  const [{ data: profile }, budgets, dash, saran, debts] = await Promise.all([
+  const [{ data: profile }, budgets, dash, saran, debts, jadwal] = await Promise.all([
     supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
     loadMonthBudgets(supabase, month),
     loadDashboard(supabase, period),
     loadSuggestions(supabase, today),
     loadDebts(supabase),
+    loadMonthRules(supabase),
   ]);
+  const aman = buildSafeToSpend({ today, totalSaldo: dash.totalSaldo, budgets, rules: jadwal });
   const terbuka = debts.items.filter((d) => !d.archived && !d.status.settled);
   const nilaiBersih =
     dash.totalSaldo === null || debts.error
@@ -87,6 +91,7 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
       <FormAlert tone="error" message={dash.error ? "Sebagian data gagal dimuat. Coba muat ulang halaman." : undefined} />
 
       <SummaryTiles {...dash.summary} totalSaldo={dash.totalSaldo} netWorth={nilaiBersih} />
+      {aman && <SafeToSpendCard safe={aman} />}
 
       <section aria-labelledby="judul-kategori" className="grid grid-cols-1 gap-3 rounded-xl border border-border p-4">
         <h2 id="judul-kategori" className="font-medium">

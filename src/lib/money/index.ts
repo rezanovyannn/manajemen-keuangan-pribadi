@@ -52,3 +52,14 @@ export {
   type IncomeStability,
   type MonthlyNeed,
 } from "./planning";
+export {
+  projectCashflow,
+  safeToSpend,
+  upcomingOccurrences,
+  type AccountShortfall,
+  type CashflowProjection,
+  type Occurrence,
+  type ProjectionPoint,
+  type ProjectionRule,
+  type SafeToSpend,
+} from "./projection";

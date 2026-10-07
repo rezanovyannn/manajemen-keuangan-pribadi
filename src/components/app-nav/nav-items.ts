@@ -2,6 +2,7 @@ import {
   ArrowLeftRight,
   CircleUser,
   HandCoins,
+  Lightbulb,
   House,
   PiggyBank,
   Repeat,
@@ -29,6 +30,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Perencanaan",
     items: [
+      { href: "/insight", label: "Insight & proyeksi", Icon: Lightbulb },
       { href: "/net-worth", label: "Net worth", Icon: Scale },
       { href: "/tujuan", label: "Tujuan tabungan", Icon: Target },
       { href: "/utang", label: "Utang & piutang", Icon: HandCoins },
