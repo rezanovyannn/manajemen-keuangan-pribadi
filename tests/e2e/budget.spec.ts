@@ -45,7 +45,7 @@ test.describe("budget", () => {
     const s = await siapkan(page, tag);
 
     await page.goto("/budget");
-    await page.getByRole("link", { name: "Tambah" }).click();
+    await page.getByRole("link", { name: "Tambah", exact: true }).click();
     await page.getByLabel("Kategori pengeluaran").selectOption({ label: s.label });
     await page.getByLabel("Batas per bulan").fill("100000");
     await page.getByRole("button", { name: "Simpan" }).click();

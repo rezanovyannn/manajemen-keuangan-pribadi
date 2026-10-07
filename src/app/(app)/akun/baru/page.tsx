@@ -11,7 +11,7 @@ export default async function AkunBaruPage() {
   await requireUser();
 
   return (
-    <div className="grid max-w-xl grid-cols-1">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-1">
       <PageHeader title="Tambah akun" />
       <AccountForm action={createAccount} submitLabel="Simpan" />
     </div>

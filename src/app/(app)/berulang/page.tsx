@@ -33,7 +33,7 @@ export default async function BerulangPage({ searchParams }: PageProps<"/berulan
   const pesan = typeof status === "string" ? PESAN[status] : undefined;
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-4">
+    <div className="grid w-full max-w-3xl grid-cols-1 gap-4 lg:gap-5">
       <div className="flex items-start justify-between gap-4">
         <PageHeader title="Transaksi berulang" description="Tagihan dan pemasukan rutin. Aplikasi menyarankan, Anda yang mencatat." />
         <Link href="/berulang/baru" className={cn(buttonVariants({ size: "lg" }), "h-10 shrink-0")}>

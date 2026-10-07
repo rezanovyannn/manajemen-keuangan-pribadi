@@ -34,13 +34,13 @@ export function TransactionFiltersForm({
       <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
         Filter & cari{aktif ? " (aktif)" : ""}
       </summary>
-      <form action="/transaksi" className="grid gap-3 border-t border-border p-4">
+      <form action="/transaksi" className="grid gap-3 border-t border-border p-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-center">
         <input type="hidden" name="bulan" value={filters.month} />
         <div className="relative">
           <Search className="pointer-events-none absolute top-3 left-3 size-4 text-muted-foreground" aria-hidden />
           <Input name="cari" type="search" aria-label="Cari catatan" placeholder="Cari catatan..." defaultValue={filters.search} className="h-10 pl-9" />
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2 lg:contents">
           <select name="akun" aria-label="Filter akun" defaultValue={filters.accountId ?? ""} className={SELECT}>
             <option value="">Semua akun</option>
             {accounts.map((a) => (

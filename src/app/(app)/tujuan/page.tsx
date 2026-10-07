@@ -27,7 +27,7 @@ export default async function TujuanPage({ searchParams }: PageProps<"/tujuan">)
   const pesan = typeof status === "string" ? PESAN[status] : undefined;
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-4">
+    <div className="grid w-full grid-cols-1 gap-4 lg:gap-5">
       <div className="flex items-start justify-between gap-4">
         <PageHeader title="Tujuan tabungan" description="Progress dihitung dari saldo akun tabungan masing-masing." />
         <Link href="/tujuan/baru" className={cn(buttonVariants({ size: "lg" }), "h-10 shrink-0")}>
@@ -43,7 +43,7 @@ export default async function TujuanPage({ searchParams }: PageProps<"/tujuan">)
           Belum ada tujuan. Buat akun khusus tabungan, lalu hubungkan ke tujuan di sini.
         </div>
       ) : (
-        <ul className="grid grid-cols-1 gap-3">
+        <ul className="grid grid-cols-1 items-start gap-3 lg:grid-cols-2">
           {items.map((g) => (
             <li key={g.id}>
               <GoalCard goal={g} />

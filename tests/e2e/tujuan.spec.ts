@@ -22,7 +22,7 @@ test.describe("tujuan tabungan", () => {
     const persen = Math.min(100, Math.max(0, Math.floor((saldo * 100) / target)));
 
     await bukaMenu(page, "Tujuan tabungan");
-    await page.getByRole("link", { name: "Tambah" }).click();
+    await page.getByRole("link", { name: "Tambah", exact: true }).click();
     await page.getByLabel("Nama tujuan").fill(tujuan);
     await page.getByLabel("Target").fill(String(target));
     await page.getByLabel("Akun tabungan").selectOption({ label: akun });

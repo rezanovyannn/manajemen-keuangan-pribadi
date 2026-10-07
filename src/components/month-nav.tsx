@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export function MonthNav({ month, href }: { month: string; href: (month: string) => string }) {
   const nav = cn(buttonVariants({ variant: "ghost", size: "icon" }), "size-10");
   return (
-    <div className="flex items-center justify-between gap-2">
+    <div className="flex items-center justify-between gap-2 lg:max-w-sm">
       <Link href={href(shiftMonth(month, -1))} className={nav} aria-label="Bulan sebelumnya">
         <ChevronLeft aria-hidden />
       </Link>

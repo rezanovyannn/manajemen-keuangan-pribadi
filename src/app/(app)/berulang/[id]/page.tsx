@@ -28,7 +28,7 @@ export default async function UbahBerulangPage({ params }: PageProps<"/berulang/
   const status = r.paused ? "Dijeda" : isFinished(r) ? "Selesai" : `Jatuh tempo berikutnya ${formatTanggal(r.next_due_date)}`;
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-8">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-1 gap-8">
       <div>
         <PageHeader title={r.name} description={status} />
         <RecurringForm

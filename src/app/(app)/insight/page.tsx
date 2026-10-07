@@ -15,20 +15,23 @@ export default async function InsightPage() {
   const data = await loadProjection(supabase, todayInJakarta());
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-4">
+    <div className="grid w-full grid-cols-1 gap-4 lg:gap-5">
       <PageHeader title="Insight & proyeksi" description="Perkiraan dari saldo, jadwal berulang, dan budget bulan ini." />
       {data.error ? (
         <FormAlert tone="error" message="Data gagal dimuat. Coba muat ulang halaman." />
       ) : (
-        <>
-          <SafeToSpendCard safe={data.safe} detail />
+        // Desktop: kartu "aman dibelanjakan" di kiri (menempel saat digulir), proyeksi di kanan.
+        <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-5">
+          <div className="lg:sticky lg:top-10">
+            <SafeToSpendCard safe={data.safe} detail />
+          </div>
           <CashflowProjectionSection
             projection={data.projection}
             monthEnd={data.monthEnd}
             accountNames={data.accountNames}
             hasRules={data.hasRules}
           />
-        </>
+        </div>
       )}
     </div>
   );

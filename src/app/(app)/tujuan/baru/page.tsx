@@ -18,7 +18,7 @@ export default async function TujuanBaruPage() {
   const options = (accounts ?? []).filter((a) => !terpakai.has(a.id)).map((a) => ({ value: a.id, label: a.name }));
 
   return (
-    <div className="grid max-w-xl grid-cols-1">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-1">
       <PageHeader title="Tambah tujuan tabungan" />
       <GoalForm action={createGoal} accounts={options} submitLabel="Simpan" />
     </div>

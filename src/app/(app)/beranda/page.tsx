@@ -66,15 +66,19 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
   ].filter(Boolean);
 
   return (
-    // pb-16: ruang agar konten terakhir tidak tertutup tombol + melayang
-    <div className="grid max-w-xl grid-cols-1 gap-4 pb-16">
-      <PageHeader title={`Halo, ${profile?.display_name ?? "pengguna baru"}!`} description={period.label} />
-
-      <FormAlert tone={pesan?.tone ?? "success"} message={pesan?.text} />
-      <RecurringSuggestions items={saran.items} today={today} />
+    // pb-16: ruang agar konten terakhir tidak tertutup tombol + melayang (HP saja).
+    // HP: satu kolom (urutan lewat order-*). Desktop (lg): dua kolom; wrapper kolom
+    // memakai "contents" di HP agar isinya tetap satu alur.
+    <div className="grid w-full grid-cols-1 gap-4 pb-16 md:pb-0 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start lg:gap-5">
+      <div className="lg:col-span-2">
+        <PageHeader title={`Halo, ${profile?.display_name ?? "pengguna baru"}!`} description={period.label} />
+      </div>
+      <div className="empty:hidden lg:col-span-2">
+        <FormAlert tone={pesan?.tone ?? "success"} message={pesan?.text} />
+      </div>
 
       {bagian.length > 0 && (
-        <section aria-label="Peringatan budget">
+        <section aria-label="Peringatan budget" className="order-2 lg:order-none lg:col-span-2">
           <Link
             href={`/budget?bulan=${month}`}
             className="flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -87,25 +91,44 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
         </section>
       )}
 
-      <PeriodPicker period={period} />
-      <FormAlert tone="error" message={dash.error ? "Sebagian data gagal dimuat. Coba muat ulang halaman." : undefined} />
+      <div className="order-3 grid grid-cols-1 gap-2 lg:order-none lg:col-span-2 lg:max-w-md">
+        <PeriodPicker period={period} />
+        <FormAlert tone="error" message={dash.error ? "Sebagian data gagal dimuat. Coba muat ulang halaman." : undefined} />
+      </div>
 
-      <SummaryTiles {...dash.summary} totalSaldo={dash.totalSaldo} netWorth={nilaiBersih} />
-      {aman && <SafeToSpendCard safe={aman} />}
+      {/* Kolom kiri (desktop, lebih lebar): angka utama + arus kas per akun */}
+      <div className="contents lg:order-none lg:flex lg:flex-col lg:gap-5">
+        <div className="order-4 lg:order-none">
+          <SummaryTiles {...dash.summary} totalSaldo={dash.totalSaldo} netWorth={nilaiBersih} />
+        </div>
+        <section aria-labelledby="judul-akun" className="order-7 grid grid-cols-1 gap-3 lg:order-none">
+          <h2 id="judul-akun" className="px-1 font-semibold">
+            Arus kas per akun
+          </h2>
+          <AccountCashflowList items={dash.perAkun} />
+        </section>
+      </div>
 
-      <section aria-labelledby="judul-kategori" className="grid grid-cols-1 gap-3 rounded-xl border border-border bg-card p-4">
-        <h2 id="judul-kategori" className="font-medium">
-          Pengeluaran per kategori
-        </h2>
-        <ExpenseBreakdown {...dash.breakdown} />
-      </section>
-
-      <section aria-labelledby="judul-akun" className="grid grid-cols-1 gap-3">
-        <h2 id="judul-akun" className="px-1 font-medium">
-          Arus kas per akun
-        </h2>
-        <AccountCashflowList items={dash.perAkun} />
-      </section>
+      {/* Kolom kanan (desktop): saran jadwal, aman dibelanjakan, pengeluaran per kategori */}
+      <div className="contents lg:order-none lg:flex lg:flex-col lg:gap-5">
+        <div className="order-1 empty:hidden lg:order-none">
+          <RecurringSuggestions items={saran.items} today={today} />
+        </div>
+        {aman && (
+          <div className="order-5 lg:order-none">
+            <SafeToSpendCard safe={aman} />
+          </div>
+        )}
+        <section
+          aria-labelledby="judul-kategori"
+          className="order-6 grid grid-cols-1 gap-3 rounded-xl border border-border bg-card p-4 lg:order-none lg:p-5"
+        >
+          <h2 id="judul-kategori" className="font-semibold">
+            Pengeluaran per kategori
+          </h2>
+          <ExpenseBreakdown {...dash.breakdown} />
+        </section>
+      </div>
 
       <AddTransactionButton />
     </div>

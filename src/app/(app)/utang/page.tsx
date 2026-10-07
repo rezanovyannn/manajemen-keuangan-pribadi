@@ -31,7 +31,7 @@ export default async function UtangPage({ searchParams }: PageProps<"/utang">) {
   const totalSisa = totalBalance(aktif.map((d) => d.status.remaining));
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-4">
+    <div className="grid w-full grid-cols-1 gap-4 lg:gap-5">
       <div className="flex items-start justify-between gap-4">
         <PageHeader title="Utang & piutang" description="Sisa dihitung dari pembayaran yang ditandai." />
         <Link href={`/utang/baru?jenis=${kind}`} className={cn(buttonVariants({ size: "lg" }), "h-10 shrink-0")}>
@@ -40,7 +40,7 @@ export default async function UtangPage({ searchParams }: PageProps<"/utang">) {
         </Link>
       </div>
 
-      <nav aria-label="Jenis" className="grid grid-cols-2 rounded-lg border border-border p-0.5">
+      <nav aria-label="Jenis" className="grid grid-cols-2 rounded-lg border border-border bg-card p-0.5 lg:max-w-sm">
         {(["utang", "piutang"] as const).map((k) => (
           <Link
             key={k}
@@ -68,7 +68,7 @@ export default async function UtangPage({ searchParams }: PageProps<"/utang">) {
           {kind === "utang" ? "Tidak ada utang aktif." : "Tidak ada piutang aktif."}
         </div>
       ) : (
-        <ul className="grid grid-cols-1 gap-3">
+        <ul className="grid grid-cols-1 items-start gap-3 lg:grid-cols-2">
           {aktif.map((d) => (
             <li key={d.id}>
               <DebtCard debt={d} />
@@ -80,7 +80,7 @@ export default async function UtangPage({ searchParams }: PageProps<"/utang">) {
       {selesai.length > 0 && (
         <details className="rounded-xl border border-border bg-card">
           <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-muted-foreground">Lunas / diarsipkan ({selesai.length})</summary>
-          <ul className="grid grid-cols-1 gap-3 border-t border-border p-3">
+          <ul className="grid grid-cols-1 items-start gap-3 border-t border-border p-3 lg:grid-cols-2">
             {selesai.map((d) => (
               <li key={d.id}>
                 <DebtCard debt={d} />

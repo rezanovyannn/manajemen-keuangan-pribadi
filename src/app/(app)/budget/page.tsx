@@ -32,7 +32,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
   const pesan = typeof status === "string" ? PESAN[status] : undefined;
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-4">
+    <div className="grid w-full grid-cols-1 gap-4 lg:gap-5">
       <div className="flex items-start justify-between gap-4">
         <PageHeader title="Budget" description="Batas pengeluaran bulanan per kategori." />
         <Link href={`/budget/baru?bulan=${month}`} className={cn(buttonVariants({ size: "lg" }), "h-10 shrink-0")}>
@@ -48,7 +48,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
 
       {copyable > 0 && (
         <form action={copyBudgetsFromPreviousMonth.bind(null, month)}>
-          <Button type="submit" variant="outline" size="lg" className="h-10 w-full">
+          <Button type="submit" variant="outline" size="lg" className="h-10 w-full lg:w-auto lg:justify-self-start">
             <Copy aria-hidden />
             Salin {copyable} budget dari bulan lalu
           </Button>
@@ -60,7 +60,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
           Belum ada budget di bulan ini.
         </div>
       ) : (
-        <ul className="grid gap-3">
+        <ul className="grid grid-cols-1 items-start gap-3 lg:grid-cols-2">
           {items.map((item) => (
             <li key={item.id}>
               <BudgetCard item={item} month={month} />

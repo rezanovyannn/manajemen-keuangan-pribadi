@@ -29,7 +29,7 @@ export default async function UbahTujuanPage({ params }: PageProps<"/tujuan/[id]
     .map((a) => ({ value: a.id, label: a.archived_at ? `${a.name} (diarsipkan)` : a.name }));
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-8">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-1 gap-8">
       <div>
         <PageHeader title="Ubah tujuan" />
         <GoalForm

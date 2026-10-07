@@ -33,7 +33,7 @@ export default async function KategoriPage({ searchParams }: PageProps<"/kategor
   const arsip = rows.filter((c) => c.archived_at && c.type === type);
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-4">
+    <div className="grid w-full max-w-3xl grid-cols-1 gap-4 lg:gap-5">
       <div className="flex items-start justify-between gap-4">
         <PageHeader title="Kategori" description="Kelompokkan pemasukan dan pengeluaran." />
         <Link
@@ -45,7 +45,7 @@ export default async function KategoriPage({ searchParams }: PageProps<"/kategor
         </Link>
       </div>
 
-      <nav aria-label="Tipe kategori" className="grid grid-cols-2 rounded-lg border border-border p-0.5">
+      <nav aria-label="Tipe kategori" className="grid grid-cols-2 rounded-lg border border-border bg-card p-0.5 lg:max-w-sm">
         {CATEGORY_TYPES.map((t) => (
           <Link
             key={t.value}

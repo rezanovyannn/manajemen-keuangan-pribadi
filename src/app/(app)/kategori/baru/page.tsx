@@ -24,7 +24,7 @@ export default async function KategoriBaruPage({ searchParams }: PageProps<"/kat
   const parents = (data ?? []).sort((a, b) => compareCategoryName(a.name, b.name));
 
   return (
-    <div className="grid max-w-xl grid-cols-1">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-1">
       <PageHeader title={`Tambah kategori ${categoryTypeLabel(type).toLowerCase()}`} />
       <CategoryForm
         action={createCategory}

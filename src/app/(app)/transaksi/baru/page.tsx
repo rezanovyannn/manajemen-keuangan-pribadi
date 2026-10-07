@@ -44,7 +44,7 @@ export default async function TransaksiBaruPage({ searchParams }: PageProps<"/tr
 
   if (accounts.length === 0) {
     return (
-      <div className="grid max-w-xl grid-cols-1 gap-4">
+      <div className="mx-auto grid w-full max-w-xl grid-cols-1 gap-4">
         <PageHeader title="Tambah transaksi" />
         <div className="grid justify-items-center gap-4 rounded-xl border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
           Buat akun atau dompet dulu sebelum mencatat transaksi.
@@ -64,7 +64,7 @@ export default async function TransaksiBaruPage({ searchParams }: PageProps<"/tr
       const kategori = categories.find((c) => c.type === jenis.tipe && c.label === jenis.kategori)?.value;
       const nominal = debt.installmentAmount ? Math.min(debt.installmentAmount, debt.status.remaining) : debt.status.remaining;
       return (
-        <div className="grid max-w-xl grid-cols-1">
+        <div className="mx-auto grid w-full max-w-xl grid-cols-1">
           <PageHeader title={`${jenis.aksi} ${debt.name}`} description={`Sisa ${formatRupiah(debt.status.remaining)}`} />
           <TransactionForm
             action={createTransaction}
@@ -86,7 +86,7 @@ export default async function TransaksiBaruPage({ searchParams }: PageProps<"/tr
     // Jatuh tempo di masa depan tapi dicatat sekarang -> pakai tanggal hari ini.
     const hariIni = todayInJakarta();
     return (
-      <div className="grid max-w-xl grid-cols-1">
+      <div className="mx-auto grid w-full max-w-xl grid-cols-1">
         <PageHeader title="Catat dari jadwal" description={`${dariJadwal.name} · jadwal ${formatTanggal(tanggal)}`} />
         <TransactionForm
           action={createTransaction}
@@ -113,7 +113,7 @@ export default async function TransaksiBaruPage({ searchParams }: PageProps<"/tr
   const accountId = typeof akun === "string" ? akun : accounts[0]?.value;
 
   return (
-    <div className="grid max-w-xl grid-cols-1">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-1">
       {/* Simpan daftar akun & kategori di HP untuk form offline. */}
       <SaveOfflineOptions accounts={accounts} categories={categories} />
       <PageHeader title="Tambah transaksi" />

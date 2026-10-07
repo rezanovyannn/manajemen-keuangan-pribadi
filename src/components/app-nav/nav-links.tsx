@@ -8,15 +8,16 @@ import { cn } from "@/lib/utils";
 import { isNavActive, NAV_GROUPS } from "./nav-items";
 
 // Daftar menu berkelompok, dipakai di sidebar desktop dan menu laci HP.
+// Baris ringkas; menu aktif ditandai latar tipis + ikon biru (satu-satunya aksen).
 // `onNavigate` dipanggil saat menu diklik (menutup laci di HP).
 export function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Navigasi utama" className="grid gap-5">
+    <nav aria-label="Navigasi utama" className="grid gap-4">
       {NAV_GROUPS.map((group) => (
-        <div key={group.label} className="grid gap-1">
-          <p className="px-3 text-xs font-medium text-muted-foreground">{group.label}</p>
+        <div key={group.label} className="grid gap-px">
+          <p className="px-2.5 pb-1 text-xs font-medium text-muted-foreground">{group.label}</p>
           {group.items.map(({ href, label, Icon }) => {
             const active = isNavActive(pathname, href);
             return (
@@ -26,12 +27,12 @@ export function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
                 onClick={onNavigate}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50",
-                  active && "bg-muted text-foreground",
+                  "flex h-10 items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium text-sidebar-foreground/80 transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-3 focus-visible:ring-ring/50 md:h-8",
+                  active && "bg-sidebar-accent text-sidebar-accent-foreground",
                 )}
               >
-                <Icon className="size-4" aria-hidden />
-                {label}
+                <Icon className={cn("size-4 shrink-0", active ? "text-link" : "text-muted-foreground")} aria-hidden />
+                <span className="truncate">{label}</span>
               </Link>
             );
           })}

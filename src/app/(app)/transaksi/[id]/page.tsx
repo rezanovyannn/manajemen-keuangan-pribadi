@@ -57,7 +57,7 @@ export default async function UbahTransaksiPage({ params, searchParams }: PagePr
       };
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-8">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-1 gap-8">
       <div>
         <PageHeader title="Ubah transaksi" />
         <FormAlert tone="error" message={gagal === "hapus" ? "Transaksi gagal dihapus. Silakan coba lagi." : undefined} />

@@ -21,7 +21,7 @@ export default async function ProfilPage() {
     .maybeSingle();
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-4">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-1 gap-4">
       <PageHeader title="Profil" />
 
       <Card>

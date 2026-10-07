@@ -14,7 +14,7 @@ export default async function UtangBaruPage({ searchParams }: PageProps<"/utang/
   await requireUser();
 
   return (
-    <div className="grid max-w-xl grid-cols-1">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-1">
       <PageHeader title={kind === "utang" ? "Tambah utang" : "Tambah piutang"} />
       <DebtForm action={createDebt} kind={kind} initial={{ startDate: todayInJakarta() }} submitLabel="Simpan" cancelHref={`/utang?jenis=${kind}`} />
     </div>

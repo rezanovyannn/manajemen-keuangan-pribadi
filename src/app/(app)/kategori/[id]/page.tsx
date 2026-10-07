@@ -32,7 +32,7 @@ export default async function UbahKategoriPage({ params }: PageProps<"/kategori/
   const isRoot = !category.parent_id;
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-8">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-1 gap-8">
       <div>
         <PageHeader
           title="Ubah kategori"

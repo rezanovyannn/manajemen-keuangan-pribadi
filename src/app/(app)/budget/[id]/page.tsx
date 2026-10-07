@@ -30,7 +30,7 @@ export default async function UbahBudgetPage({ params }: PageProps<"/budget/[id]
   const month = budget.month.slice(0, 7);
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-8">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-1 gap-8">
       <div>
         <PageHeader title={`Budget ${label}`} description={formatBulan(month)} />
         <BudgetForm

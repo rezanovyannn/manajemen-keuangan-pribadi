@@ -18,7 +18,7 @@ export default async function UbahUtangPage({ params }: PageProps<"/utang/[id]/u
   if (!d) notFound();
 
   return (
-    <div className="grid max-w-xl grid-cols-1">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-1">
       <PageHeader title={`Ubah ${d.name}`} />
       <DebtForm
         action={updateDebt.bind(null, d.id)}

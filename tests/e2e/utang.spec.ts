@@ -17,7 +17,7 @@ test.describe("utang & piutang", () => {
 
     // Utang Rp 600.000, cicilan Rp 250.000.
     await bukaMenu(page, "Utang & piutang");
-    await page.getByRole("link", { name: "Tambah" }).click();
+    await page.getByRole("link", { name: "Tambah", exact: true }).click();
     await page.getByLabel("Nama", { exact: true }).fill(utang);
     await page.getByLabel("Jumlah utang").fill("600000");
     await page.getByLabel("Cicilan per bulan (opsional)").fill("250000");

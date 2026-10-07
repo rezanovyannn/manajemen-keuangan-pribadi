@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 import { currentNavLabel } from "./nav-items";
+import { Brand } from "./brand";
 import { NavLinks } from "./nav-links";
 
 // Bar atas di HP: tombol menu (membuka laci sidebar) + judul halaman.
@@ -22,13 +23,15 @@ export function AppMobileBar() {
         <SheetTrigger render={<Button variant="ghost" size="icon" className="size-10" aria-label="Buka menu" />}>
           <Menu className="size-5" aria-hidden />
         </SheetTrigger>
-        <SheetContent side="left" className="w-72 gap-6 overflow-y-auto px-3 py-5">
-          <SheetTitle className="px-3 text-lg font-semibold tracking-tight">Keuangan Pribadi</SheetTitle>
+        <SheetContent side="left" className="w-72 gap-5 overflow-y-auto border-sidebar-border bg-sidebar px-2.5 py-4 text-sidebar-foreground">
+          <SheetTitle>
+            <Brand asLink={false} />
+          </SheetTitle>
           <NavLinks onNavigate={() => setOpen(false)} />
           <ThemeToggle className="mt-auto w-full" />
         </SheetContent>
       </Sheet>
-      <p className="truncate font-medium">{currentNavLabel(pathname)}</p>
+      <p className="truncate text-[15px] font-semibold tracking-tight">{currentNavLabel(pathname)}</p>
     </header>
   );
 }

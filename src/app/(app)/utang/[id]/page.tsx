@@ -48,7 +48,7 @@ export default async function DetailUtangPage({ params, searchParams }: PageProp
   const pesan = typeof status === "string" ? PESAN[status] : undefined;
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-4">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-1 gap-4">
       <PageHeader title={debt.name} description={`${jenis.label}${debt.archived ? " · diarsipkan" : ""}`} />
       <FormAlert tone={pesan?.tone ?? "success"} message={pesan?.text} />
       <DebtCard debt={debt} />
