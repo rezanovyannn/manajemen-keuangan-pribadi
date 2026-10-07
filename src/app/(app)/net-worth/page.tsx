@@ -32,18 +32,18 @@ export default async function NetWorthPage() {
     <div className="grid max-w-xl grid-cols-1 gap-4">
       <PageHeader title="Net worth" description="Total aset dikurangi kewajiban." />
 
-      <div className="rounded-xl border border-border px-4 py-3">
+      <div className="rounded-xl border border-border bg-card px-4 py-3">
         <p className="text-xs text-muted-foreground">Kekayaan bersih</p>
         <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums" data-testid="net-worth">
           {bertanda(data.netWorth)}
         </p>
       </div>
       <dl className="grid grid-cols-2 gap-2">
-        <div className="rounded-xl border border-border px-3 py-3">
+        <div className="rounded-xl border border-border bg-card px-3 py-3">
           <dt className="text-xs text-muted-foreground">Aset</dt>
           <dd className="mt-1 truncate text-sm font-semibold tabular-nums" data-testid="aset">{bertanda(data.assets)}</dd>
         </div>
-        <div className="rounded-xl border border-border px-3 py-3">
+        <div className="rounded-xl border border-border bg-card px-3 py-3">
           <dt className="text-xs text-muted-foreground">Kewajiban</dt>
           <dd className="mt-1 truncate text-sm font-semibold tabular-nums" data-testid="kewajiban">{formatRupiah(data.liabilities)}</dd>
         </div>
@@ -80,7 +80,7 @@ function Bagian({ judul, children }: { judul: string; children: React.ReactNode 
   return (
     <section aria-label={judul} className="grid grid-cols-1 gap-2">
       <h2 className="px-1 font-medium">{judul}</h2>
-      <ul className="divide-y divide-border rounded-xl border border-border">{children}</ul>
+      <ul className="divide-y divide-border rounded-xl border border-border bg-card">{children}</ul>
     </section>
   );
 }

@@ -13,7 +13,7 @@ type Saran = { id: string; name: string; type: "income" | "expense"; amount: num
 export function RecurringSuggestions({ items, today }: { items: Saran[]; today: string }) {
   if (items.length === 0) return null;
   return (
-    <section aria-labelledby="judul-saran" className="grid grid-cols-1 gap-3 rounded-xl border border-border p-4">
+    <section aria-labelledby="judul-saran" className="grid grid-cols-1 gap-3 rounded-xl border border-border bg-card p-4">
       <h2 id="judul-saran" className="flex items-center gap-2 font-medium">
         <CalendarClock className="size-4 text-muted-foreground" aria-hidden />
         Perlu dicatat

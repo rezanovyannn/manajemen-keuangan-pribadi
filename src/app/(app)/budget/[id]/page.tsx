@@ -41,7 +41,7 @@ export default async function UbahBudgetPage({ params }: PageProps<"/budget/[id]
         />
       </div>
 
-      <div className="grid gap-2 rounded-xl border border-border p-4">
+      <div className="grid gap-2 rounded-xl border border-border bg-card p-4">
         <ConfirmDeleteButton
           action={deleteBudget.bind(null, budget.id, month)}
           label="Hapus budget"

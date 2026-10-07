@@ -72,7 +72,7 @@ export default async function UbahTransaksiPage({ params, searchParams }: PagePr
         />
       </div>
 
-      <div className="grid gap-2 rounded-xl border border-border p-4">
+      <div className="grid gap-2 rounded-xl border border-border bg-card p-4">
         <DeleteTransactionButton action={deleteTransaction.bind(null, target)} isTransfer={isTransfer} />
       </div>
     </div>

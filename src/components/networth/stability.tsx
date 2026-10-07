@@ -26,7 +26,7 @@ export function StabilityCard({ s, months }: { s: IncomeStability | null; months
 
   return (
     <div className="grid grid-cols-1 gap-3">
-      <div className="rounded-xl border border-border px-4 py-3">
+      <div className="rounded-xl border border-border bg-card px-4 py-3">
         <p className="text-xs text-muted-foreground">Dana darurat (total saldo ÷ rata-rata pengeluaran)</p>
         <p className="mt-1 text-2xl font-semibold tracking-tight tabular-nums" data-testid="runway">
           {runway === null ? "—" : `Cukup ±${formatTenths(runway)} bulan`}
@@ -64,7 +64,7 @@ export function StabilityCard({ s, months }: { s: IncomeStability | null; months
 
 function Tile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="min-w-0 rounded-xl border border-border px-3 py-3">
+    <div className="min-w-0 rounded-xl border border-border bg-card px-3 py-3">
       <dt className="text-xs text-muted-foreground">{label}</dt>
       <dd className="mt-1 truncate text-sm font-semibold tabular-nums" aria-label={`${label} ${value}`}>
         {value}

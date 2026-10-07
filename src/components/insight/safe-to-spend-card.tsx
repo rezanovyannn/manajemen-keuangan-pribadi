@@ -35,7 +35,7 @@ export function SafeToSpendCard({ safe, detail = false }: { safe: SafeToSpend; d
     return (
       <Link
         href="/insight"
-        className="block rounded-xl border border-border px-4 py-3 outline-none hover:bg-muted/40 focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="block rounded-xl border border-border bg-card px-4 py-3 outline-none hover:bg-muted/40 focus-visible:ring-3 focus-visible:ring-ring/50"
       >
         {isi}
       </Link>
@@ -43,7 +43,7 @@ export function SafeToSpendCard({ safe, detail = false }: { safe: SafeToSpend; d
   }
 
   return (
-    <section aria-label="Aman dibelanjakan" className="rounded-xl border border-border px-4 py-3">
+    <section aria-label="Aman dibelanjakan" className="rounded-xl border border-border bg-card px-4 py-3">
       {isi}
       <dl className="mt-3 grid grid-cols-1 gap-1 border-t border-border pt-3 text-sm tabular-nums">
         <Baris label="Saldo semua akun aktif" value={formatRupiah(safe.balance)} />

@@ -42,7 +42,7 @@ export function AccountForm({ action, initial, submitLabel }: AccountFormProps) 
           {ACCOUNT_TYPES.map((t) => (
             <label
               key={t.value}
-              className="flex h-10 cursor-pointer items-center justify-center rounded-lg border border-input text-sm font-medium transition-colors has-checked:border-primary has-checked:bg-primary has-checked:text-primary-foreground has-focus-visible:ring-3 has-focus-visible:ring-ring/50"
+              className="flex h-10 cursor-pointer items-center justify-center rounded-lg border border-input bg-card text-sm font-medium transition-colors has-checked:border-primary has-checked:bg-primary/10 has-checked:text-link has-focus-visible:ring-3 has-focus-visible:ring-ring/50"
             >
               <input
                 type="radio"

@@ -25,7 +25,7 @@ export default async function MasukPage({ searchParams }: PageProps<"/masuk">) {
         <MasukForm next={typeof next === "string" ? next : undefined} notice={notice} />
         <p className="text-center text-sm text-muted-foreground">
           Belum punya akun?{" "}
-          <Link href="/daftar" className="font-medium text-foreground underline underline-offset-4">
+          <Link href="/daftar" className="font-medium text-link underline underline-offset-4">
             Daftar
           </Link>
         </p>

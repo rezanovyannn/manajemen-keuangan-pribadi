@@ -9,10 +9,11 @@ export const JENIS_TRANSAKSI: { value: TransactionFormType; label: string }[] = 
   { value: "transfer", label: "Transfer" },
 ];
 
+// Pilihan aktif: garis + latar tipis berwarna (bukan blok penuh) agar tetap tenang.
 const WARNA_AKTIF: Record<TransactionFormType, string> = {
-  expense: "has-checked:bg-rose-600 has-checked:text-white has-checked:border-rose-600",
-  income: "has-checked:bg-emerald-600 has-checked:text-white has-checked:border-emerald-600",
-  transfer: "has-checked:bg-primary has-checked:text-primary-foreground has-checked:border-primary",
+  expense: "has-checked:border-rose-500 has-checked:bg-rose-500/10 has-checked:text-rose-700 dark:has-checked:text-rose-300",
+  income: "has-checked:border-emerald-600 has-checked:bg-emerald-500/10 has-checked:text-emerald-800 dark:has-checked:text-emerald-300",
+  transfer: "has-checked:border-primary has-checked:bg-primary/10 has-checked:text-link",
 };
 
 export function TypePicker({
@@ -33,7 +34,7 @@ export function TypePicker({
           <label
             key={j.value}
             className={cn(
-              "flex h-10 cursor-pointer items-center justify-center rounded-lg border border-input text-sm font-medium transition-colors has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
+              "flex h-10 cursor-pointer items-center justify-center rounded-lg border border-input bg-card text-sm font-medium transition-colors has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
               WARNA_AKTIF[j.value],
             )}
           >

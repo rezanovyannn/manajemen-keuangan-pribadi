@@ -39,7 +39,7 @@ export default async function UbahTujuanPage({ params }: PageProps<"/tujuan/[id]
           submitLabel="Simpan perubahan"
         />
       </div>
-      <div className="grid gap-2 rounded-xl border border-border p-4">
+      <div className="grid gap-2 rounded-xl border border-border bg-card p-4">
         <ConfirmDeleteButton
           action={deleteGoal.bind(null, goal.id)}
           label="Hapus tujuan"

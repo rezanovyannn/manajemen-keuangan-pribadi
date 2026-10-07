@@ -14,7 +14,7 @@ export function TransactionList({ items }: { items: TransactionListItem[] }) {
           <h2 id={`tgl-${g.date}`} className="mb-1 px-1 text-xs font-medium text-muted-foreground">
             {formatTanggal(g.date, { weekday: true })}
           </h2>
-          <ul className="divide-y divide-border rounded-xl border border-border">
+          <ul className="divide-y divide-border rounded-xl border border-border bg-card">
             {g.items.map((item) => (
               <li key={item.id}>
                 <Baris item={item} />

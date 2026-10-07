@@ -51,7 +51,7 @@ export function CategoryForm({ action, cancelHref, submitLabel, initialName, cre
               defaultValue={state.values?.parentId ?? create.defaultParentId ?? ""}
               aria-invalid={parentError ? true : undefined}
               aria-describedby={parentError ? "field-parentId-error" : undefined}
-              className="h-10 rounded-lg border border-input bg-transparent px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30"
+              className="h-10 rounded-md border border-input bg-card px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
             >
               <option value="">Tidak ada (kategori utama)</option>
               {create.parents.map((p) => (

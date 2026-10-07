@@ -61,7 +61,7 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
       />
 
       {aktif.length > 0 && total !== undefined && (
-        <div className="rounded-xl border border-border px-4 py-3">
+        <div className="rounded-xl border border-border bg-card px-4 py-3">
           <p className="text-xs text-muted-foreground">Total saldo akun aktif</p>
           <p className="mt-1 text-2xl font-semibold tabular-nums" data-testid="total-saldo">
             {formatRupiah(total)}
@@ -74,7 +74,7 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
           Belum ada akun. Tambahkan dompet atau rekening pertamamu.
         </div>
       ) : (
-        <ul className="divide-y divide-border rounded-xl border border-border">
+        <ul className="divide-y divide-border rounded-xl border border-border bg-card">
           {aktif.map((a) => (
             <li key={a.id}>
               <Link
@@ -99,7 +99,7 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
       )}
 
       {arsip.length > 0 && (
-        <details className="rounded-xl border border-border">
+        <details className="rounded-xl border border-border bg-card">
           <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-muted-foreground">
             Diarsipkan ({arsip.length})
           </summary>

@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -39,88 +39,130 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --color-link: var(--link);
+  --color-night: var(--night);
+  --color-night-foreground: var(--night-foreground);
+  --color-sticker-sky: var(--sticker-sky);
+  --color-sticker-purple: var(--sticker-purple);
+  --color-sticker-teal: var(--sticker-teal);
+  --color-sticker-green: var(--sticker-green);
+  --color-sticker-orange: var(--sticker-orange);
+  --color-sticker-pink: var(--sticker-pink);
+  /* Radius: input 6px, tombol 8px, kartu 12px, wadah besar 16px. */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --radius-4xl: 24px;
+  /* Bayangan tipis berlapis: "soft" untuk elemen melayang, "elevated" untuk dialog/laci. */
+  --shadow-soft:
+    0 0.175px 1.041px rgb(0 0 0 / 0.01), 0 0.8px 2.925px rgb(0 0 0 / 0.02), 0 2.025px 7.847px rgb(0 0 0 / 0.027),
+    0 4px 18px rgb(0 0 0 / 0.04);
+  --shadow-elevated:
+    0 1px 3px rgb(0 0 0 / 0.01), 0 3px 7px rgb(0 0 0 / 0.02), 0 7px 15px rgb(0 0 0 / 0.02), 0 14px 28px rgb(0 0 0 / 0.04),
+    0 23px 52px rgb(0 0 0 / 0.05);
 }
 
+/*
+ * Tema terang: kanvas "kertas hangat", kartu putih bergaris tipis, teks hampir hitam,
+ * dan SATU aksen struktural (biru) untuk tombol utama, link, menu aktif, dan fokus.
+ */
 :root {
   /* Warna seri grafik (palet kategorikal tervalidasi, slot 1-2). Terang. */
   --series-income: #2a78d6;
   --series-expense: #eb6834;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --background: #f6f5f4;
+  --foreground: #141413;
+  --card: #ffffff;
+  --card-foreground: #141413;
+  --popover: #ffffff;
+  --popover-foreground: #141413;
+  --primary: #0075de;
+  --primary-foreground: #ffffff;
+  --secondary: #efeeec;
+  --secondary-foreground: #31302e;
+  --muted: #efeeec;
+  --muted-foreground: #615d59;
+  --accent: #efeeec;
+  --accent-foreground: #141413;
+  --destructive: #d1352b;
+  --border: #e6e6e6;
+  --input: #dddddd;
+  --ring: #0075de;
+  --link: #0075de;
+  /* Band "night": satu-satunya bagian gelap (kartu saldo utama di Beranda). */
+  --night: #213183;
+  --night-foreground: #ffffff;
+  /* Palet stiker: HANYA dekorasi (ikon akun, titik kategori), tidak untuk tombol. */
+  --sticker-sky: #62aef0;
+  --sticker-purple: #b98ae8;
+  --sticker-teal: #2a9d99;
+  --sticker-green: #1aae39;
+  --sticker-orange: #dd5b00;
+  --sticker-pink: #ff64c8;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 0.5rem;
+  --sidebar: #fbfaf9;
+  --sidebar-foreground: #31302e;
+  --sidebar-primary: #0075de;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #efeeec;
+  --sidebar-accent-foreground: #141413;
+  --sidebar-border: #e9e8e6;
+  --sidebar-ring: #0075de;
 }
 
+/* Tema gelap: diturunkan dari palet yang sama (abu hangat), bukan sekadar dibalik. */
 .dark {
   /* Warna seri grafik untuk permukaan gelap (langkah gelap dari hue yang sama). */
   --series-income: #3987e5;
   --series-expense: #d95926;
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --background: #191919;
+  --foreground: #ebe9e6;
+  --card: #202020;
+  --card-foreground: #ebe9e6;
+  --popover: #252525;
+  --popover-foreground: #ebe9e6;
+  --primary: #1f6fc5;
+  --primary-foreground: #ffffff;
+  --secondary: #2c2c2b;
+  --secondary-foreground: #ebe9e6;
+  --muted: #2c2c2b;
+  --muted-foreground: #9b9a97;
+  --accent: #2c2c2b;
+  --accent-foreground: #ebe9e6;
+  --destructive: #f0645a;
+  --border: #2f2f2e;
+  --input: #3a3a39;
+  --ring: #5aa6f0;
+  --link: #5aa6f0;
+  --night: #1b2766;
+  --night-foreground: #ffffff;
+  --sticker-sky: #62aef0;
+  --sticker-purple: #c7a2f0;
+  --sticker-teal: #35b3ae;
+  --sticker-green: #2fbf4f;
+  --sticker-orange: #ee7a2a;
+  --sticker-pink: #ff7ad2;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar: #1d1d1d;
+  --sidebar-foreground: #d4d2ce;
+  --sidebar-primary: #1f6fc5;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2c2c2b;
+  --sidebar-accent-foreground: #ebe9e6;
+  --sidebar-border: #2a2a29;
+  --sidebar-ring: #5aa6f0;
 }
 
 @layer base {
@@ -129,8 +171,17 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "lnum", "locl";
   }
   html {
     @apply font-sans;
+  }
+  /* Judul tebal dengan tracking rapat (semakin besar semakin rapat). */
+  h1 {
+    letter-spacing: -0.025em;
+  }
+  h2,
+  h3 {
+    letter-spacing: -0.011em;
   }
 }

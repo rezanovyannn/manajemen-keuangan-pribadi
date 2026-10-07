@@ -18,7 +18,7 @@ export function GoalCard({ goal }: { goal: GoalItem }) {
   return (
     <Link
       href={`/tujuan/${goal.id}`}
-      className="grid grid-cols-1 gap-2 rounded-xl border border-border px-4 py-3 outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
+      className="grid grid-cols-1 gap-2 rounded-xl border border-border bg-card px-4 py-3 outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
       aria-label={`${goal.name}, ${progress.percent}% tercapai`}
     >
       <div className="flex items-center justify-between gap-3">

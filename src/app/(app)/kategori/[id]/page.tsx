@@ -58,7 +58,7 @@ export default async function UbahKategoriPage({ params }: PageProps<"/kategori/
 
       <form
         action={setCategoryArchived.bind(null, category.id, category.type, true)}
-        className="grid gap-2 rounded-xl border border-border p-4"
+        className="grid gap-2 rounded-xl border border-border bg-card p-4"
       >
         <p className="text-sm text-muted-foreground">
           Kategori yang diarsipkan{isRoot ? " (beserta sub-kategorinya)" : ""} disembunyikan dari

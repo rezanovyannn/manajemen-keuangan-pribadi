@@ -27,7 +27,7 @@ export function SelectField({ name, label, options, placeholder, defaultValue, e
         defaultValue={valid ? defaultValue : ""}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
-        className="h-10 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive md:text-sm dark:bg-input/30"
+        className="h-10 w-full min-w-0 rounded-md border border-input bg-card px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive md:text-sm"
       >
         <option value="" disabled>
           {placeholder}

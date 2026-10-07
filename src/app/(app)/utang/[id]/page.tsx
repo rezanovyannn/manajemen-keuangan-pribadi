@@ -66,7 +66,7 @@ export default async function DetailUtangPage({ params, searchParams }: PageProp
         {payments.length === 0 ? (
           <p className="rounded-xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">Belum ada.</p>
         ) : (
-          <ul className="divide-y divide-border rounded-xl border border-border">
+          <ul className="divide-y divide-border rounded-xl border border-border bg-card">
             {payments.map((p) => (
               <li key={p.id}>
                 <Link href={`/transaksi/${p.id}`} className="flex items-center gap-3 px-4 py-3 outline-none hover:bg-muted/50 focus-visible:bg-muted">
@@ -88,7 +88,7 @@ export default async function DetailUtangPage({ params, searchParams }: PageProp
         )}
       </section>
 
-      <div className="grid gap-3 rounded-xl border border-border p-4">
+      <div className="grid gap-3 rounded-xl border border-border bg-card p-4">
         <Link href={`/utang/${debt.id}/ubah`} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10 sm:justify-self-start")}>
           <Pencil aria-hidden />
           Ubah data

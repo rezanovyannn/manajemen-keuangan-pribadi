@@ -93,7 +93,7 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
       <SummaryTiles {...dash.summary} totalSaldo={dash.totalSaldo} netWorth={nilaiBersih} />
       {aman && <SafeToSpendCard safe={aman} />}
 
-      <section aria-labelledby="judul-kategori" className="grid grid-cols-1 gap-3 rounded-xl border border-border p-4">
+      <section aria-labelledby="judul-kategori" className="grid grid-cols-1 gap-3 rounded-xl border border-border bg-card p-4">
         <h2 id="judul-kategori" className="font-medium">
           Pengeluaran per kategori
         </h2>

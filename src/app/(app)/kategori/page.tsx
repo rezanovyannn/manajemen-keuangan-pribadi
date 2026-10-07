@@ -73,7 +73,7 @@ export default async function KategoriPage({ searchParams }: PageProps<"/kategor
           Belum ada kategori.
         </div>
       ) : (
-        <ul className="divide-y divide-border rounded-xl border border-border">
+        <ul className="divide-y divide-border rounded-xl border border-border bg-card">
           {aktif.map((c) => (
             <li key={c.id}>
               <KategoriLink id={c.id} name={c.name} />
@@ -92,7 +92,7 @@ export default async function KategoriPage({ searchParams }: PageProps<"/kategor
       )}
 
       {arsip.length > 0 && (
-        <details className="rounded-xl border border-border">
+        <details className="rounded-xl border border-border bg-card">
           <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-muted-foreground">
             Diarsipkan ({arsip.length})
           </summary>

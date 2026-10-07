@@ -56,7 +56,7 @@ export default async function UtangPage({ searchParams }: PageProps<"/utang">) {
       <FormAlert tone="success" message={typeof status === "string" ? PESAN[status] : undefined} />
       <FormAlert tone="error" message={error ? "Data gagal dimuat." : undefined} />
 
-      <div className="rounded-xl border border-border px-4 py-3">
+      <div className="rounded-xl border border-border bg-card px-4 py-3">
         <p className="text-xs text-muted-foreground">{kind === "utang" ? "Total sisa utang" : "Total piutang belum kembali"}</p>
         <p className="mt-1 text-2xl font-semibold tracking-tight tabular-nums" data-testid="total-sisa">
           {formatRupiah(totalSisa)}
@@ -78,7 +78,7 @@ export default async function UtangPage({ searchParams }: PageProps<"/utang">) {
       )}
 
       {selesai.length > 0 && (
-        <details className="rounded-xl border border-border">
+        <details className="rounded-xl border border-border bg-card">
           <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-muted-foreground">Lunas / diarsipkan ({selesai.length})</summary>
           <ul className="grid grid-cols-1 gap-3 border-t border-border p-3">
             {selesai.map((d) => (

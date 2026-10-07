@@ -29,7 +29,7 @@ export function AccountCashflowList({ items }: { items: AccountCashflowItem[] })
       <Daftar items={awal} />
       {sisa.length > 0 && (
         <details className="group">
-          <summary className="cursor-pointer list-none rounded-xl border border-border py-2.5 text-center text-sm font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground [&::-webkit-details-marker]:hidden">
+          <summary className="cursor-pointer list-none rounded-xl border border-border bg-card py-2.5 text-center text-sm font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground [&::-webkit-details-marker]:hidden">
             <span className="group-open:hidden">Tampilkan {sisa.length} akun lainnya</span>
             <span className="hidden group-open:inline">Sembunyikan</span>
           </summary>
@@ -57,7 +57,7 @@ function Daftar({ items }: { items: AccountCashflowItem[] }) {
 function KartuAkun({ a }: { a: AccountCashflowItem }) {
   const Ikon = a.net > 0 ? TrendingUp : a.net < 0 ? TrendingDown : Minus;
   return (
-    <article className="grid grid-cols-1 gap-3 rounded-xl border border-border px-4 py-3" aria-label={a.name}>
+    <article className="grid grid-cols-1 gap-3 rounded-xl border border-border bg-card px-4 py-3" aria-label={a.name}>
       <div className="flex items-center justify-between gap-3">
         <p className="min-w-0 truncate text-sm font-medium">{a.name}</p>
         <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">

@@ -43,7 +43,7 @@ export function PeriodPicker({ period }: { period: Period }) {
       </nav>
 
       {kustom && (
-        <form action="/beranda" className="grid grid-cols-1 gap-3 rounded-xl border border-border p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+        <form action="/beranda" className="grid grid-cols-1 gap-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
           <input type="hidden" name="periode" value="kustom" />
           <div className="grid gap-2">
             <Label htmlFor="periode-dari">Dari</Label>

@@ -41,7 +41,7 @@ export default async function ProfilPage() {
 
       <Link
         href="/kategori"
-        className="flex items-center gap-3 rounded-xl border border-border px-4 py-3 text-sm font-medium outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
       >
         <Tags className="size-4 text-muted-foreground" aria-hidden />
         <span className="flex-1">Kategori</span>
@@ -50,7 +50,7 @@ export default async function ProfilPage() {
 
       <Link
         href="/berulang"
-        className="flex items-center gap-3 rounded-xl border border-border px-4 py-3 text-sm font-medium outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
       >
         <Repeat className="size-4 text-muted-foreground" aria-hidden />
         <span className="flex-1">Transaksi berulang</span>

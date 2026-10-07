@@ -50,7 +50,7 @@ export default async function BerulangPage({ searchParams }: PageProps<"/berulan
           Belum ada jadwal. Tambahkan gaji, langganan, cicilan, atau sewa.
         </div>
       ) : (
-        <ul className="divide-y divide-border rounded-xl border border-border">
+        <ul className="divide-y divide-border rounded-xl border border-border bg-card">
           {(data ?? []).map((r) => {
             const selesai = isFinished(r);
             return (

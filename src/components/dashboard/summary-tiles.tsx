@@ -18,7 +18,7 @@ type Props = {
 export function SummaryTiles({ income, expense, net, totalSaldo, netWorth }: Props) {
   return (
     <div className="grid grid-cols-1 gap-3">
-      <div className="rounded-xl border border-border px-4 py-3">
+      <div className="rounded-xl border border-border bg-card px-4 py-3">
         <p className="text-xs text-muted-foreground">Total saldo semua akun aktif</p>
         <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums" data-testid="dash-saldo">
           {totalSaldo === null ? "—" : formatRupiah(totalSaldo)}
@@ -47,7 +47,7 @@ export function SummaryTiles({ income, expense, net, totalSaldo, netWorth }: Pro
 
 function Tile({ label, value, swatch, testId }: { label: string; value: number; swatch?: string; testId: string }) {
   return (
-    <div className="min-w-0 rounded-xl border border-border px-3 py-3">
+    <div className="min-w-0 rounded-xl border border-border bg-card px-3 py-3">
       <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
         {swatch && <span aria-hidden className={cn("size-2 shrink-0 rounded-full", swatch)} />}
         {label}

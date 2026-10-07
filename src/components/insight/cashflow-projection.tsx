@@ -25,7 +25,7 @@ export function CashflowProjectionSection({
 }) {
   const jadwal = p.points.filter((x) => x.items.length > 0);
   return (
-    <section aria-labelledby="judul-proyeksi" className="grid grid-cols-1 gap-3 rounded-xl border border-border p-4">
+    <section aria-labelledby="judul-proyeksi" className="grid grid-cols-1 gap-3 rounded-xl border border-border bg-card p-4">
       <div>
         <h2 id="judul-proyeksi" className="font-medium">
           Proyeksi saldo sampai {formatTanggal(monthEnd)}
@@ -58,7 +58,7 @@ export function CashflowProjectionSection({
         <p className="rounded-lg border border-dashed border-border py-5 text-center text-sm text-muted-foreground">
           {hasRules ? "Tidak ada jadwal lagi sampai akhir bulan." : "Belum ada transaksi berulang. "}
           {!hasRules && (
-            <Link href="/berulang" className="font-medium text-foreground underline underline-offset-4">
+            <Link href="/berulang" className="font-medium text-link underline underline-offset-4">
               Buat jadwal
             </Link>
           )}

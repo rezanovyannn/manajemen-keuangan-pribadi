@@ -41,7 +41,7 @@ export default async function UbahAkunPage({ params }: PageProps<"/akun/[id]">) 
 
       <form
         action={setAccountArchived.bind(null, account.id, true)}
-        className="grid gap-2 rounded-xl border border-border p-4"
+        className="grid gap-2 rounded-xl border border-border bg-card p-4"
       >
         <p className="text-sm text-muted-foreground">
           Akun yang diarsipkan disembunyikan dari pilihan, tapi riwayatnya tetap tersimpan dan bisa

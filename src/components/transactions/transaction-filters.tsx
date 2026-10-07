@@ -8,7 +8,7 @@ import type { TransactionFilters } from "@/lib/transactions/query";
 import { cn } from "@/lib/utils";
 
 const SELECT =
-  "h-10 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30";
+  "h-10 w-full min-w-0 rounded-md border border-input bg-card px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm";
 
 export function hrefBulan(filters: TransactionFilters, month: string) {
   const p = new URLSearchParams({ bulan: month });
@@ -30,7 +30,7 @@ export function TransactionFiltersForm({
 }) {
   const aktif = Boolean(filters.accountId || filters.categoryId || filters.search);
   return (
-    <details open={aktif} className="rounded-xl border border-border">
+    <details open={aktif} className="rounded-xl border border-border bg-card">
       <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
         Filter & cari{aktif ? " (aktif)" : ""}
       </summary>

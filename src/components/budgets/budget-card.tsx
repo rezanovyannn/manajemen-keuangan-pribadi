@@ -41,7 +41,7 @@ export function BudgetCard({ item, month }: { item: BudgetItem; month: string })
         : null;
 
   return (
-    <details className="group rounded-xl border border-border" data-testid="budget-card">
+    <details className="group rounded-xl border border-border bg-card" data-testid="budget-card">
       <summary className="grid cursor-pointer list-none grid-cols-1 gap-2 rounded-xl px-4 py-3 outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-details-marker]:hidden">
         <div className="flex items-center justify-between gap-3">
           <p className="min-w-0 truncate font-medium">{item.label}</p>

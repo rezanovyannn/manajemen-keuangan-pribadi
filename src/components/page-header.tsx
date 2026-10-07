@@ -1,8 +1,8 @@
 export function PageHeader({ title, description }: { title: string; description?: string }) {
   return (
-    <header className="mb-6 grid gap-1">
-      <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-      {description && <p className="text-sm text-muted-foreground">{description}</p>}
+    <header className="mb-2 grid gap-1 md:mb-4">
+      <h1 className="text-[26px] leading-tight font-bold md:text-[32px]">{title}</h1>
+      {description && <p className="text-sm text-muted-foreground md:text-[15px]">{description}</p>}
     </header>
   );
 }
