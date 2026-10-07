@@ -51,7 +51,7 @@ export function CategoryForm({ action, cancelHref, submitLabel, initialName, cre
               defaultValue={state.values?.parentId ?? create.defaultParentId ?? ""}
               aria-invalid={parentError ? true : undefined}
               aria-describedby={parentError ? "field-parentId-error" : undefined}
-              className="h-10 rounded-md border border-input bg-card px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
+              className="h-11 md:h-10 rounded-md border border-input bg-card px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
             >
               <option value="">Tidak ada (kategori utama)</option>
               {create.parents.map((p) => (
@@ -70,10 +70,10 @@ export function CategoryForm({ action, cancelHref, submitLabel, initialName, cre
       )}
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <Link href={cancelHref} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10")}>
+        <Link href={cancelHref} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 md:h-10")}>
           Batal
         </Link>
-        <Button type="submit" size="lg" className="h-10" disabled={pending}>
+        <Button type="submit" size="lg" className="h-11 md:h-10" disabled={pending}>
           {pending ? "Menyimpan..." : submitLabel}
         </Button>
       </div>

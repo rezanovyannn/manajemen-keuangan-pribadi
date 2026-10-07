@@ -82,7 +82,8 @@ function KartuAkun({ a }: { a: AccountCashflowItem }) {
         </p>
       </div>
 
-      <dl className="grid grid-cols-3 gap-2">
+      {/* HP: tiga baris (label kiri, angka kanan). Layar lebih lebar: tiga kotak kecil. */}
+      <dl className="grid grid-cols-1 divide-y divide-border/60 rounded-lg bg-muted/50 sm:grid-cols-3 sm:gap-2 sm:divide-y-0 sm:bg-transparent">
         <Mini label="Masuk" value={formatRupiah(a.income)} swatch="bg-[var(--series-income)]" />
         <Mini label="Keluar" value={formatRupiah(a.expense)} swatch="bg-[var(--series-expense)]" />
         <Mini label="Transfer" value={bertanda(a.transferNet)} swatch="bg-muted-foreground" />
@@ -93,12 +94,12 @@ function KartuAkun({ a }: { a: AccountCashflowItem }) {
 
 function Mini({ label, value, swatch }: { label: string; value: string; swatch: string }) {
   return (
-    <div className="min-w-0 rounded-lg bg-muted/50 px-2.5 py-2">
+    <div className="flex min-w-0 items-center justify-between gap-3 px-3 py-2 sm:block sm:rounded-lg sm:bg-muted/50 sm:px-2.5">
       <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <span aria-hidden className={cn("size-2 shrink-0 rounded-full", swatch)} />
         {label}
       </dt>
-      <dd className="mt-0.5 truncate text-sm font-semibold tabular-nums" aria-label={`${label} ${value}`}>
+      <dd className="text-sm font-semibold tabular-nums sm:mt-0.5 sm:truncate" aria-label={`${label} ${value}`}>
         {value}
       </dd>
     </div>

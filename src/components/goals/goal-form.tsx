@@ -34,10 +34,10 @@ export function GoalForm({ action, accounts, initial = {}, submitLabel }: Props)
       <FormField name="deadline" label="Tenggat (opsional)" type="date" defaultValue={v.deadline} errors={err.deadline} />
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <Link href="/tujuan" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10")}>
+        <Link href="/tujuan" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 md:h-10")}>
           Batal
         </Link>
-        <Button type="submit" size="lg" className="h-10" disabled={pending}>
+        <Button type="submit" size="lg" className="h-11 md:h-10" disabled={pending}>
           {pending ? "Menyimpan..." : submitLabel}
         </Button>
       </div>

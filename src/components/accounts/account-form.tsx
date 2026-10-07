@@ -42,7 +42,7 @@ export function AccountForm({ action, initial, submitLabel }: AccountFormProps) 
           {ACCOUNT_TYPES.map((t) => (
             <label
               key={t.value}
-              className="flex h-10 cursor-pointer items-center justify-center rounded-lg border border-input bg-card text-sm font-medium transition-colors has-checked:border-primary has-checked:bg-primary/10 has-checked:text-link has-focus-visible:ring-3 has-focus-visible:ring-ring/50"
+              className="flex h-11 md:h-10 cursor-pointer items-center justify-center rounded-lg border border-input bg-card text-sm font-medium transition-colors has-checked:border-primary has-checked:bg-primary/10 has-checked:text-link has-focus-visible:ring-3 has-focus-visible:ring-ring/50"
             >
               <input
                 type="radio"
@@ -70,10 +70,10 @@ export function AccountForm({ action, initial, submitLabel }: AccountFormProps) 
       />
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <Link href="/akun" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10")}>
+        <Link href="/akun" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 md:h-10")}>
           Batal
         </Link>
-        <Button type="submit" size="lg" className="h-10" disabled={pending}>
+        <Button type="submit" size="lg" className="h-11 md:h-10" disabled={pending}>
           {pending ? "Menyimpan..." : submitLabel}
         </Button>
       </div>

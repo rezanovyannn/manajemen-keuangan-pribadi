@@ -18,7 +18,7 @@ export function FormField({ name, label, errors, ...inputProps }: FormFieldProps
       <Input
         id={id}
         name={name}
-        className="h-10"
+        className="h-11 md:h-10"
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         {...inputProps}

@@ -42,7 +42,7 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
     <div className="grid w-full grid-cols-1 gap-4 lg:gap-5">
       <div className="flex items-start justify-between gap-4">
         <PageHeader title="Akun" description="Dompet, rekening bank, dan e-wallet." />
-        <Link href="/akun/baru" className={cn(buttonVariants({ size: "lg" }), "h-10 shrink-0")}>
+        <Link href="/akun/baru" className={cn(buttonVariants({ size: "lg" }), "h-11 md:h-10 shrink-0")}>
           <Plus aria-hidden />
           Tambah
         </Link>

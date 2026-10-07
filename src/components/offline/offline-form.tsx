@@ -84,10 +84,10 @@ export function OfflineForm() {
       <FormField name="note" label="Catatan (opsional)" maxLength={200} autoComplete="off" errors={errors.note} />
       <p className="text-xs text-muted-foreground">Transfer dan biaya admin hanya bisa dicatat saat online.</p>
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <Link href="/beranda" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10")}>
+        <Link href="/beranda" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 md:h-10")}>
           Ke Beranda
         </Link>
-        <Button type="submit" size="lg" className="h-10">
+        <Button type="submit" size="lg" className="h-11 md:h-10">
           Simpan offline
         </Button>
       </div>

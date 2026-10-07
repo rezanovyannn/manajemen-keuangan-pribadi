@@ -38,7 +38,7 @@ export default async function KategoriPage({ searchParams }: PageProps<"/kategor
         <PageHeader title="Kategori" description="Kelompokkan pemasukan dan pengeluaran." />
         <Link
           href={`/kategori/baru?tipe=${categoryTypeParam(type)}`}
-          className={cn(buttonVariants({ size: "lg" }), "h-10 shrink-0")}
+          className={cn(buttonVariants({ size: "lg" }), "h-11 md:h-10 shrink-0")}
         >
           <Plus aria-hidden />
           Tambah

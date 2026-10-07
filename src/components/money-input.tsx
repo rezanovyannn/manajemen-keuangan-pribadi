@@ -45,7 +45,7 @@ export function MoneyInput({ name, label, defaultValue = "", errors, autoFocus, 
           inputMode="numeric"
           autoComplete="off"
           autoFocus={autoFocus}
-          className={cn("h-10 pl-9 tabular-nums", className)}
+          className={cn("h-11 md:h-10 pl-9 tabular-nums", className)}
           value={value}
           onChange={(e) => setValue(formatDigits(e.target.value))}
           aria-invalid={error ? true : undefined}

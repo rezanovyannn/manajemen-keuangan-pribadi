@@ -35,7 +35,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
     <div className="grid w-full grid-cols-1 gap-4 lg:gap-5">
       <div className="flex items-start justify-between gap-4">
         <PageHeader title="Budget" description="Batas pengeluaran bulanan per kategori." />
-        <Link href={`/budget/baru?bulan=${month}`} className={cn(buttonVariants({ size: "lg" }), "h-10 shrink-0")}>
+        <Link href={`/budget/baru?bulan=${month}`} className={cn(buttonVariants({ size: "lg" }), "h-11 md:h-10 shrink-0")}>
           <Plus aria-hidden />
           Tambah
         </Link>
@@ -48,7 +48,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
 
       {copyable > 0 && (
         <form action={copyBudgetsFromPreviousMonth.bind(null, month)}>
-          <Button type="submit" variant="outline" size="lg" className="h-10 w-full lg:w-auto lg:justify-self-start">
+          <Button type="submit" variant="outline" size="lg" className="h-11 md:h-10 w-full lg:w-auto lg:justify-self-start">
             <Copy aria-hidden />
             Salin {copyable} budget dari bulan lalu
           </Button>

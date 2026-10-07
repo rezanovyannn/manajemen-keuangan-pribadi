@@ -79,7 +79,7 @@ function Ringkas({ label, value, className }: { label: string; value: number; cl
   return (
     <div className="rounded-xl border border-border bg-card px-2 py-3">
       <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className={cn("mt-1 text-sm font-semibold tabular-nums", className)}>{formatRupiah(value)}</dd>
+      <dd className={cn("mt-1 text-sm leading-snug font-semibold break-words tabular-nums", className)}>{formatRupiah(value)}</dd>
     </div>
   );
 }

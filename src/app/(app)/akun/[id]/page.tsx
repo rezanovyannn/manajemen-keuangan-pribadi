@@ -47,7 +47,7 @@ export default async function UbahAkunPage({ params }: PageProps<"/akun/[id]">) 
           Akun yang diarsipkan disembunyikan dari pilihan, tapi riwayatnya tetap tersimpan dan bisa
           dipulihkan kapan saja.
         </p>
-        <Button type="submit" variant="destructive" size="lg" className="h-10 sm:justify-self-start">
+        <Button type="submit" variant="destructive" size="lg" className="h-11 md:h-10 sm:justify-self-start">
           <Archive aria-hidden />
           Arsipkan akun
         </Button>

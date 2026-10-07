@@ -45,7 +45,7 @@ export function DaftarForm() {
         errors={state.fieldErrors?.password}
       />
       <p className="-mt-2 text-xs text-muted-foreground">Minimal 8 karakter.</p>
-      <Button type="submit" size="lg" className="h-10 w-full" disabled={pending}>
+      <Button type="submit" size="lg" className="h-11 md:h-10 w-full" disabled={pending}>
         {pending ? "Memproses..." : "Daftar"}
       </Button>
     </form>

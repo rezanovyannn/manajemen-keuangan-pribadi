@@ -19,7 +19,7 @@ export function ConfirmDeleteButton({
 
   if (!konfirmasi) {
     return (
-      <Button type="button" variant="destructive" size="lg" className="h-10 sm:justify-self-start" onClick={() => setKonfirmasi(true)}>
+      <Button type="button" variant="destructive" size="lg" className="h-11 md:h-10 sm:justify-self-start" onClick={() => setKonfirmasi(true)}>
         <Trash2 aria-hidden />
         {label}
       </Button>
@@ -32,10 +32,10 @@ export function ConfirmDeleteButton({
         {message} Tindakan ini tidak bisa dibatalkan.
       </p>
       <div className="flex flex-col-reverse gap-2 sm:flex-row">
-        <Button type="button" variant="outline" size="lg" className="h-10" onClick={() => setKonfirmasi(false)} autoFocus>
+        <Button type="button" variant="outline" size="lg" className="h-11 md:h-10" onClick={() => setKonfirmasi(false)} autoFocus>
           Batal
         </Button>
-        <Button type="submit" variant="destructive" size="lg" className="h-10">
+        <Button type="submit" variant="destructive" size="lg" className="h-11 md:h-10">
           Ya, hapus
         </Button>
       </div>

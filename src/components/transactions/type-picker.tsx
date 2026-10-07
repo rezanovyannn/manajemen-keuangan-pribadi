@@ -34,7 +34,7 @@ export function TypePicker({
           <label
             key={j.value}
             className={cn(
-              "flex h-10 cursor-pointer items-center justify-center rounded-lg border border-input bg-card text-sm font-medium transition-colors has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
+              "flex h-11 md:h-10 cursor-pointer items-center justify-center rounded-lg border border-input bg-card text-sm font-medium transition-colors has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
               WARNA_AKTIF[j.value],
             )}
           >

@@ -111,15 +111,15 @@ function FormBody({
       <FormField name="note" label="Catatan (opsional)" placeholder="Contoh: makan siang" maxLength={200} autoComplete="off" defaultValue={values.note} errors={err.note} />
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <Link href={cancelHref} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10")}>
+        <Link href={cancelHref} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 md:h-10")}>
           Batal
         </Link>
         {allowContinue && (
-          <Button type="submit" name="lanjut" value="1" variant="secondary" size="lg" className="h-10" disabled={pending}>
+          <Button type="submit" name="lanjut" value="1" variant="secondary" size="lg" className="h-11 md:h-10" disabled={pending}>
             Simpan & tambah lagi
           </Button>
         )}
-        <Button type="submit" size="lg" className="h-10" disabled={pending}>
+        <Button type="submit" size="lg" className="h-11 md:h-10" disabled={pending}>
           {pending ? "Menyimpan..." : submitLabel}
         </Button>
       </div>

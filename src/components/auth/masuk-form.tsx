@@ -32,7 +32,7 @@ export function MasukForm({ next, notice }: { next?: string; notice?: string }) 
         required
         errors={state.fieldErrors?.password}
       />
-      <Button type="submit" size="lg" className="h-10 w-full" disabled={pending}>
+      <Button type="submit" size="lg" className="h-11 md:h-10 w-full" disabled={pending}>
         {pending ? "Memproses..." : "Masuk"}
       </Button>
     </form>

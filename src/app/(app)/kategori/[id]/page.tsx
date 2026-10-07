@@ -49,7 +49,7 @@ export default async function UbahKategoriPage({ params }: PageProps<"/kategori/
       {isRoot && (
         <Link
           href={`/kategori/baru?tipe=${categoryTypeParam(category.type)}&induk=${category.id}`}
-          className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10 sm:justify-self-start")}
+          className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 md:h-10 sm:justify-self-start")}
         >
           <Plus aria-hidden />
           Tambah sub-kategori
@@ -64,7 +64,7 @@ export default async function UbahKategoriPage({ params }: PageProps<"/kategori/
           Kategori yang diarsipkan{isRoot ? " (beserta sub-kategorinya)" : ""} disembunyikan dari
           pilihan, tapi riwayatnya tetap tersimpan dan bisa dipulihkan kapan saja.
         </p>
-        <Button type="submit" variant="destructive" size="lg" className="h-10 sm:justify-self-start">
+        <Button type="submit" variant="destructive" size="lg" className="h-11 md:h-10 sm:justify-self-start">
           <Archive aria-hidden />
           Arsipkan kategori
         </Button>

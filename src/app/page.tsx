@@ -11,12 +11,12 @@ export default function Home() {
         pengembangan.
       </p>
       <div className="flex w-full max-w-xs flex-col gap-3 sm:flex-row">
-        <Link href="/masuk" className={buttonVariants({ size: "lg", className: "h-10 flex-1" })}>
+        <Link href="/masuk" className={buttonVariants({ size: "lg", className: "h-11 md:h-10 flex-1" })}>
           Masuk
         </Link>
         <Link
           href="/daftar"
-          className={buttonVariants({ variant: "outline", size: "lg", className: "h-10 flex-1" })}
+          className={buttonVariants({ variant: "outline", size: "lg", className: "h-11 md:h-10 flex-1" })}
         >
           Daftar
         </Link>

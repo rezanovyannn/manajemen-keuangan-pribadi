@@ -68,10 +68,10 @@ function Body({
       <FormField name="note" label="Catatan (opsional)" maxLength={200} autoComplete="off" defaultValue={v.note} errors={err.note} />
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <Link href="/berulang" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10")}>
+        <Link href="/berulang" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 md:h-10")}>
           Batal
         </Link>
-        <Button type="submit" size="lg" className="h-10" disabled={pending}>
+        <Button type="submit" size="lg" className="h-11 md:h-10" disabled={pending}>
           {pending ? "Menyimpan..." : submitLabel}
         </Button>
       </div>

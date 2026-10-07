@@ -8,7 +8,7 @@ import type { TransactionFilters } from "@/lib/transactions/query";
 import { cn } from "@/lib/utils";
 
 const SELECT =
-  "h-10 w-full min-w-0 rounded-md border border-input bg-card px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm";
+  "h-11 md:h-10 w-full min-w-0 rounded-md border border-input bg-card px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm";
 
 export function hrefBulan(filters: TransactionFilters, month: string) {
   const p = new URLSearchParams({ bulan: month });
@@ -37,8 +37,8 @@ export function TransactionFiltersForm({
       <form action="/transaksi" className="grid gap-3 border-t border-border p-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-center">
         <input type="hidden" name="bulan" value={filters.month} />
         <div className="relative">
-          <Search className="pointer-events-none absolute top-3 left-3 size-4 text-muted-foreground" aria-hidden />
-          <Input name="cari" type="search" aria-label="Cari catatan" placeholder="Cari catatan..." defaultValue={filters.search} className="h-10 pl-9" />
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+          <Input name="cari" type="search" aria-label="Cari catatan" placeholder="Cari catatan..." defaultValue={filters.search} className="h-11 md:h-10 pl-9" />
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:contents">
           <select name="akun" aria-label="Filter akun" defaultValue={filters.accountId ?? ""} className={SELECT}>
@@ -60,11 +60,11 @@ export function TransactionFiltersForm({
         </div>
         <div className="flex gap-2 sm:justify-end">
           {aktif && (
-            <Link href={`/transaksi?bulan=${filters.month}`} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10 flex-1 sm:flex-none")}>
+            <Link href={`/transaksi?bulan=${filters.month}`} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 md:h-10 flex-1 sm:flex-none")}>
               Reset
             </Link>
           )}
-          <Button type="submit" size="lg" className="h-10 flex-1 sm:flex-none">
+          <Button type="submit" size="lg" className="h-11 md:h-10 flex-1 sm:flex-none">
             Terapkan
           </Button>
         </div>

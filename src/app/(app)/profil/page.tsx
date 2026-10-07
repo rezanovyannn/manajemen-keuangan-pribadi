@@ -90,7 +90,7 @@ export default async function ProfilPage() {
       </Card>
 
       <form action={keluar}>
-        <Button type="submit" variant="outline" size="lg" className="h-10 w-full">
+        <Button type="submit" variant="outline" size="lg" className="h-11 md:h-10 w-full">
           <LogOut aria-hidden />
           Keluar
         </Button>

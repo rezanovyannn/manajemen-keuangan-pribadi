@@ -38,10 +38,11 @@ export function SummaryTiles({ income, expense, net, totalSaldo, netWorth }: Pro
           </Link>
         )}
       </div>
-      <dl className="grid grid-cols-3 gap-2">
+      {/* HP: Pemasukan & Pengeluaran berdampingan, Selisih satu baris penuh (angka tidak terpotong). */}
+      <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Tile label="Pemasukan" value={income} swatch="bg-[var(--series-income)]" testId="dash-pemasukan" />
         <Tile label="Pengeluaran" value={expense} swatch="bg-[var(--series-expense)]" testId="dash-pengeluaran" />
-        <Tile label="Selisih" value={net} testId="dash-selisih" />
+        <Tile label="Selisih" value={net} testId="dash-selisih" className="col-span-2 sm:col-span-1" />
       </dl>
     </div>
   );
@@ -66,14 +67,26 @@ function Bintang() {
   );
 }
 
-function Tile({ label, value, swatch, testId }: { label: string; value: number; swatch?: string; testId: string }) {
+function Tile({
+  label,
+  value,
+  swatch,
+  testId,
+  className,
+}: {
+  label: string;
+  value: number;
+  swatch?: string;
+  testId: string;
+  className?: string;
+}) {
   return (
-    <div className="min-w-0 rounded-xl border border-border bg-card px-3 py-3 lg:px-4">
+    <div className={cn("min-w-0 rounded-xl border border-border bg-card px-3 py-3 lg:px-4", className)}>
       <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
         {swatch && <span aria-hidden className={cn("size-2 shrink-0 rounded-full", swatch)} />}
         {label}
       </dt>
-      <dd className="mt-1 truncate text-sm font-semibold tabular-nums" data-testid={testId}>
+      <dd className="mt-1 text-sm leading-snug font-semibold break-words tabular-nums" data-testid={testId}>
         {formatRupiah(value)}
       </dd>
     </div>

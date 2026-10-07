@@ -54,7 +54,7 @@ export default async function DetailUtangPage({ params, searchParams }: PageProp
       <DebtCard debt={debt} />
 
       {!debt.status.settled && !debt.archived && (
-        <Link href={`/transaksi/baru?utang=${debt.id}`} className={cn(buttonVariants({ size: "lg" }), "h-10")}>
+        <Link href={`/transaksi/baru?utang=${debt.id}`} className={cn(buttonVariants({ size: "lg" }), "h-11 md:h-10")}>
           {jenis.aksi} {debt.kind === "utang" ? "cicilan" : "pembayaran"}
         </Link>
       )}
@@ -89,12 +89,12 @@ export default async function DetailUtangPage({ params, searchParams }: PageProp
       </section>
 
       <div className="grid gap-3 rounded-xl border border-border bg-card p-4">
-        <Link href={`/utang/${debt.id}/ubah`} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10 sm:justify-self-start")}>
+        <Link href={`/utang/${debt.id}/ubah`} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 md:h-10 sm:justify-self-start")}>
           <Pencil aria-hidden />
           Ubah data
         </Link>
         <form action={setDebtArchived.bind(null, debt.id, !debt.archived)}>
-          <Button type="submit" variant="outline" size="lg" className="h-10">
+          <Button type="submit" variant="outline" size="lg" className="h-11 md:h-10">
             {debt.archived ? <ArchiveRestore aria-hidden /> : <Archive aria-hidden />}
             {debt.archived ? "Pulihkan" : "Arsipkan"}
           </Button>

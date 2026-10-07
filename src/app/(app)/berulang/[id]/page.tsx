@@ -55,7 +55,7 @@ export default async function UbahBerulangPage({ params }: PageProps<"/berulang/
 
       <div className="grid gap-3 rounded-xl border border-border bg-card p-4">
         <form action={setRulePaused.bind(null, r.id, !r.paused)}>
-          <Button type="submit" variant="outline" size="lg" className="h-10">
+          <Button type="submit" variant="outline" size="lg" className="h-11 md:h-10">
             {r.paused ? <Play aria-hidden /> : <Pause aria-hidden />}
             {r.paused ? "Lanjutkan jadwal" : "Jeda jadwal"}
           </Button>

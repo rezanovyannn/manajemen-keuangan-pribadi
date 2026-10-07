@@ -48,7 +48,7 @@ export default async function TransaksiBaruPage({ searchParams }: PageProps<"/tr
         <PageHeader title="Tambah transaksi" />
         <div className="grid justify-items-center gap-4 rounded-xl border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
           Buat akun atau dompet dulu sebelum mencatat transaksi.
-          <Link href="/akun/baru" className={cn(buttonVariants({ size: "lg" }), "h-10")}>
+          <Link href="/akun/baru" className={cn(buttonVariants({ size: "lg" }), "h-11 md:h-10")}>
             Tambah akun
           </Link>
         </div>

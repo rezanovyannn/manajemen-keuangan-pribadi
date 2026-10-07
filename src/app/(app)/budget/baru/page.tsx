@@ -25,7 +25,7 @@ export default async function BudgetBaruPage({ searchParams }: PageProps<"/budge
       {categories.length === 0 ? (
         <div className="grid justify-items-center gap-4 rounded-xl border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
           Semua kategori pengeluaran sudah punya budget di bulan ini.
-          <Link href={kembali} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10")}>
+          <Link href={kembali} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 md:h-10")}>
             Kembali
           </Link>
         </div>

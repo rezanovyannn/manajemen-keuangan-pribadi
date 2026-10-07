@@ -47,13 +47,13 @@ export function PeriodPicker({ period }: { period: Period }) {
           <input type="hidden" name="periode" value="kustom" />
           <div className="grid gap-2">
             <Label htmlFor="periode-dari">Dari</Label>
-            <Input id="periode-dari" name="dari" type="date" required defaultValue={period.from} className="h-10" />
+            <Input id="periode-dari" name="dari" type="date" required defaultValue={period.from} className="h-11 md:h-10" />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="periode-sampai">Sampai</Label>
-            <Input id="periode-sampai" name="sampai" type="date" required defaultValue={period.to} className="h-10" />
+            <Input id="periode-sampai" name="sampai" type="date" required defaultValue={period.to} className="h-11 md:h-10" />
           </div>
-          <Button type="submit" size="lg" className="h-10">
+          <Button type="submit" size="lg" className="h-11 md:h-10">
             Terapkan
           </Button>
           {period.invalid && (
