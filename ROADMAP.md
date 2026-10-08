@@ -106,15 +106,16 @@ catat apa yang mengganggu, lalu sesuaikan prioritas fase berikutnya.
 - [x] Pencatatan utang dan cicilan (+ piutang, keputusan 6 Okt 2026)
 - [x] Halaman net worth: total aset dikurangi kewajiban
 - [x] Dukungan pendapatan tidak tetap (rata-rata, buffer)
+- [x] Tabungan disisihkan manual per tujuan: Sisihkan/Ambil dari akun mana saja, saldo akun tetap (tabel `goal_allocations`, keputusan 8 Okt 2026)
 
 ---
 
-## Fase 8 — Import dan input cepat (±3–4 hari) — DILEWATI (keputusan 7 Okt 2026: target aplikasi gratis)
+## Fase 8 — Import dan input cepat (±3–4 hari) — SEBAGIAN (7 Okt 2026: import & fitur berbayar dilewati; input cepat dibuat tanpa AI pada 8 Okt 2026)
 
 - ~~Import CSV mutasi bank/e-wallet dengan pemetaan kolom~~
 - ~~Deteksi duplikat saat import~~
-- ~~Aturan kategori otomatis (contoh: "Indomaret" → Belanja harian)~~
-- ~~Input bahasa natural, contoh "makan siang 35rb gopay" (memakai LLM API)~~
+- [x] Kategori otomatis tanpa AI: belajar dari catatan di riwayat transaksi ("gojek" → Transportasi)
+- [x] Input bahasa natural tanpa LLM: "Ketik cepat" di Catat kilat ("makan siang 35rb gopay")
 - ~~Upload foto struk ke Supabase Storage (private bucket)~~
 
 ---
@@ -134,6 +135,15 @@ catat apa yang mengganggu, lalu sesuaikan prioritas fase berikutnya.
 - [x] Indikator "aman dibelanjakan" (safe to spend)
 - [x] Proyeksi arus kas
 - [ ] Pelacakan investasi manual: reksadana, saham, emas, crypto
+
+---
+
+## Fase 11 — Kemudahan untuk Gen Z (8 Okt 2026, di luar rencana awal atas permintaan pemilik)
+
+- [x] Tampilan baru gaya dokumen (kanvas hangat, satu aksen biru, Inter), tata letak khusus desktop
+- [x] Onboarding pengguna baru: intro, wizard /mulai, checklist "Mulai di sini"
+- [x] Navigasi bawah di HP (menggantikan menu laci); desktop tetap sidebar
+- [x] Catat kilat: panel dari tombol ⊕ (keypad, chip kategori + emoji, akun terakhir, favorit 1 ketukan + Batalkan)
 
 ---
 

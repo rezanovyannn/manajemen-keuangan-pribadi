@@ -53,8 +53,8 @@ export function SafeToSpendCard({ safe, detail = false }: { safe: SafeToSpend; d
         <Baris label="Aman dibelanjakan" value={formatRupiah(safe.safe)} strong />
       </dl>
       <p className="mt-2 text-xs text-muted-foreground">
-        Saldo akun yang terhubung ke tujuan tabungan tidak dianggap uang belanja. Pemasukan terjadwal (misalnya gaji)
-        tidak ikut dihitung agar angkanya tetap aman jika pemasukan terlambat.
+        Tabungan yang kamu sisihkan untuk tujuan tidak dianggap uang belanja. Pemasukan terjadwal (misalnya gaji) tidak
+        ikut dihitung agar angkanya tetap aman jika pemasukan terlambat.
       </p>
     </section>
   );
