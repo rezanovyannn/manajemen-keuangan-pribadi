@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
+import { Sparkles, Wand2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { addDays } from "@/lib/dates";
 import { formatRupiah, formatRupiahRingkas } from "@/lib/money";
 import { guessCategory, type Favorite } from "@/lib/quick-add/learn";
+import { parseQuickText } from "@/lib/quick-add/parse";
 import type { QuickAddData } from "@/lib/quick-add/query";
 import { cn } from "@/lib/utils";
 
@@ -43,6 +44,7 @@ export function QuickAddPanel({
   const [catatan, setCatatan] = useState("");
   const [semuaKategori, setSemuaKategori] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [ketik, setKetik] = useState("");
   const [pending, startTransition] = useTransition();
 
   const pilihanKategori = useMemo(() => data.categories.filter((c) => c.type === jenis), [data.categories, jenis]);
@@ -71,6 +73,21 @@ export function QuickAddPanel({
   if (kategoriAktif && !tampil.some((c) => c.id === kategoriAktif)) {
     const k = pilihanKategori.find((c) => c.id === kategoriAktif);
     if (k) tampil.push(k);
+  }
+
+  // Ketik bebas: isi nominal, akun, jenis, dan catatan dari satu kalimat.
+  function ketikBebas(v: string) {
+    setKetik(v);
+    const p = parseQuickText(v, data.accounts);
+    setDigits(p.amount !== null ? String(p.amount) : "");
+    if (p.accountId) setAkun(p.accountId);
+    // Hanya beralih ke "Masuk" bila ada kata pemasukan; pilihan pengguna tidak ditimpa.
+    if (p.type === "income" && jenis !== "income") {
+      setJenis("income");
+      setKategori(null);
+      setKategoriManual(false);
+    }
+    setCatatan(p.note);
   }
 
   function simpan() {
@@ -119,6 +136,29 @@ export function QuickAddPanel({
           </button>
         ))}
       </div>
+
+      {/* Ketik bebas */}
+      <label className="grid gap-1.5">
+        <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+          <Wand2 className="size-3.5 text-link" aria-hidden />
+          Ketik cepat
+        </span>
+        <input
+          value={ketik}
+          onChange={(e) => ketikBebas(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && siap && !pending) {
+              e.preventDefault();
+              simpan();
+            }
+          }}
+          maxLength={200}
+          autoComplete="off"
+          enterKeyHint="done"
+          placeholder="kopi 25rb gopay · gaji 8jt bca"
+          className="h-11 rounded-md border border-input bg-card px-3 text-base outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:h-10 md:text-sm"
+        />
+      </label>
 
       {/* Favorit 1 ketukan */}
       {favorit.length > 0 && (

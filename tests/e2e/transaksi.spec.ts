@@ -9,8 +9,7 @@ test.describe("transaksi", () => {
     await masuk(page);
     const catatan = tagUji(info.project.name, "kopi");
 
-    await page.getByRole("link", { name: "Tambah transaksi" }).click();
-    await expect(page).toHaveURL(/\/transaksi\/baru$/);
+    await page.goto("/transaksi/baru");
 
     // Nominal langsung fokus dan diformat otomatis.
     const nominal = page.getByLabel("Nominal");

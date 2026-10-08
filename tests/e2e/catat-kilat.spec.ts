@@ -76,4 +76,22 @@ test.describe("catat kilat", () => {
 
     await hapusTransaksi(page, catatan);
   });
+
+  test("ketik bebas: \"<catatan> 15,5rb <akun>\" mengisi nominal, akun, dan catatan", async ({ page }, info) => {
+    await masuk(page);
+    const tag = tagUji(info.project.name, "ketik");
+    const panel = await bukaKilat(page);
+    await panel.getByLabel("Ketik cepat").fill(`${tag} bakso 15,5rb ${AKUN.gopay}`);
+    await expect(panel.getByTestId("kilat-nominal")).toHaveText("Rp 15.500");
+    await expect(panel.getByRole("region", { name: "Akun" }).getByRole("button", { name: AKUN.gopay, exact: true })).toHaveAttribute("aria-pressed", "true");
+    await expect(panel.getByLabel("Catatan (opsional)")).toHaveValue(`${tag} bakso`);
+    await panel.getByRole("region", { name: "Kategori" }).getByRole("button", { name: "Makan & Minum", exact: true }).click();
+    await panel.getByLabel("Ketik cepat").press("Enter"); // Enter = simpan
+    await expect(page.getByRole("status").filter({ hasText: "Pengeluaran Rp 15.500 tersimpan" })).toBeVisible();
+
+    const daftar = await cariTransaksi(page, `${tag} bakso`);
+    await expect(daftar).toHaveCount(1);
+    await expect(daftar.first()).toContainText(AKUN.gopay);
+    await hapusTransaksi(page, `${tag} bakso`);
+  });
 });
