@@ -21,8 +21,8 @@ test.describe("onboarding", () => {
     asli = await bacaProfilUji();
   });
   test.afterAll(async () => {
-    // Kembalikan profil akun uji seperti semula.
-    await ubahProfilUji(asli);
+    // Kembalikan flag onboarding/checklist akun uji seperti semula.
+    await ubahProfilUji({ onboarding_completed_at: asli.onboarding_completed_at, checklist_dismissed_at: asli.checklist_dismissed_at });
   });
 
   test("pengguna baru diarahkan ke /mulai; 'Nanti saja' tidak mengarahkan lagi", async ({ page }) => {
@@ -50,9 +50,10 @@ test.describe("onboarding", () => {
     await page.getByRole("link", { name: "Lanjut" }).click();
     await page.getByRole("link", { name: "Mulai atur" }).click();
 
-    // Nama (dikembalikan di afterAll).
+    // Nama: terisi nama yang ada; dikirim ulang tanpa diubah (tidak mengubah profil akun uji).
     await expect(page.getByText("Langkah 1 dari 6 · Nama")).toBeVisible();
-    await page.getByLabel("Nama panggilan").fill("E2E Penguji");
+    const nama = await page.getByLabel("Nama panggilan").inputValue();
+    expect(nama.length).toBeGreaterThan(0);
     await page.getByRole("button", { name: "Lanjut" }).click();
 
     // Akun: pilihan cepat mengisi nama + jenis; nama diganti agar berawalan E2E.
@@ -98,7 +99,7 @@ test.describe("onboarding", () => {
     await expect(page.getByRole("heading", { name: "Semua siap!" })).toBeVisible();
     await page.getByRole("button", { name: "Ke Beranda" }).click();
     await expect(page.getByText(/Selamat datang! Catat transaksi pertamamu/)).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Halo, E2E Penguji!" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: `Halo, ${nama}!` })).toBeVisible();
 
     // Data wizard tersimpan.
     await page.goto("/tujuan");

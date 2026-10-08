@@ -12,6 +12,7 @@ const PORT = 3000;
 export default defineConfig({
   testDir: "./tests/e2e",
   // Bersihkan data uji "E2E ..." dari akun uji setelah semua test selesai.
+  globalSetup: "./tests/e2e/global-setup.ts",
   globalTeardown: "./tests/e2e/global-teardown.ts",
   // Test memakai 4 akun tetap di akun uji (BRI, Mandiri, GoPay, Cash On Hand),
   // jadi dijalankan berurutan agar saldo tidak saling memengaruhi.
