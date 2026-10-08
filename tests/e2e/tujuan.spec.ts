@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { addDays, todayInJakarta } from "../../src/lib/dates";
 import { formatRupiah, parseRupiah } from "../../src/lib/money/rupiah";
-import { AKUN, bukaMenu, catat, hapusTransaksi, masuk, saldoAkun, skipTanpaAkunUji, tagUji } from "./helpers";
+import { AKUN, barisAkun, bukaMenu, catat, hapusTransaksi, masuk, saldoAkun, skipTanpaAkunUji, tagUji } from "./helpers";
 
 // Nilai baris "Tabungan tujuan" di kartu aman dibelanjakan (halaman Insight).
 async function tabunganTujuan(page: Page) {
@@ -49,8 +49,13 @@ test.describe("tujuan tabungan", () => {
     await expect(kartu).toContainText(`kurang ${formatRupiah(target - saldo)}`);
     await expect(kartu).toContainText(/Perlu ±Rp [\d.]+\/bulan/);
 
-    // Saldo akun tujuan tidak lagi dihitung sebagai uang yang aman dibelanjakan.
-    expect(await tabunganTujuan(page)).toBe(tabunganAwal + saldo);
+    // Saldo akun tujuan (sampai target) tidak dihitung sebagai uang yang aman dibelanjakan.
+    const disisihkan = Math.min(Math.max(saldo, 0), target);
+    expect(await tabunganTujuan(page)).toBe(tabunganAwal + disisihkan);
+    // Kartu akun menampilkan bagian tabungan dan sisanya.
+    await page.goto("/akun");
+    await expect(barisAkun(page, akun)).toContainText(`Tabungan ${tujuan}${formatRupiah(disisihkan)}`);
+    await expect(barisAkun(page, akun)).toContainText(`Bebas dipakai${formatRupiah(saldo - disisihkan)}`);
 
     // Akun yang sudah dipakai tidak ditawarkan untuk tujuan baru.
     await page.goto("/tujuan/baru");
@@ -64,6 +69,10 @@ test.describe("tujuan tabungan", () => {
     await page.getByRole("button", { name: "Simpan perubahan" }).click();
     await expect(page.getByText("Perubahan tersimpan.")).toBeVisible();
     await expect(kartu).toContainText("Tercapai");
+    // Kelebihan di atas target bebas dipakai.
+    await page.goto("/akun");
+    await expect(barisAkun(page, akun)).toContainText(`Bebas dipakai${formatRupiah(200_000)}`);
+    await page.goto("/tujuan");
 
     // Bersihkan: hapus tujuan dan setoran uji.
     await kartu.click();

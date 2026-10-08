@@ -201,19 +201,20 @@ describe("safeToSpend", () => {
     expect(t.perDay).toBe(33_333);
   });
 
-  it("saldo akun tujuan tabungan tidak dihitung; tagihan dari akun tujuan tidak dobel", () => {
+  it("saldo akun tujuan dihitung tabungan sampai target; kelebihan bebas dipakai; semua tagihan dikurangkan", () => {
     const s = safeToSpend({
       ...base,
-      balance: 10_000_000,
+      balance: 20_000_000,
       goalAccounts: [
-        { accountId: "tabungan", balance: 6_000_000 },
-        { accountId: "minus", balance: -50_000 },
+        { accountId: "lebih", balance: 10_000_000, target: 5_000_000 },
+        { accountId: "kurang", balance: 3_000_000, target: 8_000_000 },
+        { accountId: "minus", balance: -50_000, target: 1_000_000 },
       ],
-      occurrences: [kejadian({ amount: 200_000, accountId: "tabungan" }), kejadian({ amount: 100_000, accountId: "a1" })],
+      occurrences: [kejadian({ amount: 200_000, accountId: "lebih" }), kejadian({ amount: 100_000, accountId: "a1" })],
       budgets: [],
     });
-    expect(s.goalSavings).toBe(6_000_000);
-    expect(s.bills).toBe(100_000);
-    expect(s.safe).toBe(3_900_000);
+    expect(s.goalSavings).toBe(8_000_000);
+    expect(s.bills).toBe(300_000);
+    expect(s.safe).toBe(11_700_000);
   });
 });

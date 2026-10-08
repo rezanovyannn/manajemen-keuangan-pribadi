@@ -1,4 +1,4 @@
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronRight, Plus, Target } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -9,7 +9,7 @@ import { PageHeader } from "@/components/page-header";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { accountTypeLabel } from "@/lib/accounts/types";
 import { requireUser } from "@/lib/auth/session";
-import { formatRupiah, totalBalance } from "@/lib/money";
+import { formatRupiah, goalSplit, totalBalance } from "@/lib/money";
 import { loadAccountBalances } from "@/lib/transactions/balances";
 import { cn } from "@/lib/utils";
 
@@ -24,11 +24,14 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
   const { gagal } = await searchParams;
   const { supabase } = await requireUser();
 
-  const { data: accounts, error } = await supabase
-    .from("accounts")
-    .select("id, name, type, opening_balance, archived_at")
-    .order("created_at");
+  const [{ data: accounts, error }, { data: goals, error: goalsError }] = await Promise.all([
+    supabase.from("accounts").select("id, name, type, opening_balance, archived_at").order("created_at"),
+    supabase.from("goals").select("account_id, name, target_amount").is("archived_at", null),
+  ]);
   if (error) console.error("[accounts] daftar gagal", { code: error.code });
+  if (goalsError) console.error("[accounts] tujuan gagal", { code: goalsError.code });
+  // Satu tujuan aktif per akun (dijamin indeks unik di database).
+  const tujuan = new Map((goals ?? []).map((g) => [g.account_id, g]));
 
   const aktif = accounts?.filter((a) => !a.archived_at) ?? [];
   const arsip = accounts?.filter((a) => a.archived_at) ?? [];
@@ -81,8 +84,9 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
             <li key={a.id} className="lg:rounded-xl lg:border lg:border-border lg:bg-card">
               <Link
                 href={`/akun/${a.id}`}
-                className="flex items-center gap-3 px-4 py-3 outline-none hover:bg-muted/50 focus-visible:bg-muted lg:h-full lg:flex-col lg:items-stretch lg:gap-4 lg:rounded-xl lg:p-5"
+                className="grid grid-cols-1 gap-2.5 px-4 py-3 outline-none hover:bg-muted/50 focus-visible:bg-muted lg:h-full lg:content-start lg:gap-4 lg:rounded-xl lg:p-5"
               >
+                <div className="flex items-center gap-3 lg:flex-col lg:items-stretch lg:gap-4">
                 <div className="flex min-w-0 flex-1 items-center gap-3">
                   <AccountIcon type={a.type} />
                   <div className="min-w-0 flex-1">
@@ -103,6 +107,13 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
                   <p className="text-xs text-muted-foreground">Awal {formatRupiah(a.opening_balance)}</p>
                 </div>
                 <ChevronRight className="size-4 text-muted-foreground lg:hidden" aria-hidden />
+                </div>
+                {tujuan.has(a.id) && saldo(a.id) !== undefined && (
+                  <PembagianTabungan
+                    nama={tujuan.get(a.id)!.name}
+                    {...goalSplit(saldo(a.id)!, tujuan.get(a.id)!.target_amount)}
+                  />
+                )}
               </Link>
             </li>
           ))}
@@ -135,5 +146,24 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
         </details>
       )}
     </div>
+  );
+}
+
+// Bagian saldo yang disisihkan untuk tujuan tabungan (sampai target) dan sisanya.
+function PembagianTabungan({ nama, saved, free }: { nama: string; saved: number; free: number }) {
+  return (
+    <dl className="grid grid-cols-1 gap-1 rounded-lg bg-muted/60 px-3 py-2 text-xs">
+      <div className="flex items-start justify-between gap-3">
+        <dt className="flex min-w-0 items-start gap-1.5 text-muted-foreground">
+          <Target className="mt-px size-3.5 shrink-0 text-link" aria-hidden />
+          <span className="break-words">Tabungan {nama}</span>
+        </dt>
+        <dd className="shrink-0 font-semibold tabular-nums">{formatRupiah(saved)}</dd>
+      </div>
+      <div className="flex items-center justify-between gap-3">
+        <dt className="text-muted-foreground">Bebas dipakai</dt>
+        <dd className={cn("shrink-0 font-semibold tabular-nums", free < 0 && "text-rose-700 dark:text-rose-400")}>{formatRupiah(free)}</dd>
+      </div>
+    </dl>
   );
 }

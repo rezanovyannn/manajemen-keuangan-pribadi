@@ -4,6 +4,7 @@ import {
   debtStatus,
   formatTenths,
   goalProgress,
+  goalSplit,
   incomeStability,
   monthlyNeeded,
   monthsUntil,
@@ -119,5 +120,23 @@ describe("incomeStability", () => {
   it("tanpa data atau tanpa pengeluaran", () => {
     expect(incomeStability([], 1_000)).toBeNull();
     expect(incomeStability([{ income: 1_000, expense: 0 }], 1_000)?.runwayTenths).toBeNull();
+  });
+});
+
+describe("goalSplit", () => {
+  it("tabungan sampai target, sisanya bebas dipakai", () => {
+    expect(goalSplit(10_000_000, 5_000_000)).toEqual({ saved: 5_000_000, free: 5_000_000 });
+    expect(goalSplit(3_000_000, 5_000_000)).toEqual({ saved: 3_000_000, free: 0 });
+    expect(goalSplit(5_000_000, 5_000_000)).toEqual({ saved: 5_000_000, free: 0 });
+  });
+
+  it("saldo minus: tabungan 0, bebas dipakai ikut minus", () => {
+    expect(goalSplit(-20_000, 5_000_000)).toEqual({ saved: 0, free: -20_000 });
+    expect(goalSplit(0, 5_000_000)).toEqual({ saved: 0, free: 0 });
+  });
+
+  it("target harus > 0 dan nominal integer", () => {
+    expect(() => goalSplit(1, 0)).toThrow();
+    expect(() => goalSplit(1.5, 10)).toThrow();
   });
 });

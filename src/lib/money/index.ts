@@ -41,6 +41,7 @@ export {
   debtStatus,
   formatTenths,
   goalProgress,
+  goalSplit,
   incomeStability,
   monthlyNeeded,
   monthsUntil,
