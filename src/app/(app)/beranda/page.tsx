@@ -1,12 +1,14 @@
 import { TriangleAlert } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { FormAlert } from "@/components/auth/form-field";
 import { AccountCashflowList } from "@/components/dashboard/account-cashflow";
 import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown";
 import { PeriodPicker } from "@/components/dashboard/period-picker";
 import { SafeToSpendCard } from "@/components/insight/safe-to-spend-card";
+import { ChecklistCard } from "@/components/onboarding/checklist-card";
 import { SummaryTiles } from "@/components/dashboard/summary-tiles";
 import { PageHeader } from "@/components/page-header";
 import { RecurringSuggestions } from "@/components/recurring/suggestions";
@@ -16,6 +18,9 @@ import { loadMonthBudgets } from "@/lib/budgets/query";
 import { loadDashboard } from "@/lib/dashboard/query";
 import { loadDebts } from "@/lib/debts/query";
 import { buildSafeToSpend, loadMonthRules } from "@/lib/insight/query";
+import { buildChecklist } from "@/lib/onboarding/checklist";
+import { loadChecklistCounts } from "@/lib/onboarding/query";
+import { perluOnboarding } from "@/lib/onboarding/steps";
 import { currentMonthInJakarta, resolvePeriod, todayInJakarta } from "@/lib/dates";
 import { countBudgetAlerts, netWorth, totalBalance } from "@/lib/money";
 import { loadSuggestions } from "@/lib/recurring/suggestions";
@@ -27,6 +32,7 @@ const PESAN: Record<string, { tone: "success" | "error"; text: string }> = {
   "sudah-dicatat": { tone: "success", text: "Jadwal ini sudah pernah dicatat, tidak dibuat ganda." },
   dilewati: { tone: "success", text: "Jadwal dilewati untuk tanggal ini." },
   gagal: { tone: "error", text: "Perubahan gagal disimpan. Silakan coba lagi." },
+  siap: { tone: "success", text: "Selamat datang! Catat transaksi pertamamu dengan tombol Tambah transaksi." },
 };
 
 function teks(v: string | string[] | undefined) {
@@ -42,13 +48,16 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
   const { supabase, user } = await requireUser();
 
   const [{ data: profile }, budgets, dash, saran, debts, jadwal] = await Promise.all([
-    supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
+    supabase.from("profiles").select("display_name, onboarding_completed_at, checklist_dismissed_at").eq("id", user.id).maybeSingle(),
     loadMonthBudgets(supabase, month),
     loadDashboard(supabase, period),
     loadSuggestions(supabase, today),
     loadDebts(supabase),
     loadMonthRules(supabase),
   ]);
+  // Pengguna baru diarahkan ke wizard /mulai (sekali; "Nanti saja" juga menandainya selesai).
+  if (perluOnboarding(profile)) redirect("/mulai");
+  const checklist = profile && !profile.checklist_dismissed_at ? await loadChecklistCounts(supabase, budgets.items.length) : null;
   const aman = buildSafeToSpend({ today, totalSaldo: dash.totalSaldo, accountBalances: dash.accountBalances, budgets, rules: jadwal });
   const terbuka = debts.items.filter((d) => !d.archived && !d.status.settled);
   const nilaiBersih =
@@ -76,6 +85,12 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
       <div className="empty:hidden lg:col-span-2">
         <FormAlert tone={pesan?.tone ?? "success"} message={pesan?.text} />
       </div>
+
+      {checklist && (
+        <div className="order-1 lg:order-none lg:col-span-2">
+          <ChecklistCard items={buildChecklist(checklist)} />
+        </div>
+      )}
 
       {bagian.length > 0 && (
         <section aria-label="Peringatan budget" className="order-2 lg:order-none lg:col-span-2">

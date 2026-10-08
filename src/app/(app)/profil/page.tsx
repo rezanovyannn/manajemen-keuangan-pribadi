@@ -1,4 +1,4 @@
-import { ChevronRight, LogOut, Repeat, Tags } from "lucide-react";
+import { ChevronRight, LogOut, Repeat, Rocket, Tags } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -40,6 +40,15 @@ export default async function ProfilPage() {
       </Card>
 
       <Link
+        href="/mulai?langkah=nama"
+        className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
+      >
+        <Rocket className="size-4 text-muted-foreground" aria-hidden />
+        <span className="flex-1">Panduan awal</span>
+        <ChevronRight className="size-4 text-muted-foreground" aria-hidden />
+      </Link>
+
+      <Link
         href="/kategori"
         className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
       >
@@ -57,7 +66,7 @@ export default async function ProfilPage() {
         <ChevronRight className="size-4 text-muted-foreground" aria-hidden />
       </Link>
 
-      <Card>
+      <Card id="pasang" className="scroll-mt-20">
         <CardHeader>
           <CardTitle>
             <h2>Pasang di HP</h2>

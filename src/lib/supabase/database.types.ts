@@ -16,6 +16,8 @@ type ProfileRow = {
   id: string;
   display_name: string | null;
   currency: string;
+  onboarding_completed_at: string | null; // null = pengguna baru (diarahkan ke /mulai)
+  checklist_dismissed_at: string | null;
 } & Timestamps;
 
 type AccountRow = {
