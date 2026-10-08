@@ -2,7 +2,7 @@ import { addDays } from "@/lib/dates";
 import { daysUntil, nextOccurrenceAfter, type Frequency } from "@/lib/recurring/schedule";
 
 import { addAmounts } from "./balance";
-import { goalSplit } from "./planning";
+import { coveredSavings } from "./allocation";
 import { assertAmount } from "./rupiah";
 
 // Proyeksi arus kas dan "aman dibelanjakan". Hanya memakai data pasti:
@@ -136,15 +136,16 @@ export type SafeToSpend = {
 };
 
 // aman dibelanjakan = saldo - tabungan tujuan - tagihan terjadwal - sisa budget yang belum terpakai.
-// - Saldo akun yang terhubung ke tujuan tabungan aktif dianggap tabungan SAMPAI TARGET-nya
-//   (lihat goalSplit); kelebihan di atas target bebas dipakai. Semua tagihan terjadwal tetap
-//   dikurangkan, termasuk dari akun tabungan (konservatif).
+// - Tabungan yang disisihkan (goal_allocations) bukan uang belanja: per akun dikurangi
+//   sebesar yang disisihkan, dibatasi saldo akun itu (lihat coveredSavings). Semua tagihan
+//   terjadwal tetap dikurangkan (konservatif).
 // - Pemasukan terjadwal sengaja TIDAK dihitung (konservatif: gaji bisa terlambat).
 // - Tagihan terjadwal yang kategorinya punya budget mengurangi cadangan budget itu,
 //   agar tidak terhitung dua kali.
 export function safeToSpend(input: {
   balance: number;
-  goalAccounts: { accountId: string; balance: number; target: number }[];
+  // Per akun aktif: saldo + total yang disisihkan untuk tujuan aktif.
+  goalAccounts: { accountId: string; balance: number; allocated: number }[];
   occurrences: Occurrence[];
   budgets: { categoryIds: string[]; remaining: number }[];
   today: string;
@@ -152,7 +153,7 @@ export function safeToSpend(input: {
 }): SafeToSpend {
   const { balance, today, monthEnd } = input;
   if (monthEnd < today) throw new RangeError("Akhir bulan tidak boleh sebelum hari ini.");
-  const goalSavings = input.goalAccounts.reduce((s, g) => addAmounts(s, goalSplit(g.balance, g.target).saved), 0);
+  const goalSavings = input.goalAccounts.reduce((s, g) => addAmounts(s, coveredSavings(g.balance, g.allocated)), 0);
   const tagihan = input.occurrences.filter((o) => o.type === "expense" && o.date <= monthEnd);
   const bills = tagihan.reduce((s, o) => addAmounts(s, o.amount), 0);
 

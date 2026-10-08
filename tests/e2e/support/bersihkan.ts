@@ -59,7 +59,7 @@ export async function bersihkanAkunUji(mode: Mode, opsi: { simulasi?: boolean; l
     }
   }
 
-  const [accounts, categories, txs, budgets, rules, goals, debts] = await Promise.all([
+  const [accounts, categories, txs, budgets, rules, goals, debts, setoran] = await Promise.all([
     semuaBaris("accounts", "id,name"),
     semuaBaris("categories", "id,name,type,parent_id,archived_at"),
     semuaBaris("transactions", "id,account_id,category_id,type,transfer_id,note,debt_id,recurring_rule_id"),
@@ -67,6 +67,7 @@ export async function bersihkanAkunUji(mode: Mode, opsi: { simulasi?: boolean; l
     semuaBaris("recurring_rules", "id,name,account_id"),
     semuaBaris("goals", "id,name,account_id"),
     semuaBaris("debts", "id,name"),
+    semuaBaris("goal_allocations", "id,goal_id,account_id"),
   ]);
 
   const semua = mode === "semua";
@@ -90,6 +91,9 @@ export async function bersihkanAkunUji(mode: Mode, opsi: { simulasi?: boolean; l
       ruleHapus.has(t.recurring_rule_id as string) ||
       isE2E(t.note),
   );
+  const goalHapus = new Set(goals.filter((g) => semua || isE2E(g.name) || akunHapus.has(g.account_id as string)).map((g) => g.id));
+  // Setoran tabungan dari akun yang dihapus (atau milik tujuan yang dihapus) ikut dihapus.
+  const setoranHapus = setoran.filter((r) => semua || goalHapus.has(r.goal_id as string) || akunHapus.has(r.account_id as string)).map((r) => r.id);
   const transferIds = [...new Set(txHapus.filter((t) => t.transfer_id).map((t) => t.transfer_id as string))];
   const biasaIds = txHapus.filter((t) => !t.transfer_id).map((t) => t.id);
 
@@ -98,7 +102,8 @@ export async function bersihkanAkunUji(mode: Mode, opsi: { simulasi?: boolean; l
     transfer: transferIds.length,
     budget: budgets.filter((b) => semua || katHapus.has(b.category_id as string)).length,
     jadwal: ruleHapus.size,
-    tujuan: goals.filter((g) => semua || isE2E(g.name) || akunHapus.has(g.account_id as string)).length,
+    tujuan: goalHapus.size,
+    setoranTabungan: setoranHapus.length,
     utangPiutang: debtHapus.size,
     kategori: katHapus.size,
     akun: akunHapus.size,
@@ -113,7 +118,8 @@ export async function bersihkanAkunUji(mode: Mode, opsi: { simulasi?: boolean; l
   }
   await hapus("budgets", budgets.filter((b) => semua || katHapus.has(b.category_id as string)).map((b) => b.id));
   await hapus("recurring_rules", [...ruleHapus]);
-  await hapus("goals", goals.filter((g) => semua || isE2E(g.name) || akunHapus.has(g.account_id as string)).map((g) => g.id));
+  await hapus("goal_allocations", setoranHapus);
+  await hapus("goals", [...goalHapus]);
   await hapus("debts", [...debtHapus]);
   const anak = categories.filter((c) => c.parent_id && katHapus.has(c.id)).map((c) => c.id);
   await hapus("categories", anak);

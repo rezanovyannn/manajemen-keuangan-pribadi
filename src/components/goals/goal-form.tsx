@@ -6,18 +6,16 @@ import { useActionState } from "react";
 import type { GoalFormState } from "@/actions/goals";
 import { FormAlert, FormField } from "@/components/auth/form-field";
 import { MoneyInput } from "@/components/money-input";
-import { SelectField, type SelectOption } from "@/components/transactions/select-field";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type Props = {
   action: (prev: GoalFormState, formData: FormData) => Promise<GoalFormState>;
-  accounts: SelectOption[];
   initial?: Record<string, string>;
   submitLabel: string;
 };
 
-export function GoalForm({ action, accounts, initial = {}, submitLabel }: Props) {
+export function GoalForm({ action, initial = {}, submitLabel }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
   const v = { ...initial, ...state.values };
   const err = state.fieldErrors ?? {};
@@ -27,10 +25,10 @@ export function GoalForm({ action, accounts, initial = {}, submitLabel }: Props)
       <FormAlert message={state.error} tone="error" />
       <FormField name="name" label="Nama tujuan" placeholder="Contoh: Liburan Bali, Dana darurat" maxLength={50} defaultValue={v.name} errors={err.name} />
       <MoneyInput name="targetAmount" label="Target" defaultValue={v.targetAmount} errors={err.targetAmount} />
-      <div className="grid gap-2">
-        <SelectField name="accountId" label="Akun tabungan" placeholder="Pilih akun" options={accounts} defaultValue={v.accountId} errors={err.accountId} />
-        <p className="text-xs text-muted-foreground">Progress dihitung dari saldo akun ini. Satu akun untuk satu tujuan.</p>
-      </div>
+      <p className="text-xs text-muted-foreground">
+        Setelah disimpan, isi tabungan dengan tombol <span className="font-medium text-foreground">Sisihkan</span> dari akun mana saja. Saldo
+        akunnya tidak berubah; hanya ditandai sebagai tabungan.
+      </p>
       <FormField name="deadline" label="Tenggat (opsional)" type="date" defaultValue={v.deadline} errors={err.deadline} />
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

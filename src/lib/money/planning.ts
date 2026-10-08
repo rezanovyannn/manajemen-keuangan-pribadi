@@ -37,16 +37,6 @@ export function goalProgress(target: number, saved: number): GoalProgress {
   };
 }
 
-// Pembagian saldo akun tujuan: "saved" = bagian yang disisihkan untuk tujuan (0 s.d. target),
-// "free" = sisanya, bebas dipakai (bisa minus jika saldo akun minus).
-export function goalSplit(balance: number, target: number): { saved: number; free: number } {
-  assertAmount(balance);
-  assertAmount(target);
-  if (target <= 0) throw new RangeError("Target harus lebih dari 0.");
-  const saved = balance <= 0 ? 0 : Math.min(balance, target);
-  return { saved, free: addAmounts(balance, -saved) };
-}
-
 // Jumlah bulan penuh dari `today` sampai `deadline` (keduanya "YYYY-MM-DD").
 export function monthsUntil(today: string, deadline: string): number {
   const [y1, m1, d1] = today.split("-").map(Number) as [number, number, number];

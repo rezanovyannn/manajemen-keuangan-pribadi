@@ -3,7 +3,8 @@ import "server-only";
 import type { BudgetItem } from "@/lib/budgets/query";
 import { loadMonthBudgets } from "@/lib/budgets/query";
 import { addDays, currentMonthInJakarta, monthRange } from "@/lib/dates";
-import { projectCashflow, safeToSpend, upcomingOccurrences, type ProjectionRule } from "@/lib/money";
+import { loadActiveAllocations } from "@/lib/goals/query";
+import { allocationTotals, projectCashflow, safeToSpend, upcomingOccurrences, type ProjectionRule } from "@/lib/money";
 import type { createClient } from "@/lib/supabase/server";
 import { loadAccountBalances } from "@/lib/transactions/balances";
 
@@ -24,19 +25,17 @@ async function loadRules(supabase: Supabase, until: string) {
   return { rules: (data ?? []) as ProjectionRule[], error };
 }
 
-type GoalTarget = { accountId: string; target: number };
-
-// Tujuan tabungan aktif: akun + target (satu tujuan aktif per akun).
-async function loadGoalTargets(supabase: Supabase) {
-  const { data, error } = await supabase.from("goals").select("account_id, target_amount").is("archived_at", null);
-  if (error) console.error("[insight] muat tujuan gagal", { code: error.code });
-  return { goals: (data ?? []).map((g): GoalTarget => ({ accountId: g.account_id, target: g.target_amount })), error };
+// Total yang disisihkan per akun untuk tujuan aktif (goal_allocations).
+async function loadAllocatedByAccount(supabase: Supabase) {
+  const { rows, error } = await loadActiveAllocations(supabase);
+  return { allocated: allocationTotals(rows).byAccount, error };
 }
 
-// Saldo akun tujuan + target (hanya akun aktif, karena saldo total juga hanya akun aktif).
-function saldoTujuan(goals: GoalTarget[], balances: { id: string; balance: number }[]) {
-  const saldo = new Map(balances.map((b) => [b.id, b.balance]));
-  return goals.flatMap((g) => (saldo.has(g.accountId) ? [{ ...g, balance: saldo.get(g.accountId)! }] : []));
+// Saldo + tabungan per akun aktif (saldo total juga hanya akun aktif).
+function saldoTujuan(allocated: Map<string, number>, balances: { id: string; balance: number }[]) {
+  return balances
+    .filter((b) => (allocated.get(b.id) ?? 0) !== 0)
+    .map((b) => ({ accountId: b.id, balance: b.balance, allocated: allocated.get(b.id)! }));
 }
 
 const cadanganBudget = (items: BudgetItem[]) => items.map((b) => ({ categoryIds: b.categoryIds, remaining: b.usage.remaining }));
@@ -45,8 +44,8 @@ const cadanganBudget = (items: BudgetItem[]) => items.map((b) => ({ categoryIds:
 // dan akun tujuan (dimuat paralel dengan data Beranda lain).
 export async function loadMonthRules(supabase: Supabase) {
   const monthEnd = monthEndInJakarta();
-  const [rules, goals] = await Promise.all([loadRules(supabase, monthEnd), loadGoalTargets(supabase)]);
-  return { monthEnd, rules: rules.rules, goals: goals.goals, error: rules.error ?? goals.error };
+  const [rules, goals] = await Promise.all([loadRules(supabase, monthEnd), loadAllocatedByAccount(supabase)]);
+  return { monthEnd, rules: rules.rules, allocated: goals.allocated, error: rules.error ?? goals.error };
 }
 
 // null jika salah satu data gagal dimuat (lebih baik tidak tampil daripada angka yang salah).
@@ -62,7 +61,7 @@ export function buildSafeToSpend(input: {
   if (rules.error || totalSaldo === null || accountBalances === null || budgets.error) return null;
   return safeToSpend({
     balance: totalSaldo,
-    goalAccounts: saldoTujuan(rules.goals, accountBalances),
+    goalAccounts: saldoTujuan(rules.allocated, accountBalances),
     occurrences: upcomingOccurrences(rules.rules, today, rules.monthEnd),
     budgets: cadanganBudget(budgets.items),
     today,
@@ -77,7 +76,7 @@ export async function loadProjection(supabase: Supabase, today: string) {
     supabase.from("accounts").select("id, name, opening_balance, archived_at").is("archived_at", null).order("created_at"),
     loadRules(supabase, monthEnd),
     loadMonthBudgets(supabase, currentMonthInJakarta()),
-    loadGoalTargets(supabase),
+    loadAllocatedByAccount(supabase),
   ]);
   const accounts = accountsRes.data ?? [];
   const balances = await loadAccountBalances(supabase, accounts);
@@ -92,7 +91,7 @@ export async function loadProjection(supabase: Supabase, today: string) {
   const projection = projectCashflow({ accounts: saldo, occurrences, today, until: monthEnd });
   const safe = safeToSpend({
     balance: projection.start,
-    goalAccounts: saldoTujuan(goals.goals, saldo),
+    goalAccounts: saldoTujuan(goals.allocated, saldo),
     occurrences,
     budgets: cadanganBudget(budgets.items),
     today,

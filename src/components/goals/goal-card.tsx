@@ -6,7 +6,8 @@ import type { GoalItem } from "@/lib/goals/query";
 import { formatRupiah } from "@/lib/money";
 import { cn } from "@/lib/utils";
 
-export function GoalCard({ goal }: { goal: GoalItem }) {
+// `asLink`: di daftar tujuan kartu menautkan ke halaman tujuan; di halaman tujuan itu sendiri tidak.
+export function GoalCard({ goal, asLink = true }: { goal: GoalItem; asLink?: boolean }) {
   const { progress, need } = goal;
   const kebutuhan =
     need.kind === "monthly"
@@ -16,10 +17,14 @@ export function GoalCard({ goal }: { goal: GoalItem }) {
         : null;
 
   return (
-    <Link
+    <Wadah
+      asLink={asLink}
       href={`/tujuan/${goal.id}`}
-      className="grid grid-cols-1 gap-2 rounded-xl border border-border bg-card px-4 py-3 outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
-      aria-label={`${goal.name}, ${progress.percent}% tercapai`}
+      className={cn(
+        "grid grid-cols-1 gap-2 rounded-xl border border-border bg-card px-4 py-3",
+        asLink && "outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50",
+      )}
+      label={`${goal.name}, ${progress.percent}% tercapai`}
     >
       <div className="flex items-center justify-between gap-3">
         <p className="min-w-0 truncate font-medium">{goal.name}</p>
@@ -51,12 +56,38 @@ export function GoalCard({ goal }: { goal: GoalItem }) {
         <p className="shrink-0 text-xs text-muted-foreground tabular-nums">{progress.percent}%</p>
       </div>
       <p className="text-xs text-muted-foreground">
-        Akun {goal.accountName}
-        {!progress.achieved && ` · kurang ${formatRupiah(progress.remaining)}`}
+        {goal.perAccount.length === 0
+          ? "Belum ada tabungan. Buka untuk menyisihkan dari akun mana saja."
+          : `Dari ${goal.perAccount.map((a) => `${a.accountName} ${formatRupiah(a.amount)}`).join(" · ")}`}
+        {!progress.achieved && goal.perAccount.length > 0 && ` · kurang ${formatRupiah(progress.remaining)}`}
       </p>
       {kebutuhan && !progress.achieved && (
         <p className={cn("text-xs font-medium", need.kind === "overdue" ? "text-rose-700 dark:text-rose-400" : "text-foreground")}>{kebutuhan}</p>
       )}
+    </Wadah>
+  );
+}
+
+function Wadah({
+  asLink,
+  href,
+  className,
+  label,
+  children,
+}: {
+  asLink: boolean;
+  href: string;
+  className: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return asLink ? (
+    <Link href={href} className={className} aria-label={label}>
+      {children}
     </Link>
+  ) : (
+    <section className={className} aria-label={label}>
+      {children}
+    </section>
   );
 }

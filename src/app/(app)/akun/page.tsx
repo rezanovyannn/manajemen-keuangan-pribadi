@@ -1,4 +1,4 @@
-import { ChevronRight, Plus, Target } from "lucide-react";
+import { ChevronRight, Plus, Target, TriangleAlert } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -9,7 +9,8 @@ import { PageHeader } from "@/components/page-header";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { accountTypeLabel } from "@/lib/accounts/types";
 import { requireUser } from "@/lib/auth/session";
-import { formatRupiah, goalSplit, totalBalance } from "@/lib/money";
+import { loadAccountSavings, type AccountSavings } from "@/lib/goals/query";
+import { formatRupiah, totalBalance } from "@/lib/money";
 import { loadAccountBalances } from "@/lib/transactions/balances";
 import { cn } from "@/lib/utils";
 
@@ -24,14 +25,11 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
   const { gagal } = await searchParams;
   const { supabase } = await requireUser();
 
-  const [{ data: accounts, error }, { data: goals, error: goalsError }] = await Promise.all([
-    supabase.from("accounts").select("id, name, type, opening_balance, archived_at").order("created_at"),
-    supabase.from("goals").select("account_id, name, target_amount").is("archived_at", null),
-  ]);
+  const { data: accounts, error } = await supabase
+    .from("accounts")
+    .select("id, name, type, opening_balance, archived_at")
+    .order("created_at");
   if (error) console.error("[accounts] daftar gagal", { code: error.code });
-  if (goalsError) console.error("[accounts] tujuan gagal", { code: goalsError.code });
-  // Satu tujuan aktif per akun (dijamin indeks unik di database).
-  const tujuan = new Map((goals ?? []).map((g) => [g.account_id, g]));
 
   const aktif = accounts?.filter((a) => !a.archived_at) ?? [];
   const arsip = accounts?.filter((a) => a.archived_at) ?? [];
@@ -40,6 +38,8 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
   const { balances, error: saldoError } = await loadAccountBalances(supabase, accounts ?? []);
   const saldo = (id: string) => balances?.get(id);
   const total = balances ? totalBalance(aktif.map((a) => balances.get(a.id) ?? 0)) : undefined;
+  // Tabungan yang disisihkan per akun (goal_allocations) + sisa bebas dipakai.
+  const { byAccount: tabungan } = balances ? await loadAccountSavings(supabase, aktif, balances) : { byAccount: null };
 
   return (
     <div className="grid w-full grid-cols-1 gap-4 lg:gap-5">
@@ -108,12 +108,7 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
                 </div>
                 <ChevronRight className="size-4 text-muted-foreground lg:hidden" aria-hidden />
                 </div>
-                {tujuan.has(a.id) && saldo(a.id) !== undefined && (
-                  <PembagianTabungan
-                    nama={tujuan.get(a.id)!.name}
-                    {...goalSplit(saldo(a.id)!, tujuan.get(a.id)!.target_amount)}
-                  />
-                )}
+                {tabungan?.get(a.id) && <PembagianTabungan s={tabungan.get(a.id)!} />}
               </Link>
             </li>
           ))}
@@ -149,21 +144,29 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
   );
 }
 
-// Bagian saldo yang disisihkan untuk tujuan tabungan (sampai target) dan sisanya.
-function PembagianTabungan({ nama, saved, free }: { nama: string; saved: number; free: number }) {
+// Tabungan per tujuan yang disisihkan dari akun ini, lalu sisa bebas dipakai.
+function PembagianTabungan({ s }: { s: AccountSavings }) {
   return (
     <dl className="grid grid-cols-1 gap-1 rounded-lg bg-muted/60 px-3 py-2 text-xs">
-      <div className="flex items-start justify-between gap-3">
-        <dt className="flex min-w-0 items-start gap-1.5 text-muted-foreground">
-          <Target className="mt-px size-3.5 shrink-0 text-link" aria-hidden />
-          <span className="break-words">Tabungan {nama}</span>
-        </dt>
-        <dd className="shrink-0 font-semibold tabular-nums">{formatRupiah(saved)}</dd>
-      </div>
-      <div className="flex items-center justify-between gap-3">
+      {s.goals.map((g) => (
+        <div key={g.goalId} className="flex items-start justify-between gap-3">
+          <dt className="flex min-w-0 items-start gap-1.5 text-muted-foreground">
+            <Target className="mt-px size-3.5 shrink-0 text-link" aria-hidden />
+            <span className="break-words">Tabungan {g.name}</span>
+          </dt>
+          <dd className="shrink-0 font-semibold tabular-nums">{formatRupiah(g.amount)}</dd>
+        </div>
+      ))}
+      <div className="flex items-center justify-between gap-3 border-t border-border/70 pt-1">
         <dt className="text-muted-foreground">Bebas dipakai</dt>
-        <dd className={cn("shrink-0 font-semibold tabular-nums", free < 0 && "text-rose-700 dark:text-rose-400")}>{formatRupiah(free)}</dd>
+        <dd className={cn("shrink-0 font-semibold tabular-nums", s.free < 0 && "text-rose-700 dark:text-rose-400")}>{formatRupiah(s.free)}</dd>
       </div>
+      {s.shortfall > 0 && (
+        <p className="flex items-start gap-1.5 text-amber-800 dark:text-amber-300">
+          <TriangleAlert className="mt-px size-3.5 shrink-0" aria-hidden />
+          Saldo kurang {formatRupiah(s.shortfall)} dari tabungan yang disisihkan.
+        </p>
+      )}
     </dl>
   );
 }

@@ -84,10 +84,20 @@ type GoalRow = {
   id: string;
   user_id: string;
   name: string;
-  account_id: string;
+  account_id: string | null; // tidak dipakai lagi sejak goal_allocations
   target_amount: number;
   deadline: string | null;
   archived_at: string | null;
+} & Timestamps;
+
+type GoalAllocationRow = {
+  id: string;
+  user_id: string;
+  goal_id: string;
+  account_id: string;
+  amount: number; // > 0 sisihkan, < 0 ambil
+  occurred_on: string;
+  note: string | null;
 } & Timestamps;
 
 type DebtRow = {
@@ -152,8 +162,15 @@ export type Database = {
       };
       goals: {
         Row: GoalRow;
-        Insert: Pick<GoalRow, "name" | "account_id" | "target_amount"> & Partial<Pick<GoalRow, "id" | "user_id" | "deadline" | "archived_at">>;
+        Insert: Pick<GoalRow, "name" | "target_amount"> & Partial<Pick<GoalRow, "id" | "user_id" | "account_id" | "deadline" | "archived_at">>;
         Update: Partial<Pick<GoalRow, "name" | "account_id" | "target_amount" | "deadline" | "archived_at">>;
+        Relationships: [];
+      };
+      goal_allocations: {
+        Row: GoalAllocationRow;
+        Insert: Pick<GoalAllocationRow, "goal_id" | "account_id" | "amount"> &
+          Partial<Pick<GoalAllocationRow, "id" | "user_id" | "occurred_on" | "note">>;
+        Update: Partial<Pick<GoalAllocationRow, "amount" | "occurred_on" | "note">>;
         Relationships: [];
       };
       debts: {

@@ -41,7 +41,6 @@ export {
   debtStatus,
   formatTenths,
   goalProgress,
-  goalSplit,
   incomeStability,
   monthlyNeeded,
   monthsUntil,
@@ -78,3 +77,14 @@ export {
   type SubscriptionCandidate,
   type UnusualExpense,
 } from "./insight";
+export {
+  accountSplit,
+  allocationLimit,
+  allocationTotals,
+  canRemoveAllocation,
+  checkAllocation,
+  coveredSavings,
+  type AccountSplit,
+  type AllocationKind,
+  type AllocationRow,
+} from "./allocation";

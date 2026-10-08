@@ -16,7 +16,7 @@ export const metadata: Metadata = { title: "Tujuan Tabungan · Keuangan Pribadi"
 const PESAN: Record<string, { tone: "success" | "error"; text: string }> = {
   tersimpan: { tone: "success", text: "Tujuan tersimpan." },
   diubah: { tone: "success", text: "Perubahan tersimpan." },
-  dihapus: { tone: "success", text: "Tujuan dihapus. Saldo akunnya tidak berubah." },
+  dihapus: { tone: "success", text: "Tujuan dihapus. Tabungannya kembali menjadi saldo bebas." },
   gagal: { tone: "error", text: "Perubahan gagal disimpan. Silakan coba lagi." },
 };
 
@@ -29,7 +29,7 @@ export default async function TujuanPage({ searchParams }: PageProps<"/tujuan">)
   return (
     <div className="grid w-full grid-cols-1 gap-4 lg:gap-5">
       <div className="flex items-start justify-between gap-4">
-        <PageHeader title="Tujuan tabungan" description="Progress dihitung dari saldo akun tabungan masing-masing." />
+        <PageHeader title="Tujuan tabungan" description="Sisihkan tabungan dari akun mana saja; saldo akunnya tetap." />
         <Link href="/tujuan/baru" className={cn(buttonVariants({ size: "lg" }), "h-11 md:h-10 shrink-0")}>
           <Plus aria-hidden />
           Tambah
@@ -40,7 +40,7 @@ export default async function TujuanPage({ searchParams }: PageProps<"/tujuan">)
 
       {items.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
-          Belum ada tujuan. Buat akun khusus tabungan, lalu hubungkan ke tujuan di sini.
+          Belum ada tujuan. Buat tujuan, lalu sisihkan tabungan dari akun mana saja.
         </div>
       ) : (
         <ul className="grid grid-cols-1 items-start gap-3 lg:grid-cols-2">
