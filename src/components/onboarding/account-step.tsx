@@ -6,7 +6,7 @@ import { addAccount } from "@/actions/onboarding";
 import { FormAlert, FormField } from "@/components/auth/form-field";
 import { MoneyInput } from "@/components/money-input";
 import { Button } from "@/components/ui/button";
-import { ACCOUNT_TYPES } from "@/lib/accounts/types";
+import { ACCOUNT_TYPES, isSpendable } from "@/lib/accounts/types";
 import { PRESET_AKUN } from "@/lib/onboarding/presets";
 import type { AccountType } from "@/lib/supabase/database.types";
 import { cn } from "@/lib/utils";
@@ -57,7 +57,7 @@ export function AccountStepForm({ existing }: { existing: string[] }) {
       <fieldset className="grid gap-2">
         <legend className="mb-2 text-sm font-medium">Jenis</legend>
         <div className="grid grid-cols-3 gap-2">
-          {ACCOUNT_TYPES.map((t) => (
+          {ACCOUNT_TYPES.filter((t) => isSpendable(t.value)).map((t) => (
             <label
               key={t.value}
               className="flex h-11 cursor-pointer items-center justify-center rounded-lg border border-input bg-card text-sm font-medium has-checked:border-primary has-checked:bg-primary/10 has-checked:text-link has-focus-visible:ring-3 has-focus-visible:ring-ring/50 md:h-10"

@@ -59,7 +59,7 @@ export async function saveName(_prev: WizardState, formData: FormData): Promise<
 // --- Akun -----------------------------------------------------------------------------
 
 export async function addAccount(_prev: WizardState, formData: FormData): Promise<WizardState> {
-  const values = baca(formData, ["name", "type", "openingBalance"]);
+  const values = baca(formData, ["name", "type", "openingBalance", "investmentKind"]);
   const parsed = accountSchema.safeParse(values);
   if (!parsed.success) return { fieldErrors: z.flattenError(parsed.error).fieldErrors, values };
   const { supabase, user } = await requireUser();
@@ -67,6 +67,7 @@ export async function addAccount(_prev: WizardState, formData: FormData): Promis
     user_id: user.id,
     name: parsed.data.name,
     type: parsed.data.type,
+    investment_kind: parsed.data.investmentKind,
     opening_balance: parsed.data.openingBalance,
   });
   if (error) {

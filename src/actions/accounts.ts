@@ -11,7 +11,7 @@ import { idSchema } from "@/lib/validators/common";
 export type AccountFormState = {
   error?: string;
   fieldErrors?: Record<string, string[] | undefined>;
-  values?: { name?: string; type?: string; openingBalance?: string };
+  values?: { name?: string; type?: string; openingBalance?: string; investmentKind?: string };
 };
 
 const PESAN_GAGAL = "Akun gagal disimpan. Silakan coba lagi.";
@@ -21,12 +21,15 @@ function bacaForm(formData: FormData) {
     const v = formData.get(k);
     return typeof v === "string" ? v : "";
   };
-  return { name: get("name"), type: get("type"), openingBalance: get("openingBalance") };
+  return { name: get("name"), type: get("type"), openingBalance: get("openingBalance"), investmentKind: get("investmentKind") };
 }
 
 function pesanDb(error: { code?: string }) {
   // 23505 = unique_violation (nama akun aktif kembar)
-  return error.code === "23505" ? "Nama akun sudah dipakai. Gunakan nama lain." : PESAN_GAGAL;
+  if (error.code === "23505") return "Nama akun sudah dipakai. Gunakan nama lain.";
+  // 23503 = akun investasi yang sudah punya riwayat nilai tidak bisa diganti jenisnya
+  if (error.code === "23503") return "Jenis akun tidak bisa diubah karena sudah punya riwayat nilai investasi.";
+  return PESAN_GAGAL;
 }
 
 export async function createAccount(
@@ -42,6 +45,7 @@ export async function createAccount(
     user_id: user.id,
     name: parsed.data.name,
     type: parsed.data.type,
+    investment_kind: parsed.data.investmentKind,
     opening_balance: parsed.data.openingBalance,
   });
   if (error) {
@@ -68,7 +72,12 @@ export async function updateAccount(
   const { error, count } = await supabase
     .from("accounts")
     .update(
-      { name: parsed.data.name, type: parsed.data.type, opening_balance: parsed.data.openingBalance },
+      {
+        name: parsed.data.name,
+        type: parsed.data.type,
+        investment_kind: parsed.data.investmentKind,
+        opening_balance: parsed.data.openingBalance,
+      },
       { count: "exact" },
     )
     .eq("id", id);

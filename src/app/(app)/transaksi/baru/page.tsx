@@ -22,7 +22,7 @@ function asType(v: unknown): TransactionFormType {
 }
 
 export default async function TransaksiBaruPage({ searchParams }: PageProps<"/transaksi/baru">) {
-  const { tipe, akun, tersimpan, jadwal, tanggal, utang } = await searchParams;
+  const { tipe, akun, ke, tersimpan, jadwal, tanggal, utang } = await searchParams;
   const { supabase } = await requireUser();
 
   // Dibuka dari saran "Catat" di Beranda: isi form dari jadwal berulang.
@@ -121,7 +121,14 @@ export default async function TransaksiBaruPage({ searchParams }: PageProps<"/tr
         action={createTransaction}
         accounts={accounts}
         categories={categories}
-        initial={{ type: asType(tipe), accountId, fromAccountId: accountId, occurredOn: todayInJakarta() }}
+        // ?ke=: akun tujuan transfer (tombol "Beli" di akun investasi).
+        initial={{
+          type: asType(tipe),
+          accountId,
+          fromAccountId: accountId,
+          toAccountId: typeof ke === "string" ? ke : undefined,
+          occurredOn: todayInJakarta(),
+        }}
         submitLabel="Simpan"
         cancelHref="/transaksi"
         allowContinue

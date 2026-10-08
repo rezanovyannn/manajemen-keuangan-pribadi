@@ -7,13 +7,20 @@ import { requireUser } from "@/lib/auth/session";
 
 export const metadata: Metadata = { title: "Tambah Akun · Keuangan Pribadi" };
 
-export default async function AkunBaruPage() {
+export default async function AkunBaruPage({ searchParams }: PageProps<"/akun/baru">) {
+  const { jenis } = await searchParams;
   await requireUser();
+  // ?jenis=investment: dibuka dari bagian Investasi di halaman Akun.
+  const investasi = jenis === "investment";
 
   return (
     <div className="mx-auto grid w-full max-w-xl grid-cols-1">
-      <PageHeader title="Tambah akun" />
-      <AccountForm action={createAccount} submitLabel="Simpan" />
+      <PageHeader title={investasi ? "Tambah akun investasi" : "Tambah akun"} />
+      <AccountForm
+        action={createAccount}
+        submitLabel="Simpan"
+        initial={investasi ? { name: "", type: "investment", openingBalance: "0" } : undefined}
+      />
     </div>
   );
 }

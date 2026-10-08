@@ -35,7 +35,14 @@ describe("accountSchema", () => {
   const valid = { name: " BCA ", type: "bank", openingBalance: "2.500.000" };
 
   it("menerima input valid", () => {
-    expect(accountSchema.parse(valid)).toEqual({ name: "BCA", type: "bank", openingBalance: 2_500_000 });
+    expect(accountSchema.parse(valid)).toEqual({ name: "BCA", type: "bank", openingBalance: 2_500_000, investmentKind: null });
+  });
+
+  it("akun investasi wajib jenis aset; akun biasa mengabaikannya", () => {
+    expect(accountSchema.safeParse({ ...valid, type: "investment" }).error?.issues[0]?.message).toBe("Pilih jenis aset.");
+    expect(accountSchema.safeParse({ ...valid, type: "investment", investmentKind: "properti" }).success).toBe(false);
+    expect(accountSchema.parse({ ...valid, type: "investment", investmentKind: "emas" }).investmentKind).toBe("emas");
+    expect(accountSchema.parse({ ...valid, investmentKind: "emas" }).investmentKind).toBeNull();
   });
 
   it("menolak jenis akun yang tidak dikenal", () => {

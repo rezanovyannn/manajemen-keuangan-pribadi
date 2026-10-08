@@ -71,3 +71,17 @@ describe("formatGainPercent & isSpendable", () => {
     expect(isSpendable("cash")).toBe(true);
   });
 });
+
+describe("unitsInput", () => {
+  it("koma/titik desimal dinormalisasi; kosong = null; selain angka ditolak", async () => {
+    const { unitsInput } = await import("@/lib/validators/investment");
+    expect(unitsInput.parse("2,5")).toBe("2.5");
+    expect(unitsInput.parse("0.01320")).toBe("0.0132");
+    expect(unitsInput.parse("100")).toBe("100");
+    expect(unitsInput.parse("007,50")).toBe("7.5");
+    expect(unitsInput.parse(" ")).toBeNull();
+    expect(unitsInput.safeParse("-1").success).toBe(false);
+    expect(unitsInput.safeParse("1,2,3").success).toBe(false);
+    expect(unitsInput.safeParse("0,12345678901").success).toBe(false);
+  });
+});

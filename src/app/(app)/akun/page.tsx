@@ -7,9 +7,11 @@ import { FormAlert } from "@/components/auth/form-field";
 import { AccountIcon } from "@/components/accounts/account-icon";
 import { PageHeader } from "@/components/page-header";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { accountTypeLabel } from "@/lib/accounts/types";
+import { accountTypeLabel, isSpendable } from "@/lib/accounts/types";
 import { requireUser } from "@/lib/auth/session";
+import { InvestmentCard } from "@/components/investments/investment-card";
 import { loadAccountSavings, type AccountSavings } from "@/lib/goals/query";
+import { investmentTotals, loadInvestments } from "@/lib/investments/query";
 import { formatRupiah, totalBalance } from "@/lib/money";
 import { loadAccountBalances } from "@/lib/transactions/balances";
 import { cn } from "@/lib/utils";
@@ -31,7 +33,8 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
     .order("created_at");
   if (error) console.error("[accounts] daftar gagal", { code: error.code });
 
-  const aktif = accounts?.filter((a) => !a.archived_at) ?? [];
+  // Akun siap pakai di atas; akun investasi punya bagian sendiri (nilai pasar, untung/rugi).
+  const aktif = accounts?.filter((a) => !a.archived_at && isSpendable(a.type)) ?? [];
   const arsip = accounts?.filter((a) => a.archived_at) ?? [];
 
   // Saldo terkini = saldo awal + seluruh transaksi (lihat src/lib/money/balance.ts).
@@ -39,7 +42,12 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
   const saldo = (id: string) => balances?.get(id);
   const total = balances ? totalBalance(aktif.map((a) => balances.get(a.id) ?? 0)) : undefined;
   // Tabungan yang disisihkan per akun (goal_allocations) + sisa bebas dipakai.
-  const { byAccount: tabungan } = balances ? await loadAccountSavings(supabase, aktif, balances) : { byAccount: null };
+  const [{ byAccount: tabungan }, investasi] = await Promise.all([
+    balances ? loadAccountSavings(supabase, aktif, balances) : Promise.resolve({ byAccount: null }),
+    loadInvestments(supabase),
+  ]);
+  const asetAktif = investasi.items.filter((i) => !i.archived);
+  const totalInvestasi = investmentTotals(investasi.items);
 
   return (
     <div className="grid w-full grid-cols-1 gap-4 lg:gap-5">
@@ -114,6 +122,51 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
           ))}
         </ul>
       )}
+
+      <section aria-labelledby="judul-investasi" className="grid grid-cols-1 gap-3">
+        <div className="flex items-end justify-between gap-3 px-1">
+          <div>
+            <h2 id="judul-investasi" className="font-semibold">
+              Investasi
+            </h2>
+            <p className="text-xs text-muted-foreground">Tidak dihitung sebagai uang siap pakai; masuk Net worth.</p>
+          </div>
+          {asetAktif.length > 0 && (
+            <div className="text-right">
+              <p className="text-lg font-semibold tabular-nums" data-testid="total-investasi">
+                {formatRupiah(totalInvestasi.value)}
+              </p>
+              <p
+                className={cn(
+                  "text-xs font-medium tabular-nums",
+                  totalInvestasi.gain > 0 && "text-emerald-700 dark:text-emerald-400",
+                  totalInvestasi.gain < 0 && "text-rose-700 dark:text-rose-400",
+                )}
+              >
+                {totalInvestasi.gain >= 0 ? "+" : "−"}
+                {formatRupiah(Math.abs(totalInvestasi.gain))}
+              </p>
+            </div>
+          )}
+        </div>
+        {investasi.error && <FormAlert tone="error" message="Data investasi gagal dimuat." />}
+        {asetAktif.length === 0 ? (
+          <Link
+            href="/akun/baru?jenis=investment"
+            className="rounded-xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground outline-none hover:bg-muted/40 focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            Punya reksadana, saham, emas, atau crypto? <span className="font-medium text-link">Tambah akun investasi</span>
+          </Link>
+        ) : (
+          <ul className="grid grid-cols-1 items-start gap-3 lg:grid-cols-3">
+            {asetAktif.map((i) => (
+              <li key={i.id}>
+                <InvestmentCard item={i} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       {arsip.length > 0 && (
         <details className="rounded-xl border border-border bg-card">

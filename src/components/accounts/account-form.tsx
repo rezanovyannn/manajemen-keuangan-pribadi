@@ -1,18 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import type { AccountFormState } from "@/actions/accounts";
 import { FormAlert, FormField } from "@/components/auth/form-field";
 import { MoneyInput } from "@/components/money-input";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { ACCOUNT_TYPES } from "@/lib/accounts/types";
+import { SelectField } from "@/components/transactions/select-field";
+import { ACCOUNT_TYPES, INVESTMENT_KINDS } from "@/lib/accounts/types";
 import { cn } from "@/lib/utils";
 
 type AccountFormProps = {
   action: (prev: AccountFormState, formData: FormData) => Promise<AccountFormState>;
-  initial?: { name: string; type: string; openingBalance: string };
+  initial?: { name: string; type: string; openingBalance: string; investmentKind?: string };
   submitLabel: string;
 };
 
@@ -20,6 +21,7 @@ export function AccountForm({ action, initial, submitLabel }: AccountFormProps) 
   const [state, formAction, pending] = useActionState(action, {});
   const values = state.values ?? initial;
   const typeError = state.fieldErrors?.type?.[0];
+  const [jenis, setJenis] = useState(values?.type ?? "cash");
 
   return (
     // key: pasang ulang input saat server mengembalikan nilai baru agar defaultValue terpakai
@@ -38,7 +40,7 @@ export function AccountForm({ action, initial, submitLabel }: AccountFormProps) 
 
       <fieldset className="grid gap-2" aria-describedby={typeError ? "type-error" : undefined}>
         <legend className="mb-2 text-sm font-medium">Jenis</legend>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {ACCOUNT_TYPES.map((t) => (
             <label
               key={t.value}
@@ -48,7 +50,8 @@ export function AccountForm({ action, initial, submitLabel }: AccountFormProps) 
                 type="radio"
                 name="type"
                 value={t.value}
-                defaultChecked={(values?.type ?? "cash") === t.value}
+                checked={jenis === t.value}
+                onChange={() => setJenis(t.value)}
                 className="sr-only"
               />
               {t.label}
@@ -62,9 +65,26 @@ export function AccountForm({ action, initial, submitLabel }: AccountFormProps) 
         )}
       </fieldset>
 
+      {jenis === "investment" && (
+        <div className="grid gap-2">
+          <SelectField
+            name="investmentKind"
+            label="Jenis aset"
+            placeholder="Pilih jenis aset"
+            options={INVESTMENT_KINDS}
+            defaultValue={values?.investmentKind ?? ""}
+            errors={state.fieldErrors?.investmentKind}
+          />
+          <p className="text-xs text-muted-foreground">
+            Satu akun untuk satu aset (mis. Emas Antam, BBCA). Beli = transfer dari rekening ke akun ini; nilai pasar diperbarui
+            manual dari halaman akun. Tidak dihitung sebagai uang belanja, tapi masuk Net worth.
+          </p>
+        </div>
+      )}
+
       <MoneyInput
         name="openingBalance"
-        label="Saldo awal"
+        label={jenis === "investment" ? "Modal awal (jika sudah punya aset ini)" : "Saldo awal"}
         defaultValue={values?.openingBalance ?? "0"}
         errors={state.fieldErrors?.openingBalance}
       />
