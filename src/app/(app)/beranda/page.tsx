@@ -49,7 +49,7 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
     loadDebts(supabase),
     loadMonthRules(supabase),
   ]);
-  const aman = buildSafeToSpend({ today, totalSaldo: dash.totalSaldo, budgets, rules: jadwal });
+  const aman = buildSafeToSpend({ today, totalSaldo: dash.totalSaldo, accountBalances: dash.accountBalances, budgets, rules: jadwal });
   const terbuka = debts.items.filter((d) => !d.archived && !d.status.settled);
   const nilaiBersih =
     dash.totalSaldo === null || debts.error

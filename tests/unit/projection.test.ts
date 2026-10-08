@@ -143,7 +143,7 @@ describe("safeToSpend", () => {
   const base = { today: "2026-10-07", monthEnd: "2026-10-31" };
 
   it("saldo - tagihan - sisa budget, dibagi sisa hari (termasuk hari ini)", () => {
-    const s = safeToSpend({
+    const s = safeToSpend({ goalAccounts: [],
       ...base,
       balance: 5_000_000,
       occurrences: [kejadian({ amount: 186_000, categoryId: "tagihan" }), kejadian({ type: "income", amount: 9_000_000 })],
@@ -157,12 +157,12 @@ describe("safeToSpend", () => {
   });
 
   it("pemasukan terjadwal tidak menambah angka aman", () => {
-    const s = safeToSpend({ ...base, balance: 100_000, occurrences: [kejadian({ type: "income", amount: 1_000_000 })], budgets: [] });
+    const s = safeToSpend({ goalAccounts: [], ...base, balance: 100_000, occurrences: [kejadian({ type: "income", amount: 1_000_000 })], budgets: [] });
     expect(s.safe).toBe(100_000);
   });
 
   it("tagihan terjadwal di kategori ber-budget tidak dihitung dua kali", () => {
-    const s = safeToSpend({
+    const s = safeToSpend({ goalAccounts: [],
       ...base,
       balance: 1_000_000,
       occurrences: [kejadian({ amount: 150_000, categoryId: "netflix" })],
@@ -174,7 +174,7 @@ describe("safeToSpend", () => {
   });
 
   it("budget yang sudah terlampaui tidak mengurangi; tagihan melebihi sisa budget → cadangan 0", () => {
-    const s = safeToSpend({
+    const s = safeToSpend({ goalAccounts: [],
       ...base,
       balance: 1_000_000,
       occurrences: [kejadian({ amount: 300_000, categoryId: "b" })],
@@ -188,16 +188,32 @@ describe("safeToSpend", () => {
   });
 
   it("kekurangan: angka minus, per hari 0", () => {
-    const s = safeToSpend({ ...base, balance: 100_000, occurrences: [kejadian({ amount: 250_000 })], budgets: [] });
+    const s = safeToSpend({ goalAccounts: [], ...base, balance: 100_000, occurrences: [kejadian({ amount: 250_000 })], budgets: [] });
     expect(s.safe).toBe(-150_000);
     expect(s.perDay).toBe(0);
   });
 
   it("hari terakhir bulan: sisa 1 hari; pembagian dibulatkan ke bawah", () => {
-    const s = safeToSpend({ balance: 100_000, occurrences: [], budgets: [], today: "2026-10-31", monthEnd: "2026-10-31" });
+    const s = safeToSpend({ goalAccounts: [], balance: 100_000, occurrences: [], budgets: [], today: "2026-10-31", monthEnd: "2026-10-31" });
     expect(s.days).toBe(1);
     expect(s.perDay).toBe(100_000);
-    const t = safeToSpend({ balance: 100_000, occurrences: [], budgets: [], today: "2026-10-29", monthEnd: "2026-10-31" });
+    const t = safeToSpend({ goalAccounts: [], balance: 100_000, occurrences: [], budgets: [], today: "2026-10-29", monthEnd: "2026-10-31" });
     expect(t.perDay).toBe(33_333);
+  });
+
+  it("saldo akun tujuan tabungan tidak dihitung; tagihan dari akun tujuan tidak dobel", () => {
+    const s = safeToSpend({
+      ...base,
+      balance: 10_000_000,
+      goalAccounts: [
+        { accountId: "tabungan", balance: 6_000_000 },
+        { accountId: "minus", balance: -50_000 },
+      ],
+      occurrences: [kejadian({ amount: 200_000, accountId: "tabungan" }), kejadian({ amount: 100_000, accountId: "a1" })],
+      budgets: [],
+    });
+    expect(s.goalSavings).toBe(6_000_000);
+    expect(s.bills).toBe(100_000);
+    expect(s.safe).toBe(3_900_000);
   });
 });

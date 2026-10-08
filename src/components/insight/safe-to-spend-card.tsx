@@ -47,12 +47,14 @@ export function SafeToSpendCard({ safe, detail = false }: { safe: SafeToSpend; d
       {isi}
       <dl className="mt-3 grid grid-cols-1 gap-1 border-t border-border pt-3 text-sm tabular-nums">
         <Baris label="Saldo semua akun aktif" value={formatRupiah(safe.balance)} />
+        <Baris label="Tabungan tujuan" value={`−${formatRupiah(safe.goalSavings)}`} />
         <Baris label="Tagihan terjadwal" value={`−${formatRupiah(safe.bills)}`} />
         <Baris label="Sisa budget yang belum terpakai" value={`−${formatRupiah(safe.budgetReserve)}`} />
         <Baris label="Aman dibelanjakan" value={formatRupiah(safe.safe)} strong />
       </dl>
       <p className="mt-2 text-xs text-muted-foreground">
-        Pemasukan terjadwal (misalnya gaji) tidak ikut dihitung agar angkanya tetap aman jika pemasukan terlambat.
+        Saldo akun yang terhubung ke tujuan tabungan tidak dianggap uang belanja. Pemasukan terjadwal (misalnya gaji)
+        tidak ikut dihitung agar angkanya tetap aman jika pemasukan terlambat.
       </p>
     </section>
   );

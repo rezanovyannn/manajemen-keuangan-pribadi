@@ -24,26 +24,43 @@ async function loadRules(supabase: Supabase, until: string) {
   return { rules: (data ?? []) as ProjectionRule[], error };
 }
 
+// Akun yang terhubung ke tujuan tabungan aktif (satu tujuan aktif per akun).
+async function loadGoalAccountIds(supabase: Supabase) {
+  const { data, error } = await supabase.from("goals").select("account_id").is("archived_at", null);
+  if (error) console.error("[insight] muat tujuan gagal", { code: error.code });
+  return { ids: (data ?? []).map((g) => g.account_id), error };
+}
+
+// Saldo akun tujuan (hanya akun aktif, karena saldo total juga hanya akun aktif).
+function saldoTujuan(ids: string[], balances: { id: string; balance: number }[]) {
+  const set = new Set(ids);
+  return balances.filter((b) => set.has(b.id)).map((b) => ({ accountId: b.id, balance: b.balance }));
+}
+
 const cadanganBudget = (items: BudgetItem[]) => items.map((b) => ({ categoryIds: b.categoryIds, remaining: b.usage.remaining }));
 
 // Untuk kartu di Beranda: saldo & budget sudah dimuat halaman, cukup ambil jadwal
-// (dimuat paralel dengan data Beranda lain).
+// dan akun tujuan (dimuat paralel dengan data Beranda lain).
 export async function loadMonthRules(supabase: Supabase) {
   const monthEnd = monthEndInJakarta();
-  return { monthEnd, ...(await loadRules(supabase, monthEnd)) };
+  const [rules, goals] = await Promise.all([loadRules(supabase, monthEnd), loadGoalAccountIds(supabase)]);
+  return { monthEnd, rules: rules.rules, goalAccountIds: goals.ids, error: rules.error ?? goals.error };
 }
 
 // null jika salah satu data gagal dimuat (lebih baik tidak tampil daripada angka yang salah).
 export function buildSafeToSpend(input: {
   today: string;
   totalSaldo: number | null;
+  // Saldo per akun aktif (null jika gagal dihitung).
+  accountBalances: { id: string; balance: number }[] | null;
   budgets: { items: BudgetItem[]; error: unknown };
   rules: Awaited<ReturnType<typeof loadMonthRules>>;
 }) {
-  const { today, totalSaldo, budgets, rules } = input;
-  if (rules.error || totalSaldo === null || budgets.error) return null;
+  const { today, totalSaldo, accountBalances, budgets, rules } = input;
+  if (rules.error || totalSaldo === null || accountBalances === null || budgets.error) return null;
   return safeToSpend({
     balance: totalSaldo,
+    goalAccounts: saldoTujuan(rules.goalAccountIds, accountBalances),
     occurrences: upcomingOccurrences(rules.rules, today, rules.monthEnd),
     budgets: cadanganBudget(budgets.items),
     today,
@@ -54,14 +71,15 @@ export function buildSafeToSpend(input: {
 // Halaman Insight: proyeksi saldo sampai akhir bulan + aman dibelanjakan.
 export async function loadProjection(supabase: Supabase, today: string) {
   const monthEnd = monthEndInJakarta();
-  const [accountsRes, rulesRes, budgets] = await Promise.all([
+  const [accountsRes, rulesRes, budgets, goals] = await Promise.all([
     supabase.from("accounts").select("id, name, opening_balance, archived_at").is("archived_at", null).order("created_at"),
     loadRules(supabase, monthEnd),
     loadMonthBudgets(supabase, currentMonthInJakarta()),
+    loadGoalAccountIds(supabase),
   ]);
   const accounts = accountsRes.data ?? [];
   const balances = await loadAccountBalances(supabase, accounts);
-  const error = accountsRes.error ?? rulesRes.error ?? budgets.error ?? balances.error;
+  const error = accountsRes.error ?? rulesRes.error ?? budgets.error ?? goals.error ?? balances.error;
   if (error || !balances.balances) {
     if (accountsRes.error) console.error("[insight] muat akun gagal", { code: accountsRes.error.code });
     return { error: true as const };
@@ -72,6 +90,7 @@ export async function loadProjection(supabase: Supabase, today: string) {
   const projection = projectCashflow({ accounts: saldo, occurrences, today, until: monthEnd });
   const safe = safeToSpend({
     balance: projection.start,
+    goalAccounts: saldoTujuan(goals.ids, saldo),
     occurrences,
     budgets: cadanganBudget(budgets.items),
     today,

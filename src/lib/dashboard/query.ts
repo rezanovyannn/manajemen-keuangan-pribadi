@@ -74,6 +74,10 @@ export async function loadDashboard(supabase: Supabase, period: Period) {
       })),
     },
     perAkun,
+    // Saldo per akun aktif (null jika gagal dihitung).
+    accountBalances: balances.balances
+      ? accounts.filter((a) => !a.archived_at).map((a) => ({ id: a.id, balance: balances.balances.get(a.id) ?? 0 }))
+      : null,
     // Total saldo semua akun aktif (null jika gagal dihitung, bukan angka yang salah).
     totalSaldo: balances.balances
       ? totalBalance(accounts.filter((a) => !a.archived_at).map((a) => balances.balances.get(a.id) ?? 0))

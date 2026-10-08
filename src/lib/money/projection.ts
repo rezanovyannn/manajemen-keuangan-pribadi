@@ -126,19 +126,24 @@ export function projectCashflow(input: {
 
 export type SafeToSpend = {
   balance: number;
-  bills: number; // tagihan terjadwal sampai akhir bulan
+  goalSavings: number; // saldo akun tujuan tabungan (tidak boleh dipakai belanja)
+  bills: number; // tagihan terjadwal sampai akhir bulan (di luar akun tujuan)
   budgetReserve: number; // sisa budget yang belum terpakai (di luar tagihan terjadwal)
   safe: number; // bisa minus = kekurangan
   days: number; // sisa hari termasuk hari ini
   perDay: number; // 0 jika safe <= 0
 };
 
-// aman dibelanjakan = saldo - tagihan terjadwal - sisa budget yang belum terpakai.
-// Pemasukan terjadwal sengaja TIDAK dihitung (konservatif: gaji bisa terlambat).
-// Tagihan terjadwal yang kategorinya punya budget mengurangi cadangan budget itu,
-// agar tidak terhitung dua kali.
+// aman dibelanjakan = saldo - tabungan tujuan - tagihan terjadwal - sisa budget yang belum terpakai.
+// - Saldo akun yang terhubung ke tujuan tabungan aktif tidak dianggap uang belanja
+//   (seluruh saldonya, karena progress tujuan memakai seluruh saldo akun itu; saldo minus = 0).
+//   Tagihan terjadwal dari akun tujuan juga tidak dikurangkan lagi agar tidak dobel.
+// - Pemasukan terjadwal sengaja TIDAK dihitung (konservatif: gaji bisa terlambat).
+// - Tagihan terjadwal yang kategorinya punya budget mengurangi cadangan budget itu,
+//   agar tidak terhitung dua kali.
 export function safeToSpend(input: {
   balance: number;
+  goalAccounts: { accountId: string; balance: number }[];
   occurrences: Occurrence[];
   budgets: { categoryIds: string[]; remaining: number }[];
   today: string;
@@ -146,7 +151,9 @@ export function safeToSpend(input: {
 }): SafeToSpend {
   const { balance, today, monthEnd } = input;
   if (monthEnd < today) throw new RangeError("Akhir bulan tidak boleh sebelum hari ini.");
-  const tagihan = input.occurrences.filter((o) => o.type === "expense" && o.date <= monthEnd);
+  const akunTujuan = new Set(input.goalAccounts.map((g) => g.accountId));
+  const goalSavings = input.goalAccounts.reduce((s, g) => addAmounts(s, Math.max(0, assertAmount(g.balance))), 0);
+  const tagihan = input.occurrences.filter((o) => o.type === "expense" && o.date <= monthEnd && !akunTujuan.has(o.accountId));
   const bills = tagihan.reduce((s, o) => addAmounts(s, o.amount), 0);
 
   const budgetReserve = input.budgets.reduce((s, b) => {
@@ -156,8 +163,8 @@ export function safeToSpend(input: {
     return addAmounts(s, Math.max(0, addAmounts(b.remaining, -terjadwal)));
   }, 0);
 
-  const safe = addAmounts(addAmounts(assertAmount(balance), -bills), -budgetReserve);
+  const safe = [goalSavings, bills, budgetReserve].reduce((s, x) => addAmounts(s, -x), assertAmount(balance));
   const days = daysUntil(monthEnd, today) + 1;
   const perDay = safe > 0 ? Number(BigInt(safe) / BigInt(days)) : 0;
-  return { balance, bills, budgetReserve, safe, days, perDay };
+  return { balance, goalSavings, bills, budgetReserve, safe, days, perDay };
 }

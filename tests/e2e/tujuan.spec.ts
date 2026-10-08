@@ -1,8 +1,15 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 import { addDays, todayInJakarta } from "../../src/lib/dates";
-import { formatRupiah } from "../../src/lib/money/rupiah";
+import { formatRupiah, parseRupiah } from "../../src/lib/money/rupiah";
 import { AKUN, bukaMenu, catat, hapusTransaksi, masuk, saldoAkun, skipTanpaAkunUji, tagUji } from "./helpers";
+
+// Nilai baris "Tabungan tujuan" di kartu aman dibelanjakan (halaman Insight).
+async function tabunganTujuan(page: Page) {
+  await page.goto("/insight");
+  const baris = page.getByRole("region", { name: "Aman dibelanjakan" }).locator("div").filter({ has: page.getByText("Tabungan tujuan", { exact: true }) });
+  return parseRupiah(((await baris.locator("dd").textContent()) ?? "").replace("−", ""))!;
+}
 
 test.describe("tujuan tabungan", () => {
   skipTanpaAkunUji();
@@ -20,6 +27,7 @@ test.describe("tujuan tabungan", () => {
     await catat(page, { tipe: "income", nominal: "4200000", akun, kategori: "Bonus", catatan: setoran });
     const saldo = awal + 4_200_000;
     const persen = Math.min(100, Math.max(0, Math.floor((saldo * 100) / target)));
+    const tabunganAwal = await tabunganTujuan(page);
 
     await bukaMenu(page, "Tujuan tabungan");
     await page.getByRole("link", { name: "Tambah", exact: true }).click();
@@ -41,6 +49,9 @@ test.describe("tujuan tabungan", () => {
     await expect(kartu).toContainText(`kurang ${formatRupiah(target - saldo)}`);
     await expect(kartu).toContainText(/Perlu ±Rp [\d.]+\/bulan/);
 
+    // Saldo akun tujuan tidak lagi dihitung sebagai uang yang aman dibelanjakan.
+    expect(await tabunganTujuan(page)).toBe(tabunganAwal + saldo);
+
     // Akun yang sudah dipakai tidak ditawarkan untuk tujuan baru.
     await page.goto("/tujuan/baru");
     await expect(page.getByLabel("Akun tabungan").locator("option", { hasText: akun })).toHaveCount(0);
@@ -60,6 +71,7 @@ test.describe("tujuan tabungan", () => {
     await page.getByRole("button", { name: "Ya, hapus" }).click();
     await expect(page.getByText(/Tujuan dihapus/)).toBeVisible();
     await expect(kartu).toHaveCount(0);
+    expect(await tabunganTujuan(page)).toBe(tabunganAwal);
     await hapusTransaksi(page, setoran);
     expect(await saldoAkun(page, akun)).toBe(awal);
   });
