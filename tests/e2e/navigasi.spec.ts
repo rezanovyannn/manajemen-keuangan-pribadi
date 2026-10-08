@@ -33,9 +33,12 @@ test.describe("navigasi bawah (HP)", () => {
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(bawah.getByRole("button", { name: "Lainnya" })).toHaveAttribute("aria-current", "page");
 
-    // Tombol tambah di tengah.
-    await bawah.getByRole("link", { name: "Tambah transaksi" }).click();
-    await expect(page).toHaveURL(/\/transaksi\/baru$/);
+    // Tombol tambah di tengah membuka Catat kilat (tanpa pindah halaman).
+    await bawah.getByRole("button", { name: "Tambah transaksi" }).click();
+    await expect(page.getByRole("dialog", { name: "Catat kilat" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page).toHaveURL(/\/akun$/);
 
     // Konten terakhir tidak tertutup bar bawah.
     await page.goto("/beranda");

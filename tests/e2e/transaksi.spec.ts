@@ -5,7 +5,7 @@ import { AKUN, catat, cariTransaksi, hapusTransaksi, masuk, saldoAkun, skipTanpa
 test.describe("transaksi", () => {
   skipTanpaAkunUji();
 
-  test("catat pengeluaran dari tombol +", async ({ page }, info) => {
+  test("catat pengeluaran lewat form lengkap", async ({ page }, info) => {
     await masuk(page);
     const catatan = tagUji(info.project.name, "kopi");
 

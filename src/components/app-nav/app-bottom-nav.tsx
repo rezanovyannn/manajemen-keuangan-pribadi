@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+import { useQuickAdd } from "@/components/quick-add/quick-add-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ const TAB = "flex h-full min-w-0 flex-1 flex-col items-center justify-center gap
 export function AppBottomNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const quickAdd = useQuickAdd();
   const lainnyaAktif = NAV_LAINNYA.some((i) => isNavActive(pathname, i.href));
 
   return (
@@ -30,13 +32,14 @@ export function AppBottomNav() {
         ))}
 
         <div className="flex flex-1 items-start justify-center">
-          <Link
-            href="/transaksi/baru"
+          <button
+            type="button"
+            onClick={quickAdd.open}
             aria-label="Tambah transaksi"
             className="-mt-5 inline-flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-soft ring-4 ring-background outline-none transition-transform active:scale-95 focus-visible:ring-ring/60"
           >
             <Plus className="size-7" strokeWidth={2.25} aria-hidden />
-          </Link>
+          </button>
         </div>
 
         {NAV_BAWAH_KANAN.map((href) => (

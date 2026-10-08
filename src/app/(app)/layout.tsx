@@ -3,11 +3,13 @@ import { AppMobileBar } from "@/components/app-nav/app-mobile-bar";
 import { AppSidebar } from "@/components/app-nav/app-sidebar";
 import { NewTransactionShortcut } from "@/components/app-nav/new-transaction-shortcut";
 import { OfflineSync } from "@/components/offline/offline-sync";
+import { QuickAddProvider } from "@/components/quick-add/quick-add-provider";
 
 // Layout halaman setelah login: sidebar di desktop; di HP bar atas + navigasi bawah.
 // Konten dibatasi ±1120px dan ditengahkan agar nyaman di layar lebar.
 export default function AppLayout({ children }: LayoutProps<"/">) {
   return (
+    <QuickAddProvider>
     <div className="flex flex-1">
       <AppSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
@@ -22,5 +24,6 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
       <AppBottomNav />
       <NewTransactionShortcut />
     </div>
+    </QuickAddProvider>
   );
 }
