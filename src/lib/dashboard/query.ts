@@ -1,6 +1,6 @@
 import "server-only";
 
-import { accountTypeLabel } from "@/lib/accounts/types";
+import { accountTypeLabel, isSpendable } from "@/lib/accounts/types";
 import { categoryOptions } from "@/lib/categories/options";
 import type { Period } from "@/lib/dates";
 import {
@@ -74,13 +74,13 @@ export async function loadDashboard(supabase: Supabase, period: Period) {
       })),
     },
     perAkun,
-    // Saldo per akun aktif (null jika gagal dihitung).
+    // Saldo per akun aktif siap pakai (tanpa investasi; null jika gagal dihitung).
     accountBalances: balances.balances
-      ? accounts.filter((a) => !a.archived_at).map((a) => ({ id: a.id, balance: balances.balances.get(a.id) ?? 0 }))
+      ? accounts.filter((a) => !a.archived_at && isSpendable(a.type)).map((a) => ({ id: a.id, balance: balances.balances.get(a.id) ?? 0 }))
       : null,
-    // Total saldo semua akun aktif (null jika gagal dihitung, bukan angka yang salah).
+    // Total saldo akun aktif siap pakai, tanpa investasi (null jika gagal dihitung, bukan angka yang salah).
     totalSaldo: balances.balances
-      ? totalBalance(accounts.filter((a) => !a.archived_at).map((a) => balances.balances.get(a.id) ?? 0))
+      ? totalBalance(accounts.filter((a) => !a.archived_at && isSpendable(a.type)).map((a) => balances.balances.get(a.id) ?? 0))
       : null,
   };
 }

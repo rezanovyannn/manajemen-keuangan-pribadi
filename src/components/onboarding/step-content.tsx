@@ -142,7 +142,12 @@ export async function LangkahTagihan({ supabase }: { supabase: Supabase }) {
 }
 
 export async function LangkahTujuan({ supabase }: { supabase: Supabase }) {
-  const { data } = await supabase.from("accounts").select("id, name, opening_balance").is("archived_at", null).order("created_at");
+  const { data } = await supabase
+    .from("accounts")
+    .select("id, name, opening_balance")
+    .is("archived_at", null)
+    .neq("type", "investment")
+    .order("created_at");
   const accounts = data ?? [];
   const [balances, alloc] = await Promise.all([loadAccountBalances(supabase, accounts), loadActiveAllocations(supabase)]);
   const totals = allocationTotals(alloc.rows);

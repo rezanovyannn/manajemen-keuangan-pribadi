@@ -43,7 +43,7 @@ export default async function TujuanPage({ params, searchParams }: PageProps<"/t
     loadGoals(supabase, today),
     loadActiveAllocations(supabase),
     loadGoalHistory(supabase, id),
-    supabase.from("accounts").select("id, name, opening_balance, archived_at").order("created_at"),
+    supabase.from("accounts").select("id, name, opening_balance, archived_at").neq("type", "investment").order("created_at"),
   ]);
   const goal = goals.items.find((g) => g.id === id);
   if (!goal) notFound();

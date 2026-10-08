@@ -21,7 +21,7 @@ export function SummaryTiles({ income, expense, net, totalSaldo, netWorth }: Pro
     <div className="grid grid-cols-1 gap-3">
       <div className="relative overflow-hidden rounded-xl bg-night px-4 py-4 text-night-foreground shadow-soft lg:px-6 lg:py-5">
         <Bintang />
-        <p className="relative text-xs text-white/75">Total saldo semua akun aktif</p>
+        <p className="relative text-xs text-white/75">Total saldo siap pakai</p>
         <p className="relative mt-1 text-3xl font-bold tracking-tight tabular-nums lg:text-[40px] lg:leading-tight" data-testid="dash-saldo">
           {totalSaldo === null ? "—" : formatRupiah(totalSaldo)}
         </p>

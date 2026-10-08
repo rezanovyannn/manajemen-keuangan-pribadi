@@ -5,7 +5,8 @@
 
 import type { TransactionType } from "@/lib/money/balance";
 
-export type AccountType = "cash" | "bank" | "ewallet";
+export type AccountType = "cash" | "bank" | "ewallet" | "investment";
+export type InvestmentKind = "reksadana" | "saham" | "emas" | "crypto" | "obligasi" | "lainnya";
 export type CategoryType = "income" | "expense";
 export type DebtKind = "utang" | "piutang";
 export type { TransactionType };
@@ -25,8 +26,20 @@ type AccountRow = {
   user_id: string;
   name: string;
   type: AccountType;
+  investment_kind: InvestmentKind | null; // wajib jika type = investment
   opening_balance: number;
   archived_at: string | null;
+} & Timestamps;
+
+type InvestmentValuationRow = {
+  id: string;
+  user_id: string;
+  account_id: string;
+  account_type: "investment";
+  valued_on: string;
+  market_value: number;
+  units: number | string | null; // numeric: bisa datang sebagai string
+  note: string | null;
 } & Timestamps;
 
 type CategoryRow = {
@@ -131,6 +144,13 @@ export type Database = {
         Row: ProfileRow;
         Insert: Partial<ProfileRow> & { id: string };
         Update: Partial<Omit<ProfileRow, "id">>;
+        Relationships: [];
+      };
+      investment_valuations: {
+        Row: InvestmentValuationRow;
+        Insert: Pick<InvestmentValuationRow, "account_id" | "market_value"> &
+          Partial<Pick<InvestmentValuationRow, "id" | "user_id" | "valued_on" | "note">> & { units?: string | null };
+        Update: Partial<Pick<InvestmentValuationRow, "valued_on" | "market_value" | "note">> & { units?: string | null };
         Relationships: [];
       };
       accounts: {

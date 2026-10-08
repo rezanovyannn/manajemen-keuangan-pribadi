@@ -88,3 +88,10 @@ export {
   type AllocationKind,
   type AllocationRow,
 } from "./allocation";
+export {
+  balanceAsOf,
+  formatGainPercent,
+  investmentStatus,
+  type DatedTransaction,
+  type InvestmentStatus,
+} from "./investment";

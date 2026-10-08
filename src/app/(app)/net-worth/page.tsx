@@ -81,7 +81,16 @@ export default async function NetWorthPage() {
               href="/akun"
             />
           ))}
-          {data.piutang.map((d) => (
+          {data.investasi.items.map((i) => (
+          <Baris
+            key={i.id}
+            label={i.name}
+            sub={`Investasi · ${i.gain >= 0 ? "untung" : "rugi"} ${formatRupiah(Math.abs(i.gain))}`}
+            value={bertanda(i.value)}
+            href={`/akun/${i.id}`}
+          />
+        ))}
+        {data.piutang.map((d) => (
             <Baris
               key={d.id}
               label={d.name}
@@ -90,7 +99,7 @@ export default async function NetWorthPage() {
               href={`/utang/${d.id}`}
             />
           ))}
-          {data.perJenis.length === 0 && data.piutang.length === 0 && (
+          {data.perJenis.length === 0 && data.investasi.items.length === 0 && data.piutang.length === 0 && (
             <Kosong teks="Belum ada akun." />
           )}
         </Bagian>

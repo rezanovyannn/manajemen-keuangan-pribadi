@@ -73,7 +73,8 @@ export function buildSafeToSpend(input: {
 export async function loadProjection(supabase: Supabase, today: string) {
   const monthEnd = monthEndInJakarta();
   const [accountsRes, rulesRes, budgets, goals] = await Promise.all([
-    supabase.from("accounts").select("id, name, opening_balance, archived_at").is("archived_at", null).order("created_at"),
+    // Proyeksi & aman dibelanjakan hanya uang siap pakai (tanpa akun investasi).
+    supabase.from("accounts").select("id, name, opening_balance, archived_at").is("archived_at", null).neq("type", "investment").order("created_at"),
     loadRules(supabase, monthEnd),
     loadMonthBudgets(supabase, currentMonthInJakarta()),
     loadAllocatedByAccount(supabase),

@@ -17,6 +17,7 @@ import { loadMonthBudgets } from "@/lib/budgets/query";
 import { loadDashboard } from "@/lib/dashboard/query";
 import { loadDebts } from "@/lib/debts/query";
 import { buildSafeToSpend, loadMonthRules } from "@/lib/insight/query";
+import { investmentTotals, loadInvestments } from "@/lib/investments/query";
 import { buildChecklist } from "@/lib/onboarding/checklist";
 import { loadChecklistCounts } from "@/lib/onboarding/query";
 import { perluOnboarding } from "@/lib/onboarding/steps";
@@ -46,13 +47,14 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
   const pesan = PESAN[teks(sp.status) ?? ""];
   const { supabase, user } = await requireUser();
 
-  const [{ data: profile }, budgets, dash, saran, debts, jadwal] = await Promise.all([
+  const [{ data: profile }, budgets, dash, saran, debts, jadwal, investasi] = await Promise.all([
     supabase.from("profiles").select("display_name, onboarding_completed_at, checklist_dismissed_at").eq("id", user.id).maybeSingle(),
     loadMonthBudgets(supabase, month),
     loadDashboard(supabase, period),
     loadSuggestions(supabase, today),
     loadDebts(supabase),
     loadMonthRules(supabase),
+    loadInvestments(supabase),
   ]);
   // Pengguna baru diarahkan ke wizard /mulai (sekali; "Nanti saja" juga menandainya selesai).
   if (perluOnboarding(profile)) redirect("/mulai");
@@ -60,10 +62,11 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
   const aman = buildSafeToSpend({ today, totalSaldo: dash.totalSaldo, accountBalances: dash.accountBalances, budgets, rules: jadwal });
   const terbuka = debts.items.filter((d) => !d.archived && !d.status.settled);
   const nilaiBersih =
-    dash.totalSaldo === null || debts.error
+    dash.totalSaldo === null || debts.error || investasi.error
       ? null
       : netWorth({
-          accounts: dash.totalSaldo,
+          // Sama dengan halaman Net worth: uang siap pakai + nilai investasi.
+          accounts: totalBalance([dash.totalSaldo, investmentTotals(investasi.items).value]),
           receivables: totalBalance(terbuka.filter((d) => d.kind === "piutang").map((d) => d.status.remaining)),
           payables: totalBalance(terbuka.filter((d) => d.kind === "utang").map((d) => d.status.remaining)),
         }).netWorth;

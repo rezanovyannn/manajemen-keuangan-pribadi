@@ -46,7 +46,7 @@ export function SafeToSpendCard({ safe, detail = false }: { safe: SafeToSpend; d
     <section aria-label="Aman dibelanjakan" className="rounded-xl border border-border bg-card px-4 py-3">
       {isi}
       <dl className="mt-3 grid grid-cols-1 gap-1 border-t border-border pt-3 text-sm tabular-nums">
-        <Baris label="Saldo semua akun aktif" value={formatRupiah(safe.balance)} />
+        <Baris label="Saldo siap pakai (tanpa investasi)" value={formatRupiah(safe.balance)} />
         <Baris label="Tabungan tujuan" value={`−${formatRupiah(safe.goalSavings)}`} />
         <Baris label="Tagihan terjadwal" value={`−${formatRupiah(safe.bills)}`} />
         <Baris label="Sisa budget yang belum terpakai" value={`−${formatRupiah(safe.budgetReserve)}`} />

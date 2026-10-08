@@ -66,7 +66,7 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
 
       {aktif.length > 0 && total !== undefined && (
         <div className="rounded-xl border border-border bg-card px-4 py-3">
-          <p className="text-xs text-muted-foreground">Total saldo akun aktif</p>
+          <p className="text-xs text-muted-foreground">Total saldo siap pakai</p>
           <p className="mt-1 text-2xl font-semibold tabular-nums" data-testid="total-saldo">
             {formatRupiah(total)}
           </p>

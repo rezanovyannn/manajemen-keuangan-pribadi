@@ -36,7 +36,7 @@ async function saldoAkun(supabase: Supabase, accountId: string, openingBalance: 
 export async function allocateToGoal(supabase: Supabase, d: AllocateInput): Promise<AllocateError | null> {
   const [goalRes, accountRes, alloc] = await Promise.all([
     supabase.from("goals").select("id").eq("id", d.goalId).is("archived_at", null).maybeSingle(),
-    supabase.from("accounts").select("id, opening_balance, archived_at").eq("id", d.accountId).maybeSingle(),
+    supabase.from("accounts").select("id, type, opening_balance, archived_at").eq("id", d.accountId).maybeSingle(),
     loadActiveAllocations(supabase),
   ]);
   if (goalRes.error || accountRes.error || alloc.error) {
@@ -46,6 +46,8 @@ export async function allocateToGoal(supabase: Supabase, d: AllocateInput): Prom
   if (!goalRes.data) return { message: "Tujuan tidak ditemukan atau sudah diarsipkan." };
   const akun = accountRes.data;
   if (!akun || (d.kind === "sisihkan" && akun.archived_at)) return { message: "Pilih akun yang aktif.", field: "accountId" };
+  // Saldo bebas dihitung dari modal, bukan nilai pasar: tabungan tidak disisihkan dari akun investasi.
+  if (d.kind === "sisihkan" && akun.type === "investment") return { message: "Tabungan tidak bisa disisihkan dari akun investasi.", field: "accountId" };
 
   const saldo = await saldoAkun(supabase, akun.id, akun.opening_balance);
   if (saldo === null) return { message: GAGAL };

@@ -26,7 +26,8 @@ export type QuickAddData = {
 
 export async function loadQuickAddData(supabase: Supabase): Promise<QuickAddData | null> {
   const [accountsRes, categoriesRes, historyRes] = await Promise.all([
-    supabase.from("accounts").select("id, name, type").is("archived_at", null).order("created_at"),
+    // Catat kilat untuk belanja/pemasukan harian: akun investasi tidak ditampilkan.
+    supabase.from("accounts").select("id, name, type").is("archived_at", null).neq("type", "investment").order("created_at"),
     supabase.from("categories").select("id, parent_id, name, type, archived_at").is("archived_at", null),
     supabase
       .from("transactions")

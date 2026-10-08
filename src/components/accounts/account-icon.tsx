@@ -1,4 +1,4 @@
-import { Banknote, Landmark, Smartphone } from "lucide-react";
+import { Banknote, Landmark, Smartphone, TrendingUp } from "lucide-react";
 
 import type { AccountType } from "@/lib/supabase/database.types";
 import { cn } from "@/lib/utils";
@@ -8,6 +8,7 @@ const GAYA: Record<AccountType, { Icon: typeof Landmark; kelas: string }> = {
   bank: { Icon: Landmark, kelas: "bg-sticker-sky/15 text-sticker-sky" },
   ewallet: { Icon: Smartphone, kelas: "bg-sticker-purple/20 text-sticker-purple" },
   cash: { Icon: Banknote, kelas: "bg-sticker-green/15 text-sticker-green" },
+  investment: { Icon: TrendingUp, kelas: "bg-sticker-orange/15 text-sticker-orange" },
 };
 
 export function AccountIcon({ type, className }: { type: AccountType; className?: string }) {
