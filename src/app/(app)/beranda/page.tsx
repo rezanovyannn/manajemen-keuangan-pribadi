@@ -12,7 +12,6 @@ import { ChecklistCard } from "@/components/onboarding/checklist-card";
 import { SummaryTiles } from "@/components/dashboard/summary-tiles";
 import { PageHeader } from "@/components/page-header";
 import { RecurringSuggestions } from "@/components/recurring/suggestions";
-import { AddTransactionButton } from "@/components/transactions/add-button";
 import { requireUser } from "@/lib/auth/session";
 import { loadMonthBudgets } from "@/lib/budgets/query";
 import { loadDashboard } from "@/lib/dashboard/query";
@@ -32,7 +31,7 @@ const PESAN: Record<string, { tone: "success" | "error"; text: string }> = {
   "sudah-dicatat": { tone: "success", text: "Jadwal ini sudah pernah dicatat, tidak dibuat ganda." },
   dilewati: { tone: "success", text: "Jadwal dilewati untuk tanggal ini." },
   gagal: { tone: "error", text: "Perubahan gagal disimpan. Silakan coba lagi." },
-  siap: { tone: "success", text: "Selamat datang! Catat transaksi pertamamu dengan tombol Tambah transaksi." },
+  siap: { tone: "success", text: "Selamat datang! Catat transaksi pertamamu dengan tombol +." },
 };
 
 function teks(v: string | string[] | undefined) {
@@ -75,10 +74,9 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
   ].filter(Boolean);
 
   return (
-    // pb-16: ruang agar konten terakhir tidak tertutup tombol + melayang (HP saja).
     // HP: satu kolom (urutan lewat order-*). Desktop (lg): dua kolom; wrapper kolom
     // memakai "contents" di HP agar isinya tetap satu alur.
-    <div className="grid w-full grid-cols-1 gap-4 pb-16 md:pb-0 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start lg:gap-5">
+    <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start lg:gap-5">
       <div className="lg:col-span-2">
         <PageHeader title={`Halo, ${profile?.display_name ?? "pengguna baru"}!`} description={period.label} />
       </div>
@@ -145,7 +143,6 @@ export default async function BerandaPage({ searchParams }: PageProps<"/beranda"
         </section>
       </div>
 
-      <AddTransactionButton />
     </div>
   );
 }

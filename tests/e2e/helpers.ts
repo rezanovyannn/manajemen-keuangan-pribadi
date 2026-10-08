@@ -33,11 +33,17 @@ export async function arsipkanAkun(page: Page, nama: string) {
   await expect(page).toHaveURL(/\/akun$/);
 }
 
-// Klik menu navigasi. Di HP, menu ada di laci yang dibuka lewat tombol "Buka menu".
+// Klik menu navigasi. Desktop: sidebar. HP: navigasi bawah; menu lain ada di panel "Lainnya".
 export async function bukaMenu(page: Page, label: string) {
-  const tombol = page.getByRole("button", { name: "Buka menu" });
-  if (await tombol.isVisible()) await tombol.click();
-  const link = page.getByRole("navigation", { name: "Navigasi utama" }).locator("visible=true").getByRole("link", { name: label, exact: true });
+  const bawah = page.getByRole("navigation", { name: "Navigasi bawah" });
+  let link = page.getByRole("navigation", { name: "Navigasi utama" }).getByRole("link", { name: label, exact: true });
+  if (await bawah.isVisible()) {
+    link = bawah.getByRole("link", { name: label, exact: true });
+    if ((await link.count()) === 0) {
+      await bawah.getByRole("button", { name: "Lainnya" }).click();
+      link = page.getByRole("navigation", { name: "Menu lainnya" }).getByRole("link", { name: label, exact: true });
+    }
+  }
   const href = (await link.getAttribute("href")) ?? "";
   await link.click();
   // Tunggu halaman tujuan benar-benar terbuka sebelum langkah berikutnya.

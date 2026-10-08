@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 
 import { FormAlert } from "@/components/auth/form-field";
 import { PageHeader } from "@/components/page-header";
-import { AddTransactionButton } from "@/components/transactions/add-button";
 import { MonthNav } from "@/components/month-nav";
 import { hrefBulan, TransactionFiltersForm } from "@/components/transactions/transaction-filters";
 import { TransactionList } from "@/components/transactions/transaction-list";
@@ -46,8 +45,7 @@ export default async function TransaksiPage({ searchParams }: PageProps<"/transa
   const pesan = sp.tersimpan === "1" ? PESAN.tersimpan : PESAN[teks(sp.status)];
 
   return (
-    // pb-16: ruang agar baris terakhir tidak tertutup tombol + melayang (HP saja)
-    <div className="grid w-full grid-cols-1 gap-4 pb-16 md:pb-0 lg:gap-5">
+    <div className="grid w-full grid-cols-1 gap-4 lg:gap-5">
       <PageHeader title="Transaksi" />
       <FormAlert tone={pesan?.tone ?? "success"} message={pesan?.text} />
       <FormAlert tone="error" message={error ? "Daftar transaksi gagal dimuat." : undefined} />
@@ -70,7 +68,6 @@ export default async function TransaksiPage({ searchParams }: PageProps<"/transa
         <TransactionList items={items} />
       )}
 
-      <AddTransactionButton />
     </div>
   );
 }

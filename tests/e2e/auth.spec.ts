@@ -34,7 +34,7 @@ test.describe("dengan akun uji", () => {
     await masuk(page);
     await expect(page.getByRole("heading", { name: /^Halo, / })).toBeVisible();
 
-    // Desktop: sidebar. HP: menu laci lewat tombol "Buka menu" (laci tertutup setelah memilih).
+    // Desktop: sidebar. HP: panel "Lainnya" di navigasi bawah (tertutup setelah memilih).
     await bukaMenu(page, "Transaksi berulang");
     await expect(page).toHaveURL(/\/berulang$/);
     await expect(page.getByRole("dialog")).toHaveCount(0);
