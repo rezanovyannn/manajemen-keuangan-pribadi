@@ -2,17 +2,20 @@ import type { Metadata } from "next";
 
 import { FormAlert } from "@/components/auth/form-field";
 import { CashflowProjectionSection } from "@/components/insight/cashflow-projection";
+import { InsightCards } from "@/components/insight/insight-cards";
 import { SafeToSpendCard } from "@/components/insight/safe-to-spend-card";
 import { PageHeader } from "@/components/page-header";
 import { requireUser } from "@/lib/auth/session";
 import { todayInJakarta } from "@/lib/dates";
+import { loadInsights } from "@/lib/insight/insights";
 import { loadProjection } from "@/lib/insight/query";
 
 export const metadata: Metadata = { title: "Insight · Keuangan Pribadi" };
 
 export default async function InsightPage() {
   const { supabase } = await requireUser();
-  const data = await loadProjection(supabase, todayInJakarta());
+  const today = todayInJakarta();
+  const [data, insights] = await Promise.all([loadProjection(supabase, today), loadInsights(supabase, today)]);
 
   return (
     <div className="grid w-full grid-cols-1 gap-4 lg:gap-5">
@@ -32,6 +35,11 @@ export default async function InsightPage() {
             hasRules={data.hasRules}
           />
         </div>
+      )}
+      {insights.error ? (
+        <FormAlert tone="error" message="Insight gagal dimuat. Coba muat ulang halaman." />
+      ) : (
+        <InsightCards data={insights} today={today} />
       )}
     </div>
   );

@@ -130,7 +130,7 @@ catat apa yang mengganggu, lalu sesuaikan prioritas fase berikutnya.
 
 ## Fase 10 — Insight dan investasi (opsional)
 
-- [ ] Insight AI: ringkasan pengeluaran, deteksi anomali, langganan tersembunyi
+- [x] Insight (tanpa AI, berbasis aturan): ringkasan pengeluaran, deteksi anomali, langganan tersembunyi
 - [x] Indikator "aman dibelanjakan" (safe to spend)
 - [x] Proyeksi arus kas
 - [ ] Pelacakan investasi manual: reksadana, saham, emas, crypto

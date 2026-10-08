@@ -1,8 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { todayInJakarta } from "../../src/lib/dates";
+import { currentMonthInJakarta, shiftMonth, todayInJakarta } from "../../src/lib/dates";
 import { parseRupiah } from "../../src/lib/money";
-import { AKUN, masuk, skipTanpaAkunUji } from "./helpers";
+import { AKUN, catat, hapusTransaksi, masuk, skipTanpaAkunUji, tagUji } from "./helpers";
 
 const BESAR = 999_999_999;
 
@@ -68,5 +68,28 @@ test.describe("insight & proyeksi", () => {
     await expect(page.getByText("Jadwal dihapus.")).toBeVisible();
     await page.goto("/insight");
     expect(await nominal(page, "proyeksi-akhir")).toBe(akhirAwal);
+  });
+
+  test("kemungkinan langganan: 3 bulan berturut-turut, tombol mengisi form jadwal dari transaksi", async ({ page }, info) => {
+    await masuk(page);
+    const catatan = tagUji(info.project.name, "langganan");
+    const bulan = [-2, -1, 0].map((d) => shiftMonth(currentMonthInJakarta(), d));
+    for (const m of bulan) {
+      await catat(page, { tipe: "expense", nominal: "47123", akun: AKUN.cash, kategori: "Hiburan", tanggal: `${m}-01`, catatan });
+    }
+
+    await page.goto("/insight");
+    const kartu = page.getByRole("region", { name: "Kemungkinan langganan" });
+    const baris = kartu.getByRole("listitem").filter({ hasText: catatan });
+    await expect(baris).toContainText("Rp 47.123");
+    await expect(baris).toContainText("3 bulan berturut-turut");
+
+    await baris.getByRole("link", { name: /Jadikan jadwal berulang/ }).click();
+    await expect(page).toHaveURL(/\/berulang\/baru\?dariTransaksi=[0-9a-f-]{36}$/);
+    await expect(page.getByLabel("Nama")).toHaveValue(catatan.slice(0, 50));
+    await expect(page.getByLabel("Nominal perkiraan")).toHaveValue("47.123");
+    await expect(page.getByLabel("Mulai (jatuh tempo pertama)")).toHaveValue(`${shiftMonth(bulan[2]!, 1)}-01`);
+
+    for (const m of bulan) await hapusTransaksi(page, catatan, m);
   });
 });

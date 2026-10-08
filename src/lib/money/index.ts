@@ -63,3 +63,17 @@ export {
   type ProjectionRule,
   type SafeToSpend,
 } from "./projection";
+export {
+  INSIGHT,
+  categoryChanges,
+  medianAmount,
+  nextMonthlyDate,
+  normalizeNote,
+  percentChange,
+  subscriptionCandidates,
+  unusualExpenses,
+  type CategoryChange,
+  type InsightRow,
+  type SubscriptionCandidate,
+  type UnusualExpense,
+} from "./insight";
