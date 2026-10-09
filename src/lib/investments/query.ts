@@ -1,13 +1,13 @@
 import "server-only";
 
-import { addAmounts, balanceAsOf, investmentStatus, totalBalance, type DatedTransaction, type InvestmentStatus } from "@/lib/money";
+import { addAmounts, investmentLedger, totalBalance, type DatedTransaction, type InvestmentLedger } from "@/lib/money";
 import type { InvestmentKind } from "@/lib/supabase/database.types";
 import { fetchAllPages } from "@/lib/supabase/paginate";
 import type { createClient } from "@/lib/supabase/server";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
-export type InvestmentItem = InvestmentStatus & {
+export type InvestmentItem = InvestmentLedger & {
   id: string;
   name: string;
   kind: InvestmentKind | null;
@@ -35,7 +35,7 @@ export async function loadInvestments(supabase: Supabase) {
 
   const [tx, nilai] = await Promise.all([
     fetchAllPages<DatedTransaction>((from, to) =>
-      supabase.from("transactions").select("account_id, type, amount, occurred_on").in("account_id", ids).order("id").range(from, to),
+      supabase.from("transactions").select("account_id, type, amount, occurred_on, created_at").in("account_id", ids).order("id").range(from, to),
     ),
     fetchAllPages<Valuation>((from, to) =>
       supabase
@@ -55,14 +55,12 @@ export async function loadInvestments(supabase: Supabase) {
 
   const items = accounts.map((a): InvestmentItem => {
     const rows = tx.rows.filter((r) => r.account_id === a.id);
-    const terakhir = nilai.rows.find((v) => v.account_id === a.id) ?? null; // urut terbaru dulu
-    const cost = balanceAsOf(a.opening_balance, rows, "9999-12-31");
-    const status = investmentStatus({
-      cost,
-      lastValuation: terakhir ? { marketValue: terakhir.market_value, costAtValuation: balanceAsOf(a.opening_balance, rows, terakhir.valued_on) } : null,
-    });
+    const milik = nilai.rows.filter((v) => v.account_id === a.id);
+    const terakhir = milik[0] ?? null; // urut terbaru dulu
+    // Aturan naik/turun, beli, jual (harga rata-rata): src/lib/money/investment.ts
+    const ledger = investmentLedger({ openingBalance: a.opening_balance, transactions: rows, valuations: milik });
     return {
-      ...status,
+      ...ledger,
       id: a.id,
       name: a.name,
       kind: a.investment_kind,
@@ -78,7 +76,8 @@ export function investmentTotals(items: InvestmentItem[]) {
   const aktif = items.filter((i) => !i.archived);
   const value = totalBalance(aktif.map((i) => i.value));
   const cost = totalBalance(aktif.map((i) => i.cost));
-  return { value, cost, gain: addAmounts(value, -cost), count: aktif.length };
+  const realized = totalBalance(aktif.map((i) => i.realized));
+  return { value, cost, gain: addAmounts(value, -cost), realized, count: aktif.length };
 }
 
 // Riwayat nilai satu akun investasi (terbaru dulu) untuk halaman detail.

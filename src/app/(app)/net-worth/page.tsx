@@ -85,7 +85,7 @@ export default async function NetWorthPage() {
           <Baris
             key={i.id}
             label={i.name}
-            sub={`Investasi · ${i.gain >= 0 ? "untung" : "rugi"} ${formatRupiah(Math.abs(i.gain))}`}
+            sub={`Investasi · ${i.unrealized >= 0 ? "untung" : "rugi"} ${formatRupiah(Math.abs(i.unrealized))}`}
             value={bertanda(i.value)}
             href={`/akun/${i.id}`}
           />

@@ -14,11 +14,11 @@ export type ValuationFormState = {
   values?: Record<string, string>;
 };
 
-const FIELDS = ["marketValue", "valuedOn", "units", "note"] as const;
+const FIELDS = ["mode", "marketValue", "pricePerUnit", "valuedOn", "units", "note", "returnTo"] as const;
 
-function selesai(accountId: string, status: string): never {
+function selesai(accountId: string, status: string, ke: "akun" | "detail" = "detail"): never {
   for (const p of ["/akun", `/akun/${accountId}`, "/net-worth", "/beranda"]) revalidatePath(p);
-  redirect(`/akun/${accountId}?status=${status}`);
+  redirect(ke === "akun" ? `/akun?status=${status}` : `/akun/${accountId}?status=${status}`);
 }
 
 // Perbarui nilai pasar akun investasi (manual). FK di database memastikan akun milik
@@ -42,7 +42,7 @@ export async function addValuation(accountId: string, _prev: ValuationFormState,
     console.error("[investasi] simpan nilai gagal", { code: error.code });
     return { error: error.code === "23503" ? "Nilai hanya bisa dicatat untuk akun investasi." : "Nilai gagal disimpan. Silakan coba lagi.", values };
   }
-  selesai(accountId, "nilai-disimpan");
+  selesai(accountId, "nilai-disimpan", parsed.data.returnTo);
 }
 
 export async function deleteValuation(accountId: string, valuationId: string) {

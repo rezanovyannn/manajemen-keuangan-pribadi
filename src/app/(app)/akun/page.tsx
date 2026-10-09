@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/page-header";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { accountTypeLabel, isSpendable } from "@/lib/accounts/types";
 import { requireUser } from "@/lib/auth/session";
+import { todayInJakarta } from "@/lib/dates";
 import { InvestmentCard } from "@/components/investments/investment-card";
 import { loadAccountSavings, type AccountSavings } from "@/lib/goals/query";
 import { investmentTotals, loadInvestments } from "@/lib/investments/query";
@@ -24,7 +25,7 @@ const PESAN_GAGAL: Record<string, string> = {
 };
 
 export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
-  const { gagal } = await searchParams;
+  const { gagal, status } = await searchParams;
   const { supabase } = await requireUser();
 
   const { data: accounts, error } = await supabase
@@ -59,6 +60,7 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
         </Link>
       </div>
 
+      <FormAlert tone="success" message={status === "nilai-disimpan" ? "Nilai investasi diperbarui." : undefined} />
       <FormAlert
         tone="error"
         message={
@@ -161,7 +163,7 @@ export default async function AkunPage({ searchParams }: PageProps<"/akun">) {
           <ul className="grid grid-cols-1 items-start gap-3 lg:grid-cols-3">
             {asetAktif.map((i) => (
               <li key={i.id}>
-                <InvestmentCard item={i} />
+                <InvestmentCard item={i} today={todayInJakarta()} />
               </li>
             ))}
           </ul>

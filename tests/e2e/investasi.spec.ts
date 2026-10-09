@@ -30,7 +30,7 @@ test.describe("investasi manual", () => {
     await page.getByRole("button", { name: "Simpan" }).click();
     await expect(page).toHaveURL(/\/akun$/);
     const kartu = page.getByRole("region", { name: "Investasi" }).getByRole("link", { name: new RegExp(`^${nama}`) });
-    await expect(kartu).toContainText("belum pernah diperbarui");
+    await expect(page.getByRole("region", { name: "Investasi" }).getByRole("region", { name: nama })).toContainText("Belum pernah diperbarui");
 
     // Beli Rp 1.000.000 dari BRI (transfer, akun tujuan terisi otomatis).
     await kartu.click();
@@ -47,19 +47,22 @@ test.describe("investasi manual", () => {
     expect(await nominal(page, "/beranda", "dash-saldo")).toBe(saldoAwal - 1_000_000);
     expect(await nominal(page, "/net-worth", "net-worth")).toBe(nwAwal);
 
-    // Perbarui nilai: Rp 1.150.000, 2,5 gram → untung Rp 150.000 (+15,0%).
+    // Perbarui cepat dari halaman Akun: harga 460.000/gram × 2,5 gram = Rp 1.150.000.
     await page.goto("/akun");
-    await page.getByRole("region", { name: "Investasi" }).getByRole("link", { name: new RegExp(`^${nama}`) }).click();
-    await page.getByLabel("Nilai sekarang").fill("1150000");
-    await page.getByLabel("Unit (opsional)").fill("2,5");
-    await page.getByRole("button", { name: "Simpan nilai" }).click();
+    await page.getByRole("button", { name: `Perbarui nilai ${nama}` }).click();
+    const sheet = page.getByRole("dialog", { name: new RegExp(`Perbarui nilai · ${nama}`) });
+    await sheet.getByRole("radio", { name: "Harga × unit" }).click();
+    await sheet.getByLabel("Harga per unit").fill("460.000");
+    await sheet.getByLabel("Jumlah unit").fill("2,5");
+    await expect(sheet.getByText("Nilai sekarang: Rp 1.150.000")).toBeVisible();
+    await sheet.getByRole("button", { name: "Simpan nilai" }).click();
+    await expect(page).toHaveURL(/\/akun\?status=nilai-disimpan$/);
     await expect(page.getByText("Nilai investasi diperbarui.")).toBeVisible();
-    const detail = page.getByRole("region", { name: nama });
-    await expect(detail.getByTestId("investasi-nilai")).toHaveText("Rp 1.150.000");
-    await expect(detail.getByTestId("investasi-untung")).toHaveText("+Rp 150.000(+15,0%)");
-    await expect(detail).toContainText("2,5 unit");
-    await expect(detail).toContainText("Modal Rp 1.000.000");
-    await expect(page.getByRole("region", { name: "Riwayat nilai" }).getByRole("listitem")).toHaveCount(1);
+    const kartuAkun = page.getByRole("region", { name: "Investasi" }).getByRole("region", { name: nama });
+    await expect(kartuAkun.getByTestId("investasi-nilai")).toHaveText("Rp 1.150.000");
+    await expect(kartuAkun.getByTestId("investasi-perubahan")).toContainText("Naik Rp 150.000 (+15,0%)");
+    await expect(kartuAkun.getByTestId("investasi-untung")).toHaveText("+Rp 150.000 (+15,0%)");
+    await expect(kartuAkun).toContainText("2,5 unit");
 
     // Net worth naik sebesar untung; investasi tidak muncul di catat kilat.
     expect(await nominal(page, "/net-worth", "net-worth")).toBe(nwAwal + 150_000);
@@ -70,8 +73,29 @@ test.describe("investasi manual", () => {
     await expect(panel.getByRole("region", { name: "Akun" }).getByRole("button", { name: nama })).toHaveCount(0);
     await page.keyboard.press("Escape");
 
-    // Bersihkan: hapus transfer (akun uji E2E dihapus global-teardown beserta riwayat nilainya).
-    await hapusTransaksi(page, catatan);
+    // Jual separuh nilai (Rp 575.000) ke BRI: modal turun proporsional → untung terealisasi Rp 75.000.
+    await page.goto("/akun");
+    await page.getByRole("region", { name: "Investasi" }).getByRole("link", { name: new RegExp(`^${nama}`) }).click();
+    await page.getByRole("link", { name: "Jual" }).click();
+    await page.getByLabel("Nominal").fill("575000");
+    await page.getByLabel("Ke akun").selectOption({ label: AKUN.bri });
+    await page.getByLabel("Catatan (opsional)").fill(`${nama} jual`);
+    await page.getByRole("button", { name: "Simpan", exact: true }).click();
+    await expect(page).toHaveURL(/tersimpan=1/);
+
+    await page.goto("/akun");
+    const setelahJual = page.getByRole("region", { name: "Investasi" }).getByRole("region", { name: nama });
+    await expect(setelahJual.getByTestId("investasi-nilai")).toHaveText("Rp 575.000");
+    await expect(setelahJual).toContainText("Modal");
+    await expect(setelahJual).toContainText("Rp 500.000");
+    await expect(setelahJual.getByTestId("investasi-untung")).toHaveText("+Rp 75.000 (+15,0%)");
+    await expect(setelahJual.getByTestId("investasi-terealisasi")).toContainText("Untung terealisasi dari penjualan: +Rp 75.000");
+    expect(await saldoAkun(page, AKUN.bri)).toBe(briAwal - 1_000_000 + 575_000);
+    // Jual = transfer: net worth tidak berubah karena penjualan.
+    expect(await nominal(page, "/net-worth", "net-worth")).toBe(nwAwal + 150_000);
+
+    // Bersihkan: hapus transfer beli & jual (akun uji E2E dihapus global-teardown beserta riwayat nilainya).
+    await hapusTransaksi(page, nama);
     expect(await saldoAkun(page, AKUN.bri)).toBe(briAwal);
   });
 });

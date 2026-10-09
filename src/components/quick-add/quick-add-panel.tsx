@@ -292,7 +292,7 @@ export function QuickAddPanel({
         Form lengkap (transfer, biaya admin)
       </Link>
       {/* Tombol simpan menempel di bawah panel agar tidak perlu menggulir. */}
-      <div className="sticky -bottom-[calc(1rem+env(safe-area-inset-bottom))] z-10 -mx-4 border-t border-border bg-popover px-4 pt-3 pb-[calc(0.25rem+env(safe-area-inset-bottom))]">
+      <div className="sticky -bottom-[calc(1rem+env(safe-area-inset-bottom))] z-10 border-t border-border bg-popover pt-3 pb-[calc(0.25rem+env(safe-area-inset-bottom))]">
         <Button type="button" size="lg" className="h-12 w-full text-base" disabled={!siap || pending} onClick={simpan}>
           {pending ? "Menyimpan..." : nominal > 0 ? `Simpan ${formatRupiah(nominal)}` : "Simpan"}
         </Button>

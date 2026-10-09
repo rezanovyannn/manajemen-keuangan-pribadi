@@ -8,6 +8,7 @@ import { addValuation } from "@/actions/investments";
 import { AccountForm } from "@/components/accounts/account-form";
 import { FormAlert } from "@/components/auth/form-field";
 import { InvestmentCard } from "@/components/investments/investment-card";
+import { ValuationChart } from "@/components/investments/valuation-chart";
 import { ValuationForm } from "@/components/investments/valuation-form";
 import { ValuationHistory } from "@/components/investments/valuation-history";
 import { PageHeader } from "@/components/page-header";
@@ -52,7 +53,8 @@ export default async function AkunPage({ params, searchParams }: PageProps<"/aku
       {investasi && (
         <div className="grid gap-4">
           <PageHeader title={account.name} description="Beli & jual lewat transfer; nilai pasar diperbarui manual." />
-          {item && <InvestmentCard item={item} asLink={false} />}
+          {item && <InvestmentCard item={item} today={todayInJakarta()} asLink={false} />}
+          {item && <ValuationChart data={item.history.map((h) => ({ date: h.date, value: h.value }))} />}
           <div className="grid grid-cols-2 gap-2">
             {/* Beli = transfer dari rekening ke akun ini; Jual = transfer dari akun ini ke rekening. */}
             <Link href={`/transaksi/baru?tipe=transfer&ke=${account.id}`} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 md:h-10")}>
@@ -68,9 +70,10 @@ export default async function AkunPage({ params, searchParams }: PageProps<"/aku
             <h2 id="judul-nilai" className="font-semibold">
               Perbarui nilai
             </h2>
-            <ValuationForm action={addValuation.bind(null, account.id)} today={todayInJakarta()} />
+            <ValuationForm action={addValuation.bind(null, account.id)} today={todayInJakarta()} lastUnits={item?.units ?? null} />
           </section>
-          <ValuationHistory accountId={account.id} rows={riwayat?.rows ?? []} />
+          {/* Riwayat terbaru dulu; perubahan dari buku besar (urut sama, dibalik). */}
+          <ValuationHistory accountId={account.id} rows={riwayat?.rows ?? []} changes={[...(item?.history ?? [])].reverse()} />
         </div>
       )}
 

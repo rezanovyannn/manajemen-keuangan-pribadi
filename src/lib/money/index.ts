@@ -91,7 +91,11 @@ export {
 export {
   balanceAsOf,
   formatGainPercent,
-  investmentStatus,
+  investmentLedger,
+  multiplyPriceUnits,
+  parseDecimal,
   type DatedTransaction,
-  type InvestmentStatus,
+  type InvestmentLedger,
+  type Valuation,
+  type ValuationPoint,
 } from "./investment";

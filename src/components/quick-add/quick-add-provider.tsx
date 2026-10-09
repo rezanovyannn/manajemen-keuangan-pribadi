@@ -102,7 +102,7 @@ export function QuickAddProvider({ children }: { children: React.ReactNode }) {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
           side="bottom"
-          className="max-h-[92dvh] gap-4 overflow-y-auto rounded-t-2xl px-4 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:mx-auto sm:max-w-lg md:bottom-6 md:rounded-2xl"
+          className="max-h-[92dvh] gap-4 overflow-x-hidden overflow-y-auto rounded-t-2xl px-4 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:mx-auto sm:max-w-lg md:bottom-6 md:rounded-2xl"
         >
           <span aria-hidden className="mx-auto h-1 w-10 shrink-0 rounded-full bg-muted-foreground/30" />
           <div className="grid gap-0.5">

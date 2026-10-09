@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import { isValidDateString } from "@/lib/dates";
 
+import { multiplyPriceUnits } from "@/lib/money";
+
 import { rupiahInput } from "./money";
 
 // Unit (gram, lembar, unit reksadana, koin) bukan uang: boleh desimal, koma atau titik
@@ -21,16 +23,39 @@ export const unitsInput = z
     return pecahan ? `${bulat}.${pecahan}` : bulat;
   });
 
-export const valuationSchema = z.object({
-  marketValue: rupiahInput({ min: 0, label: "Nilai sekarang" }),
-  valuedOn: z.string().trim().refine(isValidDateString, "Tanggal tidak valid."),
-  units: unitsInput,
-  note: z
-    .string()
-    .trim()
-    .max(200, "Catatan maksimal 200 karakter.")
-    .transform((v) => (v === "" ? null : v)),
-});
+// Perbarui nilai: isi nilai total, ATAU harga per unit × unit (NAB × unit, harga/gram × gram).
+export const valuationSchema = z
+  .object({
+    mode: z.enum(["total", "harga"]).catch("total"),
+    marketValue: z.string(),
+    pricePerUnit: z.string(),
+    units: unitsInput,
+    valuedOn: z.string().trim().refine(isValidDateString, "Tanggal tidak valid."),
+    note: z
+      .string()
+      .trim()
+      .max(200, "Catatan maksimal 200 karakter.")
+      .transform((v) => (v === "" ? null : v)),
+    // Setelah simpan: kembali ke halaman Akun (perbarui cepat) atau detail akun.
+    returnTo: z.enum(["akun", "detail"]).catch("detail"),
+  })
+  .transform((v, ctx) => {
+    let marketValue: number | null = null;
+    if (v.mode === "total") {
+      const r = rupiahInput({ min: 0, label: "Nilai sekarang" }).safeParse(v.marketValue);
+      if (!r.success) ctx.addIssue({ code: "custom", path: ["marketValue"], message: r.error.issues[0]?.message ?? "Nilai tidak valid." });
+      else marketValue = r.data;
+    } else {
+      if (!v.units) ctx.addIssue({ code: "custom", path: ["units"], message: "Isi jumlah unit." });
+      const total = v.units ? multiplyPriceUnits(v.pricePerUnit, v.units) : null;
+      if (v.pricePerUnit.trim() === "" || (v.units && total === null)) {
+        ctx.addIssue({ code: "custom", path: ["pricePerUnit"], message: "Harga per unit harus angka, contoh 1.523,45." });
+      }
+      marketValue = total;
+    }
+    if (marketValue === null) return z.NEVER;
+    return { marketValue, units: v.units, valuedOn: v.valuedOn, note: v.note, returnTo: v.returnTo };
+  });
 
 // "2.5" → "2,5" untuk tampilan.
 export const formatUnits = (u: string | null) => (u === null ? null : u.replace(".", ","));
