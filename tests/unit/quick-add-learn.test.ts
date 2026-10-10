@@ -53,6 +53,20 @@ describe("guessCategory", () => {
     expect(guessCategory("kantor", "expense", model)).toBe("transport");
   });
 
+  it("kata umum yang muncul di banyak kategori kalah dari kata khas", () => {
+    const m = buildCategoryModel([
+      row({ note: "beli kopi", category_id: "makan" }),
+      row({ note: "toko kopi", category_id: "makan" }),
+      row({ note: "toko sabun", category_id: "belanja" }),
+      row({ note: "toko baju", category_id: "belanja" }),
+      row({ note: "toko buku", category_id: "pendidikan" }),
+      row({ note: "toko grab", category_id: "transport" }),
+      row({ note: "grab", category_id: "transport" }),
+    ]);
+    // "toko" ada di 4 kategori (lemah); "grab" khas Transportasi.
+    expect(guessCategory("toko grab bandara", "expense", m)).toBe("transport");
+  });
+
   it("awalan kata sebagai cadangan; tidak dikenal → null", () => {
     expect(guessCategory("gojekk", "expense", model)).toBe("transport");
     expect(guessCategory("parkir", "expense", model)).toBeNull();

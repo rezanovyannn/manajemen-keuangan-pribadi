@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { parseRupiah } from "../../src/lib/money/rupiah";
-import { AKUN, hapusTransaksi, masuk, saldoAkun, skipTanpaAkunUji, tagUji } from "./helpers";
+import { AKUN, catat, hapusTransaksi, masuk, saldoAkun, skipTanpaAkunUji, tagUji } from "./helpers";
 
 async function nominal(page: Page, path: string, testId: string) {
   await page.goto(path);
@@ -19,6 +19,9 @@ test.describe("investasi manual", () => {
     const nama = tagUji(info.project.name, "Emas");
     const catatan = `${nama} beli`;
 
+    // Dana uji di BRI agar cukup untuk beli (dihapus di akhir bersama transfer).
+    const briSebelumDana = await saldoAkun(page, AKUN.bri);
+    await catat(page, { tipe: "income", nominal: "2000000", akun: AKUN.bri, kategori: "Bonus", catatan: `${nama} dana` });
     const briAwal = await saldoAkun(page, AKUN.bri);
     const saldoAwal = await nominal(page, "/beranda", "dash-saldo");
     const nwAwal = await nominal(page, "/net-worth", "net-worth");
@@ -96,6 +99,6 @@ test.describe("investasi manual", () => {
 
     // Bersihkan: hapus transfer beli & jual (akun uji E2E dihapus global-teardown beserta riwayat nilainya).
     await hapusTransaksi(page, nama);
-    expect(await saldoAkun(page, AKUN.bri)).toBe(briAwal);
+    expect(await saldoAkun(page, AKUN.bri)).toBe(briSebelumDana);
   });
 });

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { masuk, skipTanpaAkunUji, tagUji } from "./helpers";
+import { AKUN, catat, hapusTransaksi, masuk, skipTanpaAkunUji, tagUji } from "./helpers";
 import { bacaProfilUji, ubahProfilUji } from "./support/profil-uji";
 
 // Pilih opsi <select> berdasarkan awal teks label (label berisi saldo, mis. "E2E ... · bebas Rp 150.000").
@@ -108,20 +108,24 @@ test.describe("onboarding", () => {
     await expect(kartu).toContainText("Rp 50.000 dari Rp 1.000.000");
   });
 
-  test("checklist 'Mulai di sini' tampil dari data dan bisa ditutup", async ({ page }) => {
+  test("checklist 'Mulai di sini' tampil dari data dan bisa ditutup", async ({ page }, info) => {
     await masuk(page);
+    // Data sendiri: satu transaksi uji (tidak bergantung isi akun uji).
+    const catatan = tagUji(info.project.name, "checklist");
+    await catat(page, { tipe: "expense", nominal: "1000", akun: AKUN.cash, kategori: "Lainnya", catatan });
     await ubahProfilUji({ checklist_dismissed_at: null });
     await page.goto("/beranda");
     const kartu = page.getByRole("region", { name: "Mulai di sini" });
     await expect(kartu).toBeVisible();
-    // Akun uji sudah punya akun, transaksi, budget, jadwal, dan tujuan.
+    await expect(kartu.getByRole("link", { name: /Tambah akun atau dompet pertama \(selesai\)/ })).toBeVisible();
     await expect(kartu.getByRole("link", { name: /Catat transaksi pertama \(selesai\)/ })).toBeVisible();
     await expect(kartu.getByRole("link", { name: /Pasang aplikasi di HP \(belum\)/ })).toBeVisible();
-    await expect(kartu).toContainText("5 dari 6 selesai");
+    await expect(kartu).toContainText(/[2-5] dari 6 selesai/);
 
     await kartu.getByRole("button", { name: "Tutup checklist" }).click();
     await expect(kartu).toHaveCount(0);
     await page.reload();
     await expect(page.getByRole("region", { name: "Mulai di sini" })).toHaveCount(0);
+    await hapusTransaksi(page, catatan);
   });
 });

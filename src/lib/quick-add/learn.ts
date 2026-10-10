@@ -51,15 +51,17 @@ const total = (m: Map<string, number>) => [...m.values()].reduce((s, n) => s + n
 
 // Tebakan kategori untuk catatan; null jika tidak ada kata yang dikenali.
 // Kata cocok persis diutamakan; awalan (mis. "gojek" untuk "gojekk") sebagai cadangan.
+// Kata yang muncul di banyak kategori (kurang khas) diberi bobot lebih kecil: n / jumlah kategori.
 export function guessCategory(note: string, type: HistoryRow["type"], model: CategoryModel): string | null {
   const skor = new Map<string, number>();
   for (const t of tokens(note)) {
     const persis = model[t];
     const sumber = persis ? [persis] : Object.entries(model).filter(([k]) => t.length >= 4 && (k.startsWith(t) || t.startsWith(k))).map(([, v]) => v);
     for (const m of sumber) {
-      for (const [k, n] of Object.entries(m)) {
-        const [tipe, id] = k.split(":") as [string, string];
-        if (tipe === type) skor.set(id, (skor.get(id) ?? 0) + n * (persis ? 2 : 1));
+      const cocok = Object.entries(m).filter(([k]) => k.startsWith(`${type}:`));
+      for (const [k, n] of cocok) {
+        const id = k.slice(type.length + 1);
+        skor.set(id, (skor.get(id) ?? 0) + ((persis ? 2 : 1) * n) / cocok.length);
       }
     }
   }
